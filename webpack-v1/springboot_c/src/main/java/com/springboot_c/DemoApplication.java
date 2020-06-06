@@ -1,4 +1,4 @@
-package com.springboot_c.demo;
+package com.springboot_c;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
