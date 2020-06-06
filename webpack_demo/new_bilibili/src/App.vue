@@ -1,28 +1,30 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <!-- 此处添加keep-alive :目的就是为了防止 过度的销毁、创建。 -->
+       <!-- 注意：有一个问题就是detail 属性时，根据id 点开不同的属性和页面，就不要keepalive。
+          此处 ，就得需要一个 新属性，排除属性：exclude='Detail';
+        -->
+    <keep-alive exclude="Detail_item">
+      <router-view></router-view>
+    </keep-alive>
+
+<!--    <nav-bar></nav-bar>-->
+    <tabBar-views></tabBar-views>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import MainTabBar from 'components/content/mainTabBar/MainTabBar'
 export default {
-  name: 'App',
+  slot: 'App',
   components: {
-    HelloWorld
+  	'tabBar-views':MainTabBar,
+  //  MainTabBar
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  @import "assets/css/base.css";
+
 </style>
