@@ -29,7 +29,6 @@ import java.util.Map;
 /**
  * 基础配置-节点管理-当前系统：切换当前节点组
  * <p>
- * Created by huangzbb on 2017/11/2.
  */
 @Log4j2
 @RestController
@@ -54,9 +53,8 @@ public class FtNodeGroupController{
         nameNodeType = cfg.getNameNodeType();
     }
 
-//    @RequiresPermissions("servicenode:ftServiceNodeSet:view")
     @RequestMapping(value = "nodeList")
-    public Object nodeList(HttpServletRequest request, HttpServletResponse response) {
+    public Object nodeList(HttpServletRequest request) {
 
         nameNodeIP = cfg.getNameNodeIP();
         nameNodePort = cfg.getNameNodePort();
@@ -100,9 +98,8 @@ public class FtNodeGroupController{
         return ResultDtoTool.buildSucceed(message,resultMap);
     }
 
-    @RequiresPermissions("servicenode:ftServiceNodeSet:view")
     @RequestMapping(value = "set")
-    public String set(FtServiceNode ftServiceNode, FtSysInfo ftSysInfo, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
+    public Object set(FtServiceNode ftServiceNode, FtSysInfo ftSysInfo, HttpServletRequest request) {
 
         nameNodeIP = cfg.getNameNodeIP();
         nameNodePort = cfg.getNameNodePort();
@@ -122,16 +119,19 @@ public class FtNodeGroupController{
             ftServiceNode.setCmdPort(this.nameNodePort);
             ftServiceNode.setType(nameNodeType);
         }
+        Map<String,Object> result = new HashMap<>();
         if (!((null == ftServiceNode.getSystemName()) || "".equals(ftServiceNode.getSystemName()))) {
-            model.addAttribute("message", "设置成功");
+            result.put("message", "设置成功");
         } else {
-            model.addAttribute("ftServiceNode", ftServiceNode);
-            return "modules/servicenode/ftServiceNodeSet";
+            result.put("ftServiceNode",ftServiceNode);
+            return  ResultDtoTool.buildSucceed(result);
         }
         ftSysInfo.setName(ftServiceNode.getSystemName());
         request.getSession().setAttribute("ftSysInfo", ftSysInfo);
         request.getSession().setAttribute("ftServiceNode", ftServiceNode);
-        model.addAttribute("ftServiceNode", ftServiceNode);
+
+        result.put("ftServiceNode", ftServiceNode);
+
         FtServiceNode ftServiceNodeNameNode = (FtServiceNode) request.getSession().getAttribute("ftServiceNodeNameNode");
         if (ftServiceNodeNameNode == null) {
             request.getSession().setAttribute("ftServiceNodeNameNode", ftServiceNode);
@@ -141,10 +141,10 @@ public class FtNodeGroupController{
         CurrNameNodeHelper.setCurrSysname(request, ftServiceNode.getSystemName());
         OptTag optTag = (OptTag) CacheUtils.get("tag_type");
         if(optTag==null){
-            model.addAttribute("tagMsg","当前未设置操作标签");
+            result.put("tagMsg","当前未设置操作标签");
         }else{
-            model.addAttribute("tagMsg","当前操作标签: "+optTag.getName());
+            result.put("tagMsg","当前操作标签: "+optTag.getName());
         }
-        return "modules/servicenode/ftServiceNodeSet";
+        return ResultDtoTool.buildSucceed(result);
     }
 }

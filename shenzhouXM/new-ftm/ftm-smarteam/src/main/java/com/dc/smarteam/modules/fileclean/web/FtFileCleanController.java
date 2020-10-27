@@ -24,6 +24,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,13 +53,13 @@ public class FtFileCleanController extends BaseController {
     @Resource
     private CfgZkService cfgZkService;
 
-    @RequestMapping(value = "list", produces="application/json;charset=UTF-8")
+    @GetMapping(value = "/list")
     public Object list(FtFileClean ftFileClean, HttpServletRequest request, HttpServletResponse response,  Map map) throws Exception {
 
-       /* FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
+        FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
-            //return  PublicRepResultTool.sendResult("9999","请先设置节点组！！！",null);
-        }*/
+            return   ResultDtoTool.buildError("请先设置节点组！！！");
+        }
 
         ResultDto<List<FileCleanModel.FileClean>> resultDto = fileCleanService.listAll();
         List<FtFileClean> list = new ArrayList<FtFileClean>();
@@ -72,8 +73,7 @@ public class FtFileCleanController extends BaseController {
                 CfgModelConverter.convertTo(fileClean, ftFileClean2);
                 list.add(ftFileClean2);
             }
-
-            for (FtFileClean ffc : list) {  //ftServiceNode.getSystemName()
+            for (FtFileClean ffc : list) {
                 if (ffc.getSystem() != null && ffc.getSystem().equalsIgnoreCase("comm001")) {
                     listTemp.add(ffc);
                 }
@@ -101,11 +101,11 @@ public class FtFileCleanController extends BaseController {
                 list2 = listTemp;
             }
         } else {
-            return  PublicRepResultTool.sendResult("9999",resultDto.getMessage(),null);
+            return ResultDtoTool.buildError(resultDto.getMessage());
         }
-
         PageHelper.getInstance().getPage(ftFileClean.getClass(), request, response, map, list2);
-        return  PublicRepResultTool.sendResult("0000","成功",list2);
+        return  ResultDtoTool.buildSucceed(list2);
+
     }
 
 
@@ -128,11 +128,12 @@ public class FtFileCleanController extends BaseController {
                     }
                 }
             } else {
-                return  PublicRepResultTool.sendResult("0000",resultDto.getMessage(),null);
+
+                return   ResultDtoTool.buildError(resultDto.getMessage());
             }
         }
         resMap.put("ftFileClean", ftFileClean);
-        return   PublicRepResultTool.sendResult("0000","成功",resMap);
+        return    ResultDtoTool.buildSucceed(resMap);
     }
 
 
@@ -165,7 +166,7 @@ public class FtFileCleanController extends BaseController {
         } else {
             message =resultDto.getMessage();
         }
-        return   PublicRepResultTool.sendResult("0000",message,null);
+        return  ResultDtoTool.buildSucceed(message);
     }
 
     @RequestMapping(value = "delete", produces="application/json;charset=UTF-8")
@@ -178,7 +179,7 @@ public class FtFileCleanController extends BaseController {
         } else {
             msg =resultDto.getMessage();
         }
-        return  PublicRepResultTool.sendResult("0000",msg ,null);
+        return  ResultDtoTool.buildSucceed(msg);
     }
 
     /**
@@ -211,7 +212,7 @@ public class FtFileCleanController extends BaseController {
                 }
             }
         }
-        return  PublicRepResultTool.sendResult("0000",message,null);
+        return   ResultDtoTool.buildSucceed(message);
     }
 
     /**
@@ -245,7 +246,7 @@ public class FtFileCleanController extends BaseController {
                 }
             }
         }
-        return  PublicRepResultTool.sendResult("0000",ms,null);
+        return   ResultDtoTool.buildSucceed(ms);
     }
 
 
@@ -259,8 +260,8 @@ public class FtFileCleanController extends BaseController {
     public Object otherConf( HttpServletRequest request, Model model) {
         String getAllStr = MessageFactory.getInstance().fileClean(new FtFileClean(), "print");//生成查询报文
         FtServiceNodeHelper.getOtherConf(request, model, getAllStr);
+        return  ResultDtoTool.buildSucceed(getAllStr);
 
-        return  PublicRepResultTool.sendResult("0000","",getAllStr);
     }
 
     @RequestMapping(value = "confComp", produces="application/json;charset=UTF-8")

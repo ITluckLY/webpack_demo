@@ -1,5 +1,6 @@
 package com.dc.smarteam.modules.file.web;
 
+import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.msggenerator.MessageFactory;
 import com.dc.smarteam.common.web.BaseController;
 import com.dc.smarteam.common.zk.ZkService;
@@ -25,9 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by huangzbb on 2016/12/2.
- */
+
 @Log4j2
 @RestController
 @RequestMapping(value = "${adminPath}/file/ftFileRollback")
@@ -39,7 +38,7 @@ public class FtFileRollbackController extends BaseController {
     private FtFileRollbackLogService ftFileRollbackService;
 
     @GetMapping(value = "/rollback")
-    public List<FtFileSend> rollback(FtFileSend ftFileSend, Model model) {
+    public Object rollback(FtFileSend ftFileSend) {
         List<FtFileSend> sendNodeList = new ArrayList<FtFileSend>();
         Map<String, JsonObject> monitorNodeMap = ZkService.getInstance().getMonitorNodeMap();
         for (String mnIpPort : monitorNodeMap.keySet()) {
@@ -53,14 +52,11 @@ public class FtFileRollbackController extends BaseController {
             ftFileSendTemp.setMonitorNodePort(Integer.parseInt(split[1]));
             sendNodeList.add(ftFileSendTemp);
         }
-
-        return sendNodeList;
+        return  ResultDtoTool.buildSucceed(sendNodeList);
     }
 
-    @RequiresPermissions("file:ftFileRollback:view")
-    @RequestMapping(value = "bakFile")
-    @ResponseBody
-    public List<FtFileUploadLog> bakFile(String dataNodeName) {
+    @GetMapping(value = "/bakFile")
+    public Object bakFile(String dataNodeName) {
         List<FtFileUploadLog> bakFileList = new ArrayList<>();
         FtFileUploadLog ftFileUploadLogTemp = new FtFileUploadLog();
         List<FtFileUploadLog> fileUploadLogList = ftFileUploadLogService.findAll(ftFileUploadLogTemp);
@@ -71,7 +67,7 @@ public class FtFileRollbackController extends BaseController {
                 bakFileList.add(ftFileUploadLog);
             }
         }
-        return bakFileList;
+        return  ResultDtoTool.buildSucceed(bakFileList);
     }
 
     @PostMapping(value = "/send")
@@ -79,11 +75,11 @@ public class FtFileRollbackController extends BaseController {
 
         String dataNodeName = ftFileSend.getDataNodeName();
         if (dataNodeName == null || "0".equals(dataNodeName)) {
-            return PublicRepResultTool.sendResult("9999","未选择数据节点","");
+            return ResultDtoTool.buildError("未选择数据节点");
         }
         String bakFileName = ftFileSend.getBakFileName();
         if (bakFileName == null || "null".equalsIgnoreCase(bakFileName)) {
-            return PublicRepResultTool.sendResult("9999","未选择备份文件","");
+            return  ResultDtoTool.buildError("未选择备份文件");
         }
         String monitorIp = null;
         String monitorPort = null;
@@ -102,12 +98,9 @@ public class FtFileRollbackController extends BaseController {
         ftServiceNode.setIpAddress(monitorIp);
         ftServiceNode.setCmdPort(monitorPort);
         String str = MessageFactory.getInstance().dataNodeRollback(bakFileName, "rollback");
-
         FtRollbackThread ftRollbackThread = new FtRollbackThread(str, ftServiceNode, dataNodeName, bakFileName, ftFileRollbackService);
-
         new Thread(ftRollbackThread).start();
-
-        return PublicRepResultTool.sendResult("0000","版本回滚中，请稍后查看回滚历史记录","");
+        return ResultDtoTool.buildSucceed("版本回滚中，请稍后查看回滚历史记录");
     }
 
     /**
@@ -144,8 +137,9 @@ public class FtFileRollbackController extends BaseController {
                 log.debug("查询的版本回滚历史记录列表: " + resultMap);
             }
         } catch (Exception e) {
-            return PublicRepResultTool.sendResult("9999","查询信息失败！详情：" + e.getMessage(),"");
+
+            return ResultDtoTool.buildError("查询信息失败！详情：" + e.getMessage());
         }
-        return PublicRepResultTool.sendResult("0000","成功",resultMap);
+        return ResultDtoTool.buildSucceed("成功",resultMap);
     }
 }

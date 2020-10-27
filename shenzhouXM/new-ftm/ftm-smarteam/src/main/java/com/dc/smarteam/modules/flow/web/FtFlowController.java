@@ -23,6 +23,7 @@ import com.dc.smarteam.service.FlowService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -31,167 +32,162 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流程管理Controller
- *
- * @author liwang
- * @version 2016-01-12
  */
 @Controller
 @RequestMapping(value = "${adminPath}/flow/ftFlow")
 public class FtFlowController extends BaseController {
 
-    @Resource
-    private FlowService flowService;
-    @Resource
-    private ComponentService componentService;
+  @Resource
+  private FlowService flowService;
+  @Resource
+  private ComponentService componentService;
 
-    @RequiresPermissions("flow:ftFlow:view")
-    @RequestMapping(value = {"list", ""})
-    public String list(FtFlow ftFlow, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {//NOSONAR
+  @GetMapping(value = "/list")
+  public Object list(FtFlow ftFlow, HttpServletRequest request, HttpServletResponse response, Map map) {
 
-        FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
-        if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
-        }
-        ftFlow.setSystemName(ftServiceNode.getSystemName());
+    FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
+    if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
+      return ResultDtoTool.buildError("请先设置节点组！！！");
+    }
+    ftFlow.setSystemName(ftServiceNode.getSystemName());
 
-        ResultDto<List<FlowModel.Flow>> resultDto = flowService.listAll();
-        List<FtFlow> list = new ArrayList<>();
-        if (ResultDtoTool.isSuccess(resultDto)) {
-            List<FlowModel.Flow> flows = resultDto.getData();
-            for (FlowModel.Flow flow : flows) {
-                //按查询条件筛选
-                String flowSysname = flow.getSysname().replaceAll("\n", "").trim();
-                flow.setSysname(flowSysname);
-                if (!"*".equals(flowSysname) && !StringUtils.equalsIgnoreCase(flowSysname, ftFlow.getSystemName())) continue;
-                if (StringUtils.isNoneEmpty(ftFlow.getName()) && !StringUtils.containsIgnoreCase(flow.getName(), ftFlow.getName())) continue;
-                if (StringUtils.isNoneEmpty(ftFlow.getDes()) && !StringUtils.containsIgnoreCase(flow.getDescribe(), ftFlow.getDes())) continue;
-                FtFlow ftFlow2 = new FtFlow();
-                CfgModelConverter.convertTo(flow, ftFlow2);
-                ftFlow2.setId(String.valueOf(list.size()));
-                list.add(ftFlow2);
-            }
-        } else {
-            String data = resultDto.getMessage();
-            addMessage(redirectAttributes, data);
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
+    ResultDto<List<FlowModel.Flow>> resultDto = flowService.listAll();
+    List<FtFlow> list = new ArrayList<>();
+    if (ResultDtoTool.isSuccess(resultDto)) {
+      List<FlowModel.Flow> flows = resultDto.getData();
+      for (FlowModel.Flow flow : flows) {
+        //按查询条件筛选
+        String flowSysname = flow.getSysname().replaceAll("\n", "").trim();
+        flow.setSysname(flowSysname);
+        if (!"*".equals(flowSysname) && !StringUtils.equalsIgnoreCase(flowSysname, ftFlow.getSystemName())) continue;
+        if (StringUtils.isNoneEmpty(ftFlow.getName()) && !StringUtils.containsIgnoreCase(flow.getName(), ftFlow.getName()))
+          continue;
+        if (StringUtils.isNoneEmpty(ftFlow.getDes()) && !StringUtils.containsIgnoreCase(flow.getDescribe(), ftFlow.getDes()))
+          continue;
+        FtFlow ftFlow2 = new FtFlow();
+        CfgModelConverter.convertTo(flow, ftFlow2);
+        ftFlow2.setId(String.valueOf(list.size()));
+        list.add(ftFlow2);
+      }
+    } else {
+      return ResultDtoTool.buildError(resultDto.getMessage());
 
-        }
-        PageHelper.getInstance().getPage(ftFlow.getClass(), request, response, model, list);
-        return "modules/flow/ftFlowList";
+    }
+    PageHelper.getInstance().getPage(ftFlow.getClass(), request, response, map, list);
+    return ResultDtoTool.buildSucceed(list);
+
+  }
+
+  @RequestMapping(value = "form")
+  public Object form(FtFlow ftFlow) {
+
+    if (StringUtils.isEmpty(ftFlow.getName())) {
+      return ResultDtoTool.buildError("请先添加名称！！！");
     }
 
-    @RequiresPermissions("flow:ftFlow:view")
-    @RequestMapping(value = "form")
-    public String form(FtFlow ftFlow, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    Map<String, Object> resultmap = new HashMap<>();
+    FtFlow entity = new FtFlow();
+    ResultDto<FlowModel.Flow> resultDto = flowService.selByName(ftFlow);
+    if (ResultDtoTool.isSuccess(resultDto)) {
+      FlowModel.Flow flow = resultDto.getData();
+      CfgModelConverter.convertTo(flow, entity);
+      entity.setId("1");
+    } else {
+      return ResultDtoTool.buildError(resultDto.getMessage());
+    }
+    resultmap.put("ftFlow", entity);
+    return ResultDtoTool.buildSucceed(resultmap);
+  }
 
-        if (StringUtils.isEmpty(ftFlow.getName())) {
-            return "modules/flow/ftFlowForm";
-        }
+  @RequestMapping(value = "save")
+  public Object save(FtFlow ftFlow, HttpServletRequest request) {
 
-        FtFlow entity = new FtFlow();
-        ResultDto<FlowModel.Flow> resultDto = flowService.selByName(ftFlow);
-        if (ResultDtoTool.isSuccess(resultDto)) {
-            FlowModel.Flow flow = resultDto.getData();
-            CfgModelConverter.convertTo(flow, entity);
-            entity.setId("1");
-        } else {
-            String data = resultDto.getMessage();
-            addMessage(redirectAttributes, data);
-            return "redirect:" + Global.getAdminPath() + "/flow/ftFlow/?repage";
-        }
-        model.addAttribute("ftFlow", entity);
-        return "modules/flow/ftFlowEditForm";
+    FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
+    if (ftServiceNode == null) {
+      return ResultDtoTool.buildError("请先设置节点组！！！");
+    }
+    ftFlow.setSystemName("*".equals(ftFlow.getSystemName()) ? "*" : ftServiceNode.getSystemName());
+    ResultDto<String> resultDto;
+    if (StringUtils.isEmpty(ftFlow.getId())) {
+      resultDto = flowService.add(ftFlow);
+    } else {
+      resultDto = flowService.update(ftFlow);
+    }
+    String mes = "";
+    if (ResultDtoTool.isSuccess(resultDto)) {
+        mes ="保存流程管理成功";
+    } else {
+        mes =resultDto.getMessage();
+    }
+      return  ResultDtoTool.buildSucceed(mes);
+  }
+
+  @RequestMapping(value = "delete")
+  public Object delete(FtFlow ftFlow, HttpServletRequest request) {
+    FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
+    if (ftServiceNode == null) {
+      return  ResultDtoTool.buildError("请先选择数据！！！");
     }
 
-    @RequiresPermissions("flow:ftFlow:edit")
-    @RequestMapping(value = "save")
-    public String save(FtFlow ftFlow, HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) {
-
-        FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
-        if (ftServiceNode == null) {
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
-        }
-        ftFlow.setSystemName("*".equals(ftFlow.getSystemName()) ? "*" : ftServiceNode.getSystemName());
-        ResultDto<String> resultDto;
-        if (StringUtils.isEmpty(ftFlow.getId())) {
-            resultDto = flowService.add(ftFlow);
-        } else {
-            resultDto = flowService.update(ftFlow);
-        }
-        if (ResultDtoTool.isSuccess(resultDto)) {
-            addMessage(redirectAttributes, "保存流程管理成功");
-        } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
-        }
-        return "redirect:" + Global.getAdminPath() + "/flow/ftFlow/?repage";
+    ResultDto<String> resultDto = flowService.del(ftFlow);
+    String  mss = "";
+    if (ResultDtoTool.isSuccess(resultDto)) {
+        mss ="删除流程管理成功";
+    } else {
+        mss =resultDto.getMessage();
     }
+    return ResultDtoTool.buildSucceed(mss);
+  }
 
-    @RequiresPermissions("flow:ftFlow:edit")
-    @RequestMapping(value = "delete")
-    public String delete(FtFlow ftFlow, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
-        if (ftServiceNode == null) {
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
-        }
-
-        ResultDto<String> resultDto = flowService.del(ftFlow);
-        if (ResultDtoTool.isSuccess(resultDto)) {
-            addMessage(redirectAttributes, "删除流程管理成功");
-        } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
-        }
-        return "redirect:" + Global.getAdminPath() + "/flow/ftFlow/?repage";
+  @RequestMapping(value = "component")
+  public Object component(FtFlow ftFlow) {
+    ResultDto<List<ComponentModel.Service>> dto = componentService.listAll();
+    List<FtComponent> list = new ArrayList<>();
+    Map<String,Object> result=new HashMap<>();
+    if (ResultDtoTool.isSuccess(dto)) {
+      List<ComponentModel.Service> compservices = dto.getData();
+      for (ComponentModel.Service compservice : compservices) {
+        FtComponent ftComponent = new FtComponent();
+        CfgModelConverter.convertTo(compservice, ftComponent);
+        list.add(ftComponent);
+      }
+    } else {
+        return  ResultDtoTool.buildError(dto.getMessage());
     }
+      result.put("ftFlow", ftFlow);
+      result.put("ftComponentList", list);
+    return ResultDtoTool.buildSucceed(result);
+  }
 
-    @RequiresPermissions("flow:ftFlow:view")
-    @RequestMapping(value = "component")
-    public String component(FtFlow ftFlow, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
-        ResultDto<List<ComponentModel.Service>> dto = componentService.listAll();
-        List<FtComponent> list = new ArrayList<>();
-        if (ResultDtoTool.isSuccess(dto)) {
-            List<ComponentModel.Service> compservices = dto.getData();
-            for (ComponentModel.Service compservice : compservices) {
-                FtComponent ftComponent = new FtComponent();
-                CfgModelConverter.convertTo(compservice, ftComponent);
-                list.add(ftComponent);
-            }
-        } else {
-            addMessage(redirectAttributes, dto.getMessage());
-            return "redirect:" + Global.getAdminPath() + "/flow/ftFlow/?repage";
-        }
-        model.addAttribute("ftFlow", ftFlow);
-        model.addAttribute("ftComponentList", list);
-        return "modules/flow/ftFlowComponent";
-    }
+  @RequestMapping(value = "confComp")
+  public String confComp(FtServiceNode ftServiceNode, HttpServletRequest request,   Model model) {
+    FtServiceNode ftServiceNodeNameNode = (FtServiceNode) request.getSession().getAttribute("ftServiceNodeNameNode");
+    String getAllStr = MessageFactory.getInstance().cfgSync("flow", "generateSyncCfgXml", ftServiceNodeNameNode.getSystemName());//生成查询报文
+    String getOtherAllStr = MessageFactory.getInstance().flow(new FtFlow(), "print");//生成查询报文
+    FtServiceNodeHelper.getConfComp(ftServiceNode, ftServiceNodeNameNode, getAllStr, getOtherAllStr, request, model);
+    return "modules/flow/ftFlowConfComp";
+  }
 
-    @RequiresPermissions("flow:ftFlow:view")
-    @RequestMapping(value = "confComp")
-    public String confComp(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model) {
-        FtServiceNode ftServiceNodeNameNode = (FtServiceNode) request.getSession().getAttribute("ftServiceNodeNameNode");
-        String getAllStr = MessageFactory.getInstance().cfgSync("flow", "generateSyncCfgXml", ftServiceNodeNameNode.getSystemName());//生成查询报文
-        String getOtherAllStr = MessageFactory.getInstance().flow(new FtFlow(), "print");//生成查询报文
-        FtServiceNodeHelper.getConfComp(ftServiceNode, ftServiceNodeNameNode, getAllStr, getOtherAllStr, request, model);
-        return "modules/flow/ftFlowConfComp";
-    }
-
-    @RequiresPermissions("servicenode:ftServiceNode:view")
-    @RequestMapping(value = {"catchFileCfg"})
-    @ResponseBody
-    public String catchFileCfg(FtServiceNode ftServiceNode, String fileName, HttpServletRequest request) {
-        return FtServiceNodeHelper.getCachtFileCfg(fileName, request);
-    }
+  @RequiresPermissions("servicenode:ftServiceNode:view")
+  @RequestMapping(value = {"catchFileCfg"})
+  @ResponseBody
+  public String catchFileCfg(FtServiceNode ftServiceNode, String fileName, HttpServletRequest request) {
+    return FtServiceNodeHelper.getCachtFileCfg(fileName, request);
+  }
 
 
-    @RequiresPermissions("servicenode:ftServiceNode:view")
-    @RequestMapping(value = "otherConf")
-    public String otherConf(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model) {
-        String getAllStr = MessageFactory.getInstance().flow(new FtFlow(), "print");//生成查询报文
-        FtServiceNodeHelper.getOtherConf(request, model, getAllStr);
-        return "modules/flow/ftFlowOtherConf";
-    }
+  @RequiresPermissions("servicenode:ftServiceNode:view")
+  @RequestMapping(value = "otherConf")
+  public String otherConf(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model) {
+    String getAllStr = MessageFactory.getInstance().flow(new FtFlow(), "print");//生成查询报文
+    FtServiceNodeHelper.getOtherConf(request, model, getAllStr);
+    return "modules/flow/ftFlowOtherConf";
+  }
 
 }

@@ -1,6 +1,7 @@
 package com.dc.smarteam.modules.file.web;
 
 import com.dc.smarteam.common.config.Global;
+import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.persistence.Page;
 import com.dc.smarteam.common.utils.StringUtils;
 import com.dc.smarteam.helper.CurrNameNodeHelper;
@@ -53,7 +54,8 @@ public class BizFileController {
     public Object list(BizFile bizFile, HttpServletRequest request, HttpServletResponse response) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
-           return PublicRepResultTool.sendResult("9999","请先设置节点组！！！",null);
+           return ResultDtoTool.buildError("请先设置节点组！！！");
+
         }
         Map<String,Object> resultMap = new HashMap<>();
         List<String> nodeNameList = bizFileService.findNodeNameList();
@@ -62,14 +64,14 @@ public class BizFileController {
         Page<BizFile> page = bizFileService.findPage(new Page<BizFile>(request, response), bizFile);
         bizFile.setPage(page);
         resultMap.put("page", page);
-        return  PublicRepResultTool.sendResult("0000","成功",resultMap);
+        return ResultDtoTool.buildSucceed(resultMap);
     }
 
     @RequestMapping(value = "form" ,produces = "application/json;charset=UTF-8")
     public Object form(BizFile bizFile) {
         Map<String,Object> re =  new HashMap<>();
         re.put("bizFile", bizFile);
-        return  PublicRepResultTool.sendResult("0000","成功",re);
+        return  ResultDtoTool.buildSucceed(re);
     }
 
 }

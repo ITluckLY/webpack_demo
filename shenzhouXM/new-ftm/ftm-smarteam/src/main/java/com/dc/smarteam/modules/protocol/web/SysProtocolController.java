@@ -76,7 +76,7 @@ public class SysProtocolController extends BaseController {
     public Object list(SysProtocol sysProtocol, HttpServletRequest request, HttpServletResponse response, Map map) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
-          return  PublicRepResultTool.sendResult("9999","请先设置节点组！！！",null);
+          return   ResultDtoTool.buildError("请先设置节点组！！！");
         }
         List<SysProtocol> list = new ArrayList<>();
         ResultDto<List<SystemModel.System>> dto = sysService.listAll();
@@ -92,10 +92,10 @@ public class SysProtocolController extends BaseController {
                 list.add(newSysProtocol);
             }
         } else {
-            return PublicRepResultTool.sendResult("9999", dto.getMessage(),null);
+            return   ResultDtoTool.buildError(dto.getMessage());
         }
         PageHelper.getInstance().getPage(sysProtocol.getClass(), request, response, map, list);
-        return  PublicRepResultTool.sendResult("0000", "成功",list);
+        return  ResultDtoTool.buildSucceed("成功。",list);
     }
 
 
@@ -107,7 +107,7 @@ public class SysProtocolController extends BaseController {
         dict.setType(GlobalCons.PROTOCAL_TYPE);
         List<Dict> dictList = this.dictService.findList(dict);
         res.put("dictList", dictList);
-        return  PublicRepResultTool.sendResult("0000","成功",null);
+        return  ResultDtoTool.buildSucceed("成功。",res);
     }
 
     @RequestMapping(value = "save", produces = "application/json;charset=UTF-8")
@@ -130,7 +130,8 @@ public class SysProtocolController extends BaseController {
         } else {
             ms = resultDto.getMessage() ;
         }
-        return PublicRepResultTool.sendResult("0000",ms,null);
+
+        return ResultDtoTool.buildSucceed(ms);
     }
 
     @RequestMapping(value = "saveEdit", produces = "application/json;charset=UTF-8")
@@ -142,7 +143,7 @@ public class SysProtocolController extends BaseController {
         } else {
             ms = resultDto.getMessage();
         }
-        return PublicRepResultTool.sendResult("0000",ms,null);
+        return ResultDtoTool.buildSucceed(ms);
     }
 
     @RequestMapping(value = "delete", produces = "application/json;charset=UTF-8")
@@ -166,7 +167,7 @@ public class SysProtocolController extends BaseController {
                 messages =resultDto.getMessage() ;
             }
         }
-        return  PublicRepResultTool.sendResult("0000",messages,null);
+        return  ResultDtoTool.buildSucceed(messages);
     }
 
 
@@ -174,7 +175,7 @@ public class SysProtocolController extends BaseController {
     @RequestMapping(value = "form" , produces = "application/json;charset=UTF-8")
     public Object form(SysProtocol sysProtocol) {
         if (StringUtils.isEmpty(sysProtocol.getName())) {
-            return PublicRepResultTool.sendResult("9999","请先添加数据！！！",null);
+            return  ResultDtoTool.buildError("请先选择数据！！！");
         }
         ResultDto<SystemModel.System> dto = sysService.selByName(sysProtocol);
         Map<String,Object> res =new HashMap<>();
@@ -186,21 +187,19 @@ public class SysProtocolController extends BaseController {
             return PublicRepResultTool.sendResult("9999",dto.getMessage(),null);
         }
         res.put("sysProtocol", newSysProtocol);
-        return PublicRepResultTool.sendResult("0000","成功",res);
+        return  ResultDtoTool.buildSucceed("成功",res);
     }
 
 
     /**
      *   此处有待修改？？？？？？？？？？？？？？？
-     * @param ftServiceNode
      * @param request
-     * @param response
      * @param model
      * @return
      */
     @RequiresPermissions("servicenode:ftServiceNode:view")
     @RequestMapping(value = "otherConf")
-    public String otherConf(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String otherConf(HttpServletRequest request,Model model) {
         String getAllStr = MessageFactory.getInstance().system(new SysProtocol(), "print");//生成查询报文
 
         FtServiceNodeHelper.getOtherConf(request, model, getAllStr);
@@ -221,10 +220,11 @@ public class SysProtocolController extends BaseController {
             out.flush();
             Thread.sleep(1000);
             log.info("连通成功{}:{}", ip, port);
-            return  PublicRepResultTool.sendResult("0000","连通成功",null);
+
+            return   ResultDtoTool.buildSucceed("连通成功");
         } catch (Exception e) {
             log.warn("连通失败{}:{},{}", ip, port, e.getMessage());
-            return PublicRepResultTool.sendResult("9999",e.getMessage(),null);
+            return  ResultDtoTool.buildError(e.getMessage());
         }
     }
 }

@@ -7,8 +7,8 @@ import org.apache.commons.lang.StringUtils;
  * Created by mocg on 2016/8/9.
  */
 public class ResultDtoTool {
-    public static final String SUCCESS_CODE = "0000";
-    public static final String MISS_NODE_DATA = "1001";
+    public static final String SUCCESS_CODE = "0000"; //成功
+    public static final String MISS_NODE_DATA = "1001"; // 没找到
 
     private ResultDtoTool() {
     }
@@ -40,19 +40,18 @@ public class ResultDtoTool {
         result.setData(data);
         return result;
     }
+    public static <T> ResultDto<T> buildSucceed(String message) {
+        ResultDto<T> result = new ResultDto<T>();
+        result.setCode(SUCCESS_CODE);
+        result.setMessage(message);
+        return result;
+    }
 
     public static <T> ResultDto<T> buildSucceed(String message, T data) {
         ResultDto<T> result = new ResultDto<T>();
         result.setCode(SUCCESS_CODE);
         result.setMessage(message);
         result.setData(data);
-        return result;
-    }
-
-    public static <T> ResultDto<T> buildSucceed(String code, String message) {
-        ResultDto<T> result = new ResultDto<T>();
-        result.setCode(SUCCESS_CODE);
-        result.setMessage(message);
         return result;
     }
 
@@ -65,10 +64,6 @@ public class ResultDtoTool {
 
     public static <T> ResultDto<T> buildError(String message) {
         return buildError("9999", message);
-    }
-
-    public static <T> ResultDto<T> buildSuccess(String message) {
-        return buildSucceed("9999", message);
     }
 
     public static boolean isSuccess(ResultDto dto) {

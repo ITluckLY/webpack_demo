@@ -56,7 +56,8 @@ public class CfgSyncController extends BaseController {
             return  PublicRepResultTool.sendResult("9999","请先设置节点。",null);
         }
         rs.put("ftServiceNode", ftServiceNode);
-        return PublicRepResultTool.sendResult("0000","成功",rs);
+
+        return  ResultDtoTool.buildSucceed(rs);
     }
 
     /**
@@ -71,7 +72,7 @@ public class CfgSyncController extends BaseController {
         Map<String,Object> mapm =new HashMap<>();
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
-            return PublicRepResultTool.sendResult("9999","请先设置节点组！！！",null);
+            return ResultDtoTool.buildError("请先设置节点组！！！");
         }
         String sysname = ftServiceNode.getSystemName();
         String currCfgContent = getCurrCfgContent(sysname, fileName, false);
@@ -146,7 +147,7 @@ public class CfgSyncController extends BaseController {
         mapm.put("currCfgContent", currCfgContent);
         mapm.put("inactiveNodeList", inactiveNodeList);
 
-        return  PublicRepResultTool.sendResult("9999","成功",mapm);
+        return   ResultDtoTool.buildSucceed(mapm);
     }
 
     /**
@@ -161,12 +162,13 @@ public class CfgSyncController extends BaseController {
     public Object sync(@RequestParam String fileName, HttpServletRequest request) throws IOException {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
-            return PublicRepResultTool.sendResult("9999","请先设置节点。",null);
+            return ResultDtoTool.buildError("请先设置节点组！！！");
         }
         String sysname = ftServiceNode.getSystemName();
         String content = getCurrCfgContent(sysname, fileName, true);
         cfgZkService.write(sysname, fileName, content.trim());
-        return PublicRepResultTool.sendResult("0000","成功。",null);
+        return   ResultDtoTool.buildSucceed("成功。");
+
     }
 
     /**
@@ -180,7 +182,7 @@ public class CfgSyncController extends BaseController {
     public Object syncAll(HttpServletRequest request) throws IOException {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
-            return PublicRepResultTool.sendResult("9999","请先设置节点。",null);
+            return  ResultDtoTool.buildError("请先设置节点组！！！");
         }
         String sysname = ftServiceNode.getSystemName();
         List<String> cfgFileNameList = new ArrayList<>();
@@ -203,7 +205,7 @@ public class CfgSyncController extends BaseController {
             cfgZkService.write(sysname, fileName, content);
         }
 
-        return PublicRepResultTool.sendResult("0000","成功。",null);
+        return  ResultDtoTool.buildSucceed("成功。");
     }
 
     private String getCurrCfgContent(String sysname, String fileName, boolean hasTimestamp) throws IOException {

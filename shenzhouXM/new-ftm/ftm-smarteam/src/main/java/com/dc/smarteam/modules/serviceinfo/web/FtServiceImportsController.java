@@ -40,13 +40,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 服务管理Controller
- *
- * @author hudja
- * @version 2016-01-12
+
  */
 @Controller
 @RequestMapping(value = "${adminPath}/serviceinfo/ftServiceImports")
@@ -73,26 +73,25 @@ public class FtServiceImportsController extends BaseController {
     private String localDownFilePath;
     private static final String REDIRECT = "redirect:";
 
-    @RequiresPermissions("serviceinfo:ftServiceImports:view")
     @RequestMapping(value = {""})
-    public String show(BankSystem bankSystem, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
+    public Object show( HttpServletRequest request) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
+            return  ResultDtoTool.buildError("请先设置节点组！！！");
         }
+        Map<String,Object> res= new HashMap<>();
         List<BankSystem> banksystemlist = userService.getBanksystemlist();
-        model.addAttribute("BankSystemList", banksystemlist);
-        return "modules/serviceinfo/ftServiceImport";
+        res.put("BankSystemList", banksystemlist);
+        return ResultDtoTool.buildSucceed(res);
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceFlowAdd:view")
-    @RequestMapping(value = {"addOneServiceFlow"})
-    public String showAddPage(HttpServletRequest request, Model model, FtServiceFlowVo ftServiceFlowVo) {
+    @RequestMapping(value = "addOneServiceFlow")
+    public Object showAddPage(HttpServletRequest request) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
+            return  ResultDtoTool.buildError("请先设置节点组！！！");
         }
-
+        Map<String,Object> res= new HashMap<>();
         ResultDto<List<ServiceModel.Service>> resultDto = serviceInfoService.listAll();
         ResultDto<List<UserModel.UserInfo>> userInfoDto = userService.listAll();
         ResultDto<List<SystemModel.System>> systemDto = sysService.listAll();
@@ -103,7 +102,7 @@ public class FtServiceImportsController extends BaseController {
                 tranCodeList.add(service.getTrancode());
             }
         }
-        model.addAttribute("tranCodeList", tranCodeList);
+        res.put("tranCodeList", tranCodeList);
 
         ResultDto<List<FlowModel.Flow>> resultDto2 = flowService.selBySysname(ftServiceNode.getSystemName());
         List<FtFlow> ftFlowList = new ArrayList<>();
@@ -115,7 +114,7 @@ public class FtServiceImportsController extends BaseController {
                 ftFlowList.add(ftFlow);
             }
         }
-        model.addAttribute("ftFlowList", ftFlowList);
+        res.put("ftFlowList", ftFlowList);
 
         List<String> providerList = null;
         List<String> consumerList = null;
@@ -133,42 +132,41 @@ public class FtServiceImportsController extends BaseController {
             e.printStackTrace();
             logger.error(e.getMessage());
         }
-        model.addAttribute("providerList", providerList);
-        model.addAttribute("consumerList", consumerList);
-        return "modules/serviceinfo/ftServiceFlowAdd";
+        res.put("providerList", providerList);
+        res.put("consumerList", consumerList);
+        return  ResultDtoTool.buildSucceed(res);
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceFlowAdd:edit")
     @RequestMapping(value = {"add"})
-    public String addOneServiceFlow(FtServiceFlowVo ftServiceFlowVo, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-
+    public Object addOneServiceFlow(FtServiceFlowVo ftServiceFlowVo, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         logger.info("新增交易：{}", ftServiceFlowVo.toString());
-
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         String nodesystemname = ftServiceNode.getSystemName();
         if (null == nodesystemname || StringUtils.equals(nodesystemname, "")) {
-            addMessage(redirectAttributes, "系统名称不能为空！！！");
+            //addMessage(redirectAttributes, "系统名称不能为空！！！");
+            return  ResultDtoTool.buildError("系统名称不能为空！！！");
         }
+        String mess="";
         try {
             ResultDto resultDto = serviceImportsService.addServiceFlow(ftServiceFlowVo, nodesystemname);
             if (ResultDtoTool.isSuccess(resultDto)) {
                 logger.info("添加结束，成功");
-                addMessage(redirectAttributes, "服务添加成功");
+                mess= "服务添加成功";
             } else {
                 logger.error("添加结束，失败");
-                addMessage(redirectAttributes, resultDto.getMessage());
+                mess=resultDto.getMessage();
             }
         } catch (Exception e) {
             logger.error("添加交易码服务流程失败:{}", e.getMessage());
-            addMessage(redirectAttributes, "添加交易码服务流程失败:"+e.getMessage());
+            //addMessage(redirectAttributes, "添加交易码服务流程失败:"+e.getMessage());
+            return  ResultDtoTool.buildError("添加交易码服务流程失败:"+e.getMessage());
         }
 
-        return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceImports/addOneServiceFlow";
+        return ResultDtoTool.buildSucceed(mess);
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceImports:edit")
     @RequestMapping(value = {"save"})
-    public String save(BankSystem bankSystem, @RequestParam("uploadFileName") MultipartFile file, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+    public Object save(BankSystem bankSystem, @RequestParam("uploadFileName") MultipartFile file,  HttpServletRequest request) {
         String tempName = String.valueOf(System.currentTimeMillis());
         String originalFilename = file.getOriginalFilename();
 
@@ -177,12 +175,11 @@ public class FtServiceImportsController extends BaseController {
         String extention = originalFilename.substring(idx + 1);
         String fileTemp = originalFilename.substring(0, idx);
         if (extention.isEmpty() || (!extention.equalsIgnoreCase("csv"))) {
-            addMessage(redirectAttributes, "文件上传不成功，注：只能上传.csv文件！");
-            return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceImports";
+            //addMessage(redirectAttributes, "文件上传不成功，注：只能上传.csv文件！");
+            return ResultDtoTool.buildError("文件上传不成功，注：只能上传.csv文件！");
         }
 
-        StringBuilder sb = new StringBuilder(100).append(fileTemp)
-                .append(tempName).append(".").append(extention);
+        StringBuilder sb = new StringBuilder(100).append(fileTemp).append(tempName).append(".").append(extention);
         String path = localUploadFilePath;
         String fileName = sb.toString();
         File targetFile = new File(path, fileName);
@@ -198,24 +195,23 @@ public class FtServiceImportsController extends BaseController {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         String nodesystemname = ftServiceNode.getSystemName();
         if (null == nodesystemname || StringUtils.equals(nodesystemname, "")) {
-            addMessage(redirectAttributes, "系统名称不能为空！！！");
+            //addMessage(redirectAttributes, "系统名称不能为空！！！");
+            return  ResultDtoTool.buildError("系统名称不能为空！！！");
         }
         ResultDto resultDto = serviceImportsService.serviceImports(targetFile, nodesystemname, bankSystem.getBankname());
+        String messages = "";
         if (ResultDtoTool.isSuccess(resultDto)) {
-            addMessage(redirectAttributes, "服务导入成功");
+            messages =  "服务导入成功";
         } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
-            return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceImports";
+            //addMessage(redirectAttributes, resultDto.getMessage());
+           // return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceImports";
+            return  ResultDtoTool.buildError(resultDto.getMessage());
         }
-
-
-        return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceInfo/?repage";
+        return  ResultDtoTool.buildSucceed(messages);
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceImports:view")
     @RequestMapping(value = {"download"})
-    public ResponseEntity<String> download(HttpServletRequest request,
-                                           @RequestParam("filename") String filename) {
+    public Object download(@RequestParam("filename") String filename) {
         logger.debug("进入下载页面:{}{}{}", Thread.currentThread().getContextClassLoader().getResource("").getPath(), File.separator, filename);
         File file = new File(Thread.currentThread().getContextClassLoader().getResource("").getPath() + "codes_model_bak.csv");
         ResponseEntity responseEntity = null;
@@ -239,16 +235,17 @@ public class FtServiceImportsController extends BaseController {
         } catch (Exception e) {
             logger.error("", e);
         }
-        return responseEntity;
+        return  ResultDtoTool.buildSucceed(responseEntity);
+
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceFlowEdit:view")
     @RequestMapping(value = {"editOneServiceFlow"})
-    public String showEditPage(HttpServletRequest request, Model model, FtServiceFlowVo ftServiceFlowVo) {
+    public Object showEditPage(HttpServletRequest request) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
             return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
         }
+        Map<String,Object> result =new HashMap<>();
         ResultDto<List<ServiceModel.Service>> resultDto = serviceInfoService.listAll();
         ResultDto<List<UserModel.UserInfo>> userInfoDto = userService.listAll();
         ResultDto<List<SystemModel.System>> systemDto = sysService.listAll();
@@ -258,7 +255,7 @@ public class FtServiceImportsController extends BaseController {
                 tranCodeList.add(service.getTrancode());
             }
         }
-        model.addAttribute("tranCodeList", tranCodeList);
+        result.put("tranCodeList", tranCodeList);
         ResultDto<List<FlowModel.Flow>> resultDto2 = flowService.selBySysname(ftServiceNode.getSystemName());
         List<FtFlow> ftFlowList = new ArrayList<>();
         if (ResultDtoTool.isSuccess(resultDto2)) {
@@ -269,7 +266,7 @@ public class FtServiceImportsController extends BaseController {
                 ftFlowList.add(ftFlow);
             }
         }
-        model.addAttribute("ftFlowList", ftFlowList);
+        result.put("ftFlowList", ftFlowList);
         List<String> providerList = null;
         List<String> consumerList = null;
 
@@ -286,39 +283,40 @@ public class FtServiceImportsController extends BaseController {
             e.printStackTrace();
             logger.error(e.getMessage());
         }
-        model.addAttribute("providerList", providerList);
-        model.addAttribute("consumerList", consumerList);
-        return "modules/serviceinfo/ftServiceFlowEdit";
+        result.put("providerList", providerList);
+        result.put("consumerList", consumerList);
+        return ResultDtoTool.buildSucceed(result);
     }
 
 
-    @RequiresPermissions("serviceinfo:ftServiceFlowEdit:edit")
     @RequestMapping(value = {"edit"})
-    public String updateOneServiceFlow(FtServiceFlowVo ftServiceFlowVo, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    public Object updateOneServiceFlow(FtServiceFlowVo ftServiceFlowVo, HttpServletRequest request) {
 
         logger.info("修改交易：{}", ftServiceFlowVo.toString());
 
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         String nodesystemname = ftServiceNode.getSystemName();
         if (null == nodesystemname || StringUtils.equals(nodesystemname, "")) {
-            addMessage(redirectAttributes, "系统名称不能为空！！！");
+            //addMessage(redirectAttributes, "系统名称不能为空！！！");
+            return  ResultDtoTool.buildError("系统名称不能为空！！！");
         }
 
+        String mess="";
         try {
             ResultDto resultDto = serviceImportsService.addServiceFlow(ftServiceFlowVo, nodesystemname);
             if (ResultDtoTool.isSuccess(resultDto)) {
                 logger.info("修改结束，成功");
-                addMessage(redirectAttributes, "服务修改成功");
+                mess= "服务修改成功";
             } else {
                 logger.error("修改结束，失败");
-                addMessage(redirectAttributes, resultDto.getMessage());
+                mess=  resultDto.getMessage();
             }
         } catch (Exception e) {
             logger.error("修改交易码服务流程失败:{}", e.getMessage());
-            addMessage(redirectAttributes, "修改交易码服务流程失败");
+            return  ResultDtoTool.buildError("修改交易码服务流程失败:{}"+ e.getMessage());
         }
 
-        return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceImports/updateOneServiceFlow";
+        return ResultDtoTool.buildError(mess);
     }
 
     @ResponseBody

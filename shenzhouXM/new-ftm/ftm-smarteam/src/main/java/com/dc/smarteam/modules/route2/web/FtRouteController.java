@@ -58,7 +58,7 @@ public class FtRouteController extends BaseController {
 
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName() || ftServiceNode.getSystemName().isEmpty()) {
-            return  PublicRepResultTool.sendResult("9999","请先设置节点组！！！",null);
+            return   ResultDtoTool.buildError("请先设置节点组！！！");
         }
 
         List<FtServiceInfo> ftServiceInfoList = serviceInfoService.getFtServiceInfoList();
@@ -87,10 +87,10 @@ public class FtRouteController extends BaseController {
                 }
             }
         } else {
-            return  PublicRepResultTool.sendResult("9999",resultDto2.getMessage(),null);
+            return    ResultDtoTool.buildError(resultDto2.getMessage());
         }
         PageHelper.getInstance().getPage(ftRoute.getClass(), request, response, map, endList);
-        return  PublicRepResultTool.sendResult("0000","成功",endList);
+        return  ResultDtoTool.buildSucceed("成功",endList);
     }
 
     @RequestMapping(value = "addPage", produces = "application/json;charset=UTF-8")
@@ -112,7 +112,7 @@ public class FtRouteController extends BaseController {
                 }
             }
         } else {
-            return  PublicRepResultTool.sendResult("9999",dto.getMessage(),null);
+            return   ResultDtoTool.buildError(dto.getMessage());
         }
 
         ResultDto<List<UserModel.UserInfo>> userDto = userService.listAll();
@@ -140,7 +140,7 @@ public class FtRouteController extends BaseController {
         res.put("ftUserList", ftUserList);
         res.put("ftRoute", ftRoute);
         res.put("sysProtocolList", sysProtocolList);
-        return  PublicRepResultTool.sendResult("0000","成功",res);
+        return  ResultDtoTool.buildSucceed("成功",res);
     }
 
 
@@ -156,7 +156,7 @@ public class FtRouteController extends BaseController {
             String[] split = destination.split(",");
             routeNameList.addAll(Arrays.asList(split));
         } else {
-            return  PublicRepResultTool.sendResult("9999",dto.getMessage(),null);
+            return  ResultDtoTool.buildError(dto.getMessage());
         }
 
         ResultDto<List<SystemModel.System>> sysDto = sysService.listAll();
@@ -174,7 +174,7 @@ public class FtRouteController extends BaseController {
         result.put("ftRoute", ftRoute);
         result.put("routeNameList", routeNameList);// 路由目标-已选中
         result.put("routeNameListTmp", routeNameListTmp);// 路由目标-未选中
-        return   PublicRepResultTool.sendResult("0000","成功",result);
+        return   ResultDtoTool.buildSucceed("成功",result);
     }
 
     @RequestMapping(value = "save", produces = "application/json;charset=UTF-8")
@@ -186,7 +186,7 @@ public class FtRouteController extends BaseController {
         } else if (ResultDtoTool.isSuccess(dto)) {
             message = "保存路由管理成功";
         }
-        return  PublicRepResultTool.sendResult("0000",message,null);
+        return  ResultDtoTool.buildSucceed(message);
     }
 
     @RequestMapping(value = "saveEdit", produces = "application/json;charset=UTF-8")
@@ -198,7 +198,7 @@ public class FtRouteController extends BaseController {
         } else if (ResultDtoTool.isSuccess(dto)) {
             mes ="修改路由管理成功";
         }
-        return PublicRepResultTool.sendResult("0000",mes,null);
+        return  ResultDtoTool.buildSucceed(mes);
     }
 
     @RequestMapping(value = "delete", produces = "application/json;charset=UTF-8")
@@ -211,7 +211,7 @@ public class FtRouteController extends BaseController {
         } else if (ResultDtoTool.isSuccess(resultDto) && ResultDtoTool.isSuccess(dto)) {
             message = "删除路由管理成功";
         }
-        return PublicRepResultTool.sendResult("0000",message,null);
+        return ResultDtoTool.buildSucceed(message);
     }
 
     /**

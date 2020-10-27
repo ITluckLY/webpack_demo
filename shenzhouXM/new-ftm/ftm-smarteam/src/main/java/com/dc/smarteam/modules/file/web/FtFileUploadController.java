@@ -3,6 +3,7 @@
  */
 package com.dc.smarteam.modules.file.web;
 
+import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.web.BaseController;
 import com.dc.smarteam.common.zk.ZkService;
 import com.dc.smarteam.helper.CurrNameNodeHelper;
@@ -17,6 +18,7 @@ import com.dc.smarteam.modules.servicenode.entity.FtServiceNode;
 import com.dc.smarteam.util.PublicRepResultTool;
 import com.google.gson.JsonObject;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +34,7 @@ import java.util.*;
  * @author liwang
  * @version 2016-01-12
  */
-@Log4j2
+@Slf4j
 @RestController
 @RequestMapping(value = "${adminPath}/file/ftFileUpload")
 public class FtFileUploadController extends BaseController {
@@ -71,13 +73,13 @@ public class FtFileUploadController extends BaseController {
       total = ftFileUploadService.getFtFileUploadTotal();
       resultMap.put("list", list);
       resultMap.put("total", total);
-      if (log.isDebugEnabled()) {
-        log.debug("查询的版本列表: " + resultMap);
+      if(log.isInfoEnabled()){
+        log.info("查询的版本列表: " + resultMap);
       }
     } catch (Exception e) {
       return "查询版本单失败！详情：" + e.getMessage();
     }
-    return resultMap;
+    return  ResultDtoTool.buildSucceed(resultMap);
   }
 
   /**
@@ -101,7 +103,7 @@ public class FtFileUploadController extends BaseController {
         log.debug("查询的版本单信息: " + ftFileUpload);
       }
     }
-    return ftFileUpload;
+    return   ResultDtoTool.buildSucceed(ftFileUpload);
   }
 
   /**
@@ -112,16 +114,13 @@ public class FtFileUploadController extends BaseController {
    * @return
    */
   @GetMapping(value = "/form")
-  public FtFileUpload form(FtFileUpload ftFileUpload, HttpServletRequest request) {
+  public Object form(FtFileUpload ftFileUpload, HttpServletRequest request) {
 
     FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
     ftFileUpload.setSystemName(ftServiceNode.getSystemName());
     ftFileUpload.setNodeName(ftServiceNode.getName());
-   /* ftFileUpload.setSystemName("comm001");
-    ftFileUpload.setNodeName("版本管理");
-    List<FtFileUpload> ll = new ArrayList<>();
-    ll.add(ftFileUpload);*/
-    return ftFileUpload;
+
+    return ResultDtoTool.buildSucceed(ftFileUpload);
   }
 
   /**
@@ -168,7 +167,7 @@ public class FtFileUploadController extends BaseController {
     }
     ftFileUploadService.save(ftFileUpload);
 
-    return PublicRepResultTool.sendResult("0000","保存文件管理成功","");
+    return ResultDtoTool.buildSucceed("保存文件管理成功");
   }
 
 
@@ -188,16 +187,10 @@ public class FtFileUploadController extends BaseController {
     File file = new File(uploadPath);
     boolean delete = file.delete();
     if (delete) {
-      // addMessage(redirectAttributes, "删除文件管理成功");
-      //setResultSuccess("删除文件管理成功");
-      return  PublicRepResultTool.sendResult("0000","删除文件管理成功","");
+      return  ResultDtoTool.buildSucceed("删除文件管理成功");
     } else {
-      //addMessage(redirectAttributes, "无此文件，请重新确认再进行删除操作！");
-      //setResultError("无此文件，请重新确认再进行删除操作！");
-      return  PublicRepResultTool.sendResult("0000","无此文件，请重新确认再进行删除操作！","");
+      return   ResultDtoTool.buildError("无此文件，请重新确认再进行删除操作！");
     }
-    //return setResultSuccess("删除文件管理成功");
-  //  return sendResult("0000","删除文件管理成功","");
 
   }
 
@@ -223,7 +216,7 @@ public class FtFileUploadController extends BaseController {
       ftFileSend.setMonitorNodePort(Integer.parseInt(split[1]));
       sendNodeList.add(ftFileSend);
     }
-    return sendNodeList;
+    return  ResultDtoTool.buildSucceed(sendNodeList);
   }
 
   /**
@@ -240,9 +233,7 @@ public class FtFileUploadController extends BaseController {
     if (null != ftServiceNode) {
       String nodeName = ftFileUpload.getSendNodeName();
       if (nodeName.isEmpty()) {
-        //addMessage(redirectAttributes, "数据节点不能为空");
-        //return "redirect:" + Global.getAdminPath() + "/file/ftFileUpload/?repage";
-      return PublicRepResultTool.sendResult("9999","数据节点不能为空",null);
+       return  ResultDtoTool.buildSucceed("数据节点不能为空");
       }
       String updateType = ftFileUpload.getUpdateType();
       String ip = null;
@@ -269,12 +260,10 @@ public class FtFileUploadController extends BaseController {
       ftFileUploadTemp.setUpdateDate(new Date());
       ftFileUploadTemp.setRetMsg("版本发布中");
       ftFileUploadService.update(ftFileUploadTemp);
-
       //addMessage(redirectAttributes, "版本发布中，请稍后点击详情查看结果");
       new Thread(ftpPutThread).start();
     }
-    //return "redirect:" + Global.getAdminPath() + "/file/ftFileUpload/?repage";
-    return  PublicRepResultTool.sendResult("0000","版本发布中，请稍后点击详情查看结果",null);
+    return   ResultDtoTool.buildSucceed("版本发布中，请稍后点击详情查看结果");
   }
 
 
@@ -311,9 +300,9 @@ public class FtFileUploadController extends BaseController {
       }
     } catch (Exception e) {
       String message = "查询的版本发布历史记录列表失败！详情：" + e.getMessage();
-      return PublicRepResultTool.sendResult("9999",message,null);
+      return  ResultDtoTool.buildError(message);
     }
-    return PublicRepResultTool.sendResult("0000","成功",resultMapLog);
+    return ResultDtoTool.buildSucceed(resultMapLog);
 
 
   }
@@ -325,13 +314,9 @@ public class FtFileUploadController extends BaseController {
     try {
       ftFileUploadLogTemp = ftFileUploadLogService.get(ftFileUploadLog);
     } catch (Exception e) {
-//      addMessage(redirectAttributes, "查询信息失败！详情：" + e.getMessage());
-      return PublicRepResultTool.sendResult("9999","查询信息失败！详情：", e.getMessage());
-
-     // return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
+      return  ResultDtoTool.buildError("查询信息失败！详情："+ e.getMessage());
     }
-    //model.addAttribute("ftFileUploadLogTemp", ftFileUploadLogTemp);
-    return PublicRepResultTool.sendResult("0000","成功",ftFileUploadLogTemp);
+    return ResultDtoTool.buildSucceed(ftFileUploadLogTemp);
   }
 
 }

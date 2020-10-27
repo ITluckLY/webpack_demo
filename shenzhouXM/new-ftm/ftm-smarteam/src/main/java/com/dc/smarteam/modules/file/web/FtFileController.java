@@ -68,7 +68,6 @@ public class FtFileController extends BaseController {
         return entity;
     }
 
-//    @RequiresPermissions("file:ftFile:view")
     @RequestMapping(value = {"index"}, method = RequestMethod.GET)
     public Object index(FtServiceNode ftServiceNode, User user, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
         log.debug("ftServiceNode:{}",ftServiceNode);
@@ -79,9 +78,10 @@ public class FtFileController extends BaseController {
         } else {
             String message = "节点未连接，请检查连接状态后，重新再试！";
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
-        return PublicRepResultTool.sendResult("0000","成功",resultMap);
+
+        return ResultDtoTool.buildSucceed(resultMap);
     }
 
     @RequiresPermissions("file:ftFile:view")
