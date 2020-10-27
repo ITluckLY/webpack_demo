@@ -358,7 +358,7 @@ public class FtNodeMonitorController {
         if (log.isInfoEnabled()) {
             log.info("{} instance {} was updated.", FtNodeMonitor.class.getSimpleName(), ftNodeMonitor.getId());
         }
-        return ResultDtoTool.buildSuccess("success");
+        return ResultDtoTool.buildSucceed("success");
     }
 
     @RequiresPermissions("NodeMonitor:ftNodeMonitor:edit")
