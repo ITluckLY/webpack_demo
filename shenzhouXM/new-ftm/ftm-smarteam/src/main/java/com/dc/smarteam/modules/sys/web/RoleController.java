@@ -4,8 +4,9 @@
 package com.dc.smarteam.modules.sys.web;
 
 import com.dc.smarteam.common.config.Global;
+import com.dc.smarteam.common.json.ResultDto;
+import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.persistence.Page;
-import com.dc.smarteam.common.utils.Collections3;
 import com.dc.smarteam.common.utils.StringUtils;
 import com.dc.smarteam.common.web.BaseController;
 import com.dc.smarteam.modules.sys.entity.Office;
@@ -14,17 +15,13 @@ import com.dc.smarteam.modules.sys.entity.User;
 import com.dc.smarteam.modules.sys.service.OfficeService;
 import com.dc.smarteam.modules.sys.service.SystemService;
 import com.dc.smarteam.modules.sys.utils.UserUtils;
-import com.dc.smarteam.util.PublicRepResultTool;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.log4j.Log4j2;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,10 +39,10 @@ import java.util.Map;
 @RequestMapping(value = "${adminPath}/sys/role")
 public class RoleController extends BaseController {
 
-    @Autowired
+    @Resource(name = "SystemServiceImpl")
     private SystemService systemService;
 
-    @Autowired
+    @Resource(name = "OfficeServiceImpl")
     private OfficeService officeService;
 
     @ModelAttribute("role")
@@ -59,24 +56,24 @@ public class RoleController extends BaseController {
 
 //    @RequiresPermissions("sys:role:view")
     @RequestMapping(value = {"list", ""})
-    public Object list(Role role) {
+    public ResultDto<Map<String,Object>> list(Role role) {
         List<Role> list = new ArrayList<Role>();
         String message = "";
         try {
             list = systemService.findAllRole();
         } catch (Exception e) {
             message = "查询角色信息失败！详情：" + e.getMessage();
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("list", list);
         log.debug("resultMap:{}",resultMap);
-        return PublicRepResultTool.sendResult("0000","成功",resultMap);
+        return ResultDtoTool.buildSucceed(resultMap);
     }
 
 //    @RequiresPermissions("sys:role:view")
     @RequestMapping(value = "form")
-    public Object form(Role role) {
+    public ResultDto<Map<String,Object>> form(Role role) {
         log.debug("role:{}",role);
         if (role.getOffice() == null) {
             role.setOffice(UserUtils.getUser().getOffice());
@@ -86,60 +83,60 @@ public class RoleController extends BaseController {
         resultMap.put("menuList", systemService.findAllMenu());
         resultMap.put("officeList", officeService.findAll());
         log.debug("resultMap:{}",resultMap);
-        return PublicRepResultTool.sendResult("0000","成功",resultMap);
+        return ResultDtoTool.buildSucceed(resultMap);
     }
 
 //    @RequiresPermissions("sys:role:edit")
     @RequestMapping(value = "save")
-    public Object save(Role role) {
+    public ResultDto save(Role role) {
         log.debug("role:{}",role);
         String message = "";
         if (!UserUtils.getUser().isAdmin() && role.getSysData().equals(Global.YES)) {
             message = "越权操作，只有超级管理员才能修改此数据！";
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         if (Global.isDemoMode()) {
             message = "演示模式，不允许操作！";
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         if (!beanValidator(message, role)) {
 //            return form(role, model);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         if (!"true".equals(checkName(role.getOldName(), role.getName()))) {
             message = "保存角色'" + role.getName() + "'失败, 角色名已存在";
             log.debug("message:{}",message);
 //            return form(role, model);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         if (!"true".equals(checkEnname(role.getOldEnname(), role.getEnname()))) {
             message = "保存角色'" + role.getName() + "'失败, 英文名已存在";
             log.debug("message:{}",message);
 //            return form(role, model);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         systemService.saveRole(role);
         message = "保存角色'" + role.getName() + "'成功";
         log.debug("message:{}",message);
-        return PublicRepResultTool.sendResult("0000",message,null);
+        return ResultDtoTool.buildSucceed(message,null);
     }
 
     @RequiresPermissions("sys:role:edit")
     @RequestMapping(value = "delete")
-    public Object delete(Role role) {
+    public ResultDto delete(Role role) {
         log.debug("role:{}",role);
         String message = "";
         if (!UserUtils.getUser().isAdmin() && role.getSysData().equals(Global.YES)) {
             message = "越权操作，只有超级管理员才能修改此数据！";
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message,null);
         }
         if (Global.isDemoMode()) {
             message = "演示模式，不允许操作！";
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message,null);
         }
 //		if (Role.isAdmin(id)){
 //			addMessage(redirectAttributes, "删除角色失败, 不允许内置角色或编号空");
@@ -150,7 +147,7 @@ public class RoleController extends BaseController {
         message = "删除角色成功";
 //		}
         log.debug("message:{}",message);
-        return PublicRepResultTool.sendResult("0000",message,null);
+        return ResultDtoTool.buildSucceed(message,null);
     }
 
     /**
@@ -161,32 +158,15 @@ public class RoleController extends BaseController {
      */
     @RequiresPermissions("sys:role:edit")
     @RequestMapping(value = "assign")
-    public Object assign(Role role) {
+    public ResultDto<Map<String,Object>> assign(Role role) {
         log.debug("role:{}",role);
         List<User> userList = systemService.findUser(new User(new Role(role.getId())));
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("userList", userList);
         log.debug("resultMap:{}",resultMap);
-        return PublicRepResultTool.sendResult("0000","成功",resultMap);
+        return ResultDtoTool.buildSucceed(resultMap);
     }
 
-    /**
-     * 角色分配 -- 打开角色分配对话框
-     *
-     * @param role
-     * @param model
-     * @return
-     */
-    @RequiresPermissions("sys:role:view")
-    @RequestMapping(value = "usertorole")
-    public String selectUserToRole(Role role, Model model) {
-        List<User> userList = systemService.findUser(new User(new Role(role.getId())));
-        model.addAttribute("role", role);
-        model.addAttribute("userList", userList);
-        model.addAttribute("selectIds", Collections3.extractToString(userList, "name", ","));
-        model.addAttribute("officeList", officeService.findAll());
-        return "modules/sys/selectUserToRole";
-    }
 
     /**
      * 角色分配 -- 根据部门编号获取用户列表
@@ -218,17 +198,16 @@ public class RoleController extends BaseController {
      *
      * @param userId
      * @param roleId
-     * @param redirectAttributes
      * @return
      */
 //    @RequiresPermissions("sys:role:edit")
     @RequestMapping(value = "outrole")
-    public Object outrole(String userId, String roleId) {
+    public ResultDto outrole(String userId, String roleId) {
         log.debug("userId:{}, roleId:{}",userId,roleId);
         String message = "";
         if (Global.isDemoMode()) {
             message = "演示模式，不允许操作！";
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         Role role = systemService.getRole(roleId);
         User user = systemService.getUser(userId);
@@ -244,12 +223,12 @@ public class RoleController extends BaseController {
                 } else {
                     message =  "用户【" + user.getName() + "】从角色【" + role.getName() + "】中移除成功！";
                     log.debug("message:{}", message);
-                    return PublicRepResultTool.sendResult("0000",message,null);
+                    return ResultDtoTool.buildSucceed(message,null);
                 }
             }
         }
         log.debug("message:{}", message);
-        return PublicRepResultTool.sendResult("9999",message,null);
+        return ResultDtoTool.buildError(message);
     }
 
     /**
@@ -261,13 +240,13 @@ public class RoleController extends BaseController {
      */
 //    @RequiresPermissions("sys:role:edit")
     @RequestMapping(value = "assignrole")
-    public Object assignRole(Role role, String[] idsArr) {
+    public ResultDto assignRole(Role role, String[] idsArr) {
         log.debug("role:{}, idsArr:{}", role, idsArr);
         String message = "";
         if (Global.isDemoMode()) {
             message = "演示模式，不允许操作！";
             log.debug("message:{}", message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         StringBuilder msg = new StringBuilder();
         int newNum = 0;
@@ -280,7 +259,7 @@ public class RoleController extends BaseController {
         }
         message = "已成功分配 " + newNum + " 个用户" + msg;
         log.debug("message:{}", message);
-        return PublicRepResultTool.sendResult("0000",message,null);
+        return ResultDtoTool.buildSucceed(message,null);
     }
 
     /**

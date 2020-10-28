@@ -15,9 +15,7 @@ import com.dc.smarteam.modules.file.service.FtFileUploadService;
 import com.dc.smarteam.modules.monitor.putfiletomonitor.client.FtpPutThread;
 import com.dc.smarteam.modules.monitor.putfiletomonitor.msg.FileMsgType;
 import com.dc.smarteam.modules.servicenode.entity.FtServiceNode;
-import com.dc.smarteam.util.PublicRepResultTool;
 import com.google.gson.JsonObject;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,7 +58,7 @@ public class FtFileUploadController extends BaseController {
    * @param request
    * @return
    */
-  @GetMapping(value = "/list")
+  @GetMapping(value = {"/list",""})
   public Object list(FtFileUpload ftFileUpload, HttpServletRequest request) {
     List<FtFileUpload> list;
     int total = 0;
@@ -273,7 +271,7 @@ public class FtFileUploadController extends BaseController {
    * @param ftFileUploadLog
    * @return
    */
-  @GetMapping(value = "/listLog")
+  @GetMapping(value = {"/listLog",""})
   public Object listLog(FtFileUploadLog ftFileUploadLog,  HttpServletRequest request) {
    /* try {
       Page<FtFileUploadLog> page = ftFileUploadLogService.findPage(new Page<FtFileUploadLog>(request, response), ftFileUploadLog);

@@ -2,7 +2,6 @@ package com.dc.smarteam.modules.cfgsync.web;
 
 import com.dc.smarteam.cfgmodel.NodesModel;
 import com.dc.smarteam.common.adapter.TCPAdapter;
-import com.dc.smarteam.common.config.Global;
 import com.dc.smarteam.common.json.ResultDto;
 import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.utils.StringUtils;
@@ -15,17 +14,12 @@ import com.dc.smarteam.helper.RequestMsgHelper;
 import com.dc.smarteam.modules.cfgfile.service.CfgFileService;
 import com.dc.smarteam.modules.servicenode.entity.FtServiceNode;
 import com.dc.smarteam.service.NodesService;
-import com.dc.smarteam.util.PublicRepResultTool;
 import com.dc.smarteam.util.XMLDealTool;
 import com.google.gson.JsonObject;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.dom4j.Document;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,13 +41,12 @@ public class CfgSyncController extends BaseController {
     private NodesService nodesService;
 
 
-    @RequestMapping(value = "index", produces = "application/json;charset=UTF-8")
-    @ResponseBody
-    public Object synConf(HttpServletRequest request) {
+    @RequestMapping(value = {"index", ""})
+    public ResultDto synConf(HttpServletRequest request) {
         Map<String,Object> rs = new HashMap();
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
-            return  PublicRepResultTool.sendResult("9999","请先设置节点。",null);
+            return  ResultDtoTool.buildError("请先设置节点。");
         }
         rs.put("ftServiceNode", ftServiceNode);
 

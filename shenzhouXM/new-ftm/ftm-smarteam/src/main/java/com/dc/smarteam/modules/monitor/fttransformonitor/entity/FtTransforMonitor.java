@@ -1,7 +1,9 @@
 package com.dc.smarteam.modules.monitor.fttransformonitor.entity;
 
 import com.dc.smarteam.common.persistence.DataEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -11,7 +13,11 @@ import java.util.Date;
  */
 public class FtTransforMonitor extends DataEntity<FtTransforMonitor> {
     private Long id;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date createdTime;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date modifiedTime;
     private Byte authFlag;
     private String clientFileName;
@@ -35,6 +41,8 @@ public class FtTransforMonitor extends DataEntity<FtTransforMonitor> {
     private byte scrtFlag;
     private String serverIp;
     private String serverName;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date startTime;
     private Byte suss;
     private String sysname;

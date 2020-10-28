@@ -1,6 +1,8 @@
 package com.dc.smarteam.modules.file.entity;
 
 import com.dc.smarteam.common.persistence.DataEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -35,13 +37,21 @@ public class BizFile extends DataEntity<BizFile> {
     /*文件后缀*/
     private String fileExt;
     /*上传开始时间*/
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date uploadStartTime;
     /*上传结束时间*/
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date uploadEndTime;
     /*0 原始的，1 从其他分发过来的 -1 分发失败*/
     private int state;
     private String fileMd5;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date createdTime;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date modifiedTime;
     private String flowNo;
 

@@ -647,15 +647,15 @@ public class FtNodeMonitorController {
     /*@RequiresPermissions("NodeMonitor:monitorHistory:view")*/
     @GetMapping(value = "/monitorlogForUpAndDownTotal")
     public ResultDto<Map<String, Object>> monitorlogForUpAndDownTotal(
-            @RequestParam(name = "beginDate", required = false) String startDate,
-            @RequestParam(name = "endDate", required = false) String endDate) {
+            @RequestParam(name = "beginDate", required = false) Date startDate,
+            @RequestParam(name = "endDate", required = false) Date endDate) {
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         Map<String, Object> resultMap = new HashMap<>();
         final String persentsDef = "0.00%";
         Map<String, Object> map = new HashMap<>();
         if (startDate == null && endDate == null) {
-            startDate = sdf.format(DateHelper.getStartDate());
-            endDate = sdf.format(DateHelper.getEndDate());
+            startDate = DateHelper.getStartDate();
+            endDate = DateHelper.getEndDate();
         }
 
         if (startDate != null) {

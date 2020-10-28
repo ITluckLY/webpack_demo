@@ -4,7 +4,6 @@
 package com.dc.smarteam.modules.route2.web;
 
 import com.dc.smarteam.cfgmodel.*;
-import com.dc.smarteam.common.config.Global;
 import com.dc.smarteam.common.json.ResultDto;
 import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.msggenerator.MessageFactory;
@@ -22,15 +21,12 @@ import com.dc.smarteam.service.impl.RouteServiceImpl;
 import com.dc.smarteam.service.impl.ServiceInfoServiceImpl;
 import com.dc.smarteam.service.impl.SysServiceImpl;
 import com.dc.smarteam.service.impl.UserServiceImpl;
-import com.dc.smarteam.util.PublicRepResultTool;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -53,7 +49,7 @@ public class FtRouteController extends BaseController {
     @Autowired
     private SysServiceImpl sysService;
 
-    @RequestMapping(value = "list", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = {"list" ,""})
     public Object list(FtRoute ftRoute, HttpServletRequest request, HttpServletResponse response, Map map) {
 
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);

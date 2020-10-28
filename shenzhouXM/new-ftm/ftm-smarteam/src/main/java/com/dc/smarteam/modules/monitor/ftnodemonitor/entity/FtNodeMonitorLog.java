@@ -4,6 +4,8 @@
 package com.dc.smarteam.modules.monitor.ftnodemonitor.entity;
 
 import com.dc.smarteam.common.persistence.DataEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -31,7 +33,11 @@ public class FtNodeMonitorLog extends DataEntity<FtNodeMonitorLog> {
     private String flowrate;
     private String network;
     private String port;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date beginDate;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date endDate;
 
     public Date getBeginDate() {

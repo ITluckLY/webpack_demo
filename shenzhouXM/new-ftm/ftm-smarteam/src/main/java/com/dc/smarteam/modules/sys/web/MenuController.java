@@ -4,23 +4,18 @@
 package com.dc.smarteam.modules.sys.web;
 
 import com.dc.smarteam.common.config.Global;
+import com.dc.smarteam.common.json.ResultDto;
+import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.utils.StringUtils;
 import com.dc.smarteam.common.web.BaseController;
 import com.dc.smarteam.modules.sys.entity.Menu;
 import com.dc.smarteam.modules.sys.service.SystemService;
 import com.dc.smarteam.modules.sys.utils.UserUtils;
-import com.dc.smarteam.util.PublicRepResultTool;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,7 +49,7 @@ public class MenuController extends BaseController {
 
 //    @RequiresPermissions("sys:menu:view")
     @RequestMapping(value = {"list", ""})
-    public Object list(HttpServletRequest request) {
+    public ResultDto<Map<String,Object>> list(HttpServletRequest request) {
         List<Menu> list = new ArrayList<>();
         List<Menu> sourcelist = new ArrayList<>();
         try {
@@ -64,17 +59,17 @@ public class MenuController extends BaseController {
         } catch (Exception e) {
             String message = "查询菜单信息失败！详情：" + e.getMessage();
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("list", list);
         log.debug("resultMap:{}",resultMap);
-        return PublicRepResultTool.sendResult("0000","成功",resultMap);
+        return ResultDtoTool.buildSucceed(resultMap);
     }
 
 //    @RequiresPermissions("sys:menu:view")
     @RequestMapping(value = "form")
-    public Object form(Menu menu,String msg) {
+    public ResultDto<Map<String,Object>> form(Menu menu,String msg) {
         if (menu.getParent() == null || menu.getParent().getId() == null) {
             menu.setParent(new Menu(Menu.getRootId()));
         }
@@ -90,40 +85,40 @@ public class MenuController extends BaseController {
         }
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("menu", menu);
-        return PublicRepResultTool.sendResult("0000","成功",resultMap);
+        return ResultDtoTool.buildSucceed(resultMap);
     }
 
 //    @RequiresPermissions("sys:menu:edit")
     @RequestMapping(value = "save")
-    public Object save(Menu menu) {
+    public ResultDto save(Menu menu) {
         String message = "";
         if (!UserUtils.getUser().isAdmin()) {
             message = "越权操作，只有超级管理员才能添加或修改数据！";
             log.debug("message:{}", message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         if (Global.isDemoMode()) {
             message = "演示模式，不允许操作！";
             log.debug("message:{}", message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         if (!beanValidator(message, menu)) {
 //            return form(menu, message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         systemService.saveMenu(menu);
         message = "保存菜单'" + menu.getName() + "'成功";
         log.debug("message:{}", message);
-        return PublicRepResultTool.sendResult("0000",message,null);
+        return ResultDtoTool.buildSucceed(message,null);
     }
 
 //    @RequiresPermissions("sys:menu:edit")
     @RequestMapping(value = "delete")
-    public Object delete(Menu menu, RedirectAttributes redirectAttributes) {
+    public ResultDto delete(Menu menu, RedirectAttributes redirectAttributes) {
         String message = "";
         if (Global.isDemoMode()) {
             message = "演示模式，不允许操作！";
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
 //		if (Menu.isRoot(id)){
 //			addMessage(redirectAttributes, "删除菜单失败, 不允许删除顶级菜单或编号为空");
@@ -131,34 +126,22 @@ public class MenuController extends BaseController {
         systemService.deleteMenu(menu);
         message = "删除菜单成功";
 //		}
-        return PublicRepResultTool.sendResult("0000",message,null);
+        return ResultDtoTool. buildSucceed(message,null);
     }
 
-    @RequiresPermissions("user")
-    @RequestMapping(value = "tree")
-    public String tree() {
-        return "modules/sys/menuTree";
-    }
-
-    @RequiresPermissions("user")
-    @RequestMapping(value = "treeselect")
-    public String treeselect(String parentId, Model model) {
-        model.addAttribute("parentId", parentId);
-        return "modules/sys/menuTreeselect";
-    }
 
     /**
      * 批量修改菜单排序
      */
 //    @RequiresPermissions("sys:menu:edit")
     @RequestMapping(value = "updateSort")
-    public Object updateSort(String[] ids, Integer[] sorts) {
+    public ResultDto updateSort(String[] ids, Integer[] sorts) {
         log.debug("ids:{}, sorts:{}", ids, sorts);
         String message = "";
         if (Global.isDemoMode()) {
             message = "演示模式，不允许操作！";
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         for (int i = 0; i < ids.length; i++) {
             Menu menu = new Menu(ids[i]);
@@ -167,7 +150,7 @@ public class MenuController extends BaseController {
         }
         message = "保存菜单排序成功!";
         log.debug("message:{}",message);
-        return PublicRepResultTool.sendResult("0000",message,null);
+        return ResultDtoTool.buildSucceed(message,null);
     }
 
     /**
@@ -180,7 +163,7 @@ public class MenuController extends BaseController {
      */
 //    @RequiresPermissions("user")
     @RequestMapping(value = "treeData")
-    public Object treeData(@RequestParam(required = false) String extId, @RequestParam(required = false) String isShowHide, HttpServletResponse response) {
+    public ResultDto<List<Map<String, Object>>> treeData(@RequestParam(required = false) String extId, @RequestParam(required = false) String isShowHide, HttpServletResponse response) {
         log.debug("传入参数: extId: {}, isShowHide: {}",extId, isShowHide);
         List<Map<String, Object>> mapList = Lists.newArrayList();
         List<Menu> list = systemService.findAllMenu();
@@ -197,6 +180,7 @@ public class MenuController extends BaseController {
                 mapList.add(map);
             }
         }
-        return  PublicRepResultTool.sendResult("0000","成功",mapList);
+        log.debug("mapList: {}", mapList);
+        return  ResultDtoTool.buildSucceed("成功",mapList);
     }
 }

@@ -4,7 +4,9 @@
 package com.dc.smarteam.modules.monitor.ftnodemonitor.entity;
 
 import com.dc.smarteam.common.persistence.DataEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -19,6 +21,8 @@ public class FtNodeMonitor extends DataEntity<FtNodeMonitor> {
     private static final long serialVersionUID = 1L;
     private String system;      // 系统名称
     private String node;        // 节点名称
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date time;          // 硬件状态采集时间
     private String ip;          // 节点IP
     private String port;        //节点端口
@@ -44,6 +48,8 @@ public class FtNodeMonitor extends DataEntity<FtNodeMonitor> {
     private String networkwarn;     // 网络状态警告
     private String memorywarn;      // 内存阀值
     private String periods;         // 传输间隔
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date stateTime;         // 节点状态变化时间
 
     public FtNodeMonitor() {

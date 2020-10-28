@@ -1,9 +1,10 @@
 package com.dc.smarteam.modules.monitor.ftnodemonitor.web;
 
+import com.dc.smarteam.common.json.ResultDto;
+import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.utils.IdGen;
 import com.dc.smarteam.modules.monitor.ftnodemonitor.entity.FtNodeMonitorMsgEmail;
 import com.dc.smarteam.modules.monitor.ftnodemonitor.service.FtNodeMonitorMsgEmailService;
-import com.dc.smarteam.util.PublicRepResultTool;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +30,7 @@ public class AlarmNamelistController {
     private FtNodeMonitorMsgEmailService ftNodeMonitorMsgEmailService;
 
     @RequestMapping(value = "addMsgAndEmailList", produces = "application/json;charset=UTF-8")
-    public Object addMsgAndEmailList(HttpServletRequest request, HttpServletResponse response){
+    public ResultDto addMsgAndEmailList(HttpServletRequest request, HttpServletResponse response){
         List<FtNodeMonitorMsgEmail> list;
         int total = 0;
         Map<String,Object>  resultMap = new HashMap<>();
@@ -44,26 +45,26 @@ public class AlarmNamelistController {
                 log.debug("查询的告警名单列表: "+resultMap);
             }
         } catch (Exception e) {
-            return "查询告警名单失败！详情：" + e.getMessage();
+            return ResultDtoTool.buildError("查询告警名单失败！详情：" + e.getMessage());
         }
 
-        return PublicRepResultTool.sendResult("0000","成功",resultMap);
+        return ResultDtoTool.buildSucceed("成功",resultMap);
     }
 
     @RequestMapping(value = "addMsgAndEmailForm", produces = "application/json;charset=UTF-8")
-    public Object addMsgAndEmailForm(FtNodeMonitorMsgEmail ftNodeMonitorMsgEmail) throws Exception {
+    public ResultDto addMsgAndEmailForm(FtNodeMonitorMsgEmail ftNodeMonitorMsgEmail) throws Exception {
         if (ftNodeMonitorMsgEmail.getId() != null) {
             ftNodeMonitorMsgEmail = ftNodeMonitorMsgEmailService.getFtNodeMonitorMsgEmailById(ftNodeMonitorMsgEmail.getId());
         }
         if(log.isDebugEnabled()){
             log.debug("查询的告警名单信息: "+ftNodeMonitorMsgEmail);
         }
-        return PublicRepResultTool.sendResult("0000","成功",ftNodeMonitorMsgEmail);
+        return ResultDtoTool.buildSucceed("成功",ftNodeMonitorMsgEmail);
     }
 
 
     @RequestMapping(value = "saveMsgEmail", produces = "application/json;charset=UTF-8")
-    public Object addMsgAndEmailSave(FtNodeMonitorMsgEmail ftNodeMonitorMsgEmail) throws Exception {
+    public ResultDto addMsgAndEmailSave(FtNodeMonitorMsgEmail ftNodeMonitorMsgEmail) throws Exception {
         String message = "";
         if (ftNodeMonitorMsgEmail.getId() == null) {
             ftNodeMonitorMsgEmail.setId(IdGen.uuid());
@@ -77,11 +78,11 @@ public class AlarmNamelistController {
                 message = "更新告警名单成功";
             }
         }
-        return PublicRepResultTool.sendResult("0000",message,null);
+        return ResultDtoTool.buildSucceed(message,null);
     }
 
     @RequestMapping(value = "deleteMsgEmail", produces = "application/json;charset=UTF-8")
-    public Object deleteMsgEmail(FtNodeMonitorMsgEmail ftNodeMonitorMsgEmail) throws Exception {
+    public ResultDto deleteMsgEmail(FtNodeMonitorMsgEmail ftNodeMonitorMsgEmail) throws Exception {
         String message = "";
         if (ftNodeMonitorMsgEmail.getId() != null) {
             int change = ftNodeMonitorMsgEmailService.delete(ftNodeMonitorMsgEmail);
@@ -89,6 +90,6 @@ public class AlarmNamelistController {
                 message = "删除告警名单成功";
             }
         }
-        return PublicRepResultTool.sendResult("0000",message,null);
+        return ResultDtoTool.buildSucceed(message,null);
     }
 }

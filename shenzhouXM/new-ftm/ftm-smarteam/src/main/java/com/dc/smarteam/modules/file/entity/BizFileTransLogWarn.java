@@ -1,6 +1,8 @@
 package com.dc.smarteam.modules.file.entity;
 
 import com.dc.smarteam.common.persistence.DataEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -29,14 +31,20 @@ public class BizFileTransLogWarn extends DataEntity<BizFileTransLogWarn> {
     //传输节点的名称
     private String nodeName;
     //文件传输的开始时间
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date startTime;
     //文件传输结束的时间
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date endTime;
     //传输是否成功
     private boolean suss;
     //通知类型：下载成功0: 金融网关通知；下载失败1：短信通知；
     private int noticeType;
     //通知时间
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date noticeTime;
     //通知状态
     private boolean noticeStat;

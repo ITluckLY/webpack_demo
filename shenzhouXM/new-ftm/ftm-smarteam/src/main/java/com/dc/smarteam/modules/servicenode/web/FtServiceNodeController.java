@@ -21,12 +21,13 @@ import com.dc.smarteam.modules.servicenode.entity.FtServiceNode;
 import com.dc.smarteam.modules.sysinfo.entity.FtSysInfo;
 import com.dc.smarteam.modules.sysinfo.service.FtSysInfoService;
 import com.dc.smarteam.service.NodesService;
-import com.dc.smarteam.util.PublicRepResultTool;
 import lombok.extern.log4j.Log4j2;
 import net.sf.json.JSONObject;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
@@ -48,26 +49,18 @@ import java.util.*;
 public class FtServiceNodeController extends BaseController {
 
     //20160628 增加系统service
-    @Resource
+    @Resource(name = "FtSysInfoServiceImpl")
     private FtSysInfoService ftSysInfoService;
-    @Resource
+    @Resource(name = "NodesServiceImpl")
     private NodesService nodesService;
-    @Resource
+    @Resource(name = "FtNodeMonitorServiceImpl")
     private FtNodeMonitorService ftNodeMonitorService;
     //ADD 20170908
     private static String DATA_NODE = "datanode";
 
-    /**
-     * 节点列表数据
-     *
-     * @param ftServiceNode
-     * @param request
-     * @param response
-     * @param map
-     * @return
-     */
-    @GetMapping(value = "/list")
-    public Object list(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Map map) {//NOSONAR
+    //    @RequiresPermissions("servicenode:ftServiceNode:view")
+    @RequestMapping(value = {"list", ""})
+    public ResultDto<Map<String,Object>> list(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response) {//NOSONAR
         ResultDto<List<NodesModel.Node>> resultDto = nodesService.listAll(null, request);
         List<FtServiceNode> list2 = new ArrayList<>();
         if (ResultDtoTool.isSuccess(resultDto)) {
@@ -75,18 +68,18 @@ public class FtServiceNodeController extends BaseController {
             for (NodesModel.Node node : nodeList) {
                 boolean isMatch = true;
                 if (isMatch && StringUtils.isNoneEmpty(ftServiceNode.getName())//NOSONAR
-                    && !StringUtils.containsIgnoreCase(node.getName(), ftServiceNode.getName())) {
+                        && !StringUtils.containsIgnoreCase(node.getName(), ftServiceNode.getName())) {
                     isMatch = false;
                 }
                 if (isMatch && StringUtils.isNoneEmpty(ftServiceNode.getIpAddress())//NOSONAR
-                    && !StringUtils.containsIgnoreCase(node.getIp(), ftServiceNode.getIpAddress())) {
+                        && !StringUtils.containsIgnoreCase(node.getIp(), ftServiceNode.getIpAddress())) {
                     isMatch = false;
                 }
                 if (!isMatch) continue;
                 FtServiceNode ftServiceNode2 = new FtServiceNode();
                 CfgModelConverter.convertTo(node, ftServiceNode2);
                 if (isMatch && StringUtils.isNoneEmpty(ftServiceNode.getState())//NOSONAR
-                    && !StringUtils.equalsIgnoreCase(ftServiceNode2.getState(), ftServiceNode.getState())) {
+                        && !StringUtils.equalsIgnoreCase(ftServiceNode2.getState(), ftServiceNode.getState())) {
                     isMatch = false;
                 }
                 //add 20170908 查询任务数量
@@ -104,25 +97,21 @@ public class FtServiceNodeController extends BaseController {
                 list2.add(ftServiceNode2);
             }
         } else {
-            return PublicRepResultTool.sendResult("9999", resultDto.getMessage(), null);
+            String message = resultDto.getMessage();
+            return ResultDtoTool.buildSucceed(message,null);
         }
-        PageHelper.getInstance().getPage(FtServiceNode.class, request, response, map, list2);
-        return PublicRepResultTool.sendResult("0000", "", list2);
+        Map<String,Object> resultMap = new HashMap<>();
+        PageHelper.getInstance().getPage(FtServiceNode.class, request, response, resultMap, list2);
+        log.debug("resultMap:{}",resultMap);
+        return ResultDtoTool.buildSucceed(resultMap);
     }
 
-    /**
-     * 节点列表数据
-     *
-     * @param ftServiceNode
-     * @param request
-     * @param response
-     * @return
-     */
-    @GetMapping(value = "/baseList")
-    public Object baseList(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Map map) {
+    @RequiresPermissions("servicenode:ftServiceNode:baseList")
+    @RequestMapping(value = {"baseList"})
+    public Object baseList( HttpServletRequest request, HttpServletResponse response, Map map) {
         FtServiceNode ftServiceNode0 = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode0 || null == ftServiceNode0.getSystemName()) {
-            return PublicRepResultTool.sendResult("9999", "请先设置节点!!!", "");
+            return ResultDtoTool.buildError("请先设置节点！！！");
         }
         String currSysname = ftServiceNode0.getSystemName();
         ResultDto<List<NodesModel.Node>> resultDto = nodesService.listAll(null, request);
@@ -137,25 +126,25 @@ public class FtServiceNodeController extends BaseController {
                 list2.add(ftServiceNode2);
             }
         } else {
-            return PublicRepResultTool.sendResult("9999", resultDto.getMessage(), null);
+            return ResultDtoTool.buildSucceed(resultDto.getMessage());
         }
         PageHelper.getInstance().getPage(FtServiceNode.class, request, response, map, list2);
 
-        return PublicRepResultTool.sendResult("0000", "", list2);
+        return ResultDtoTool.buildSucceed(list2);
     }
 
 
-    @GetMapping(value = "/form")
-    public Map<String, Object> form(FtServiceNode ftServiceNode, HttpServletRequest request) {
-        Map<String,Object> map = new HashMap<>();
+    //    @RequiresPermissions("servicenode:ftServiceNode:view")
+    @RequestMapping(value = "form")
+    public ResultDto<Map<String,Object>> form(FtServiceNode ftServiceNode, HttpServletRequest request) {
+        Map<String,Object> resultMap = new HashMap<>();
         if (null != ftServiceNode.getName()) {
             ResultDto<NodesModel.Node> resultDto = nodesService.selByName(ftServiceNode, request);
-
             if (ResultDtoTool.isSuccess(resultDto)) {
                 NodesModel.Node node = resultDto.getData();
                 CfgModelConverter.convertTo(node, ftServiceNode);
                 ftServiceNode.setAddOrUpdate(1);
-                map.put("ftServiceNode", ftServiceNode);
+                resultMap.put("ftServiceNode", ftServiceNode);
 
                 List<FtSysInfo> ftSysInfoList = ftSysInfoService.findList(new FtSysInfo());
                 List<FtSysInfo> systemNameList = new ArrayList<>();
@@ -164,19 +153,21 @@ public class FtServiceNodeController extends BaseController {
                         systemNameList.add(fsi);
                     }
                 }
-                map.put("systemNameList", systemNameList);
+                resultMap.put("systemNameList", systemNameList);
             }
-            map.put("opt", "update");
+            resultMap.put("opt", "update");
         } else {
             List<FtSysInfo> systemNameList = ftSysInfoService.findList(new FtSysInfo());
-            map.put("systemNameList", systemNameList);
-            map.put("opt", "add");
+            resultMap.put("systemNameList", systemNameList);
+            resultMap.put("opt", "add");
         }
-        return map;
+        log.debug("resultMap:{}",resultMap);
+        return ResultDtoTool.buildSucceed(resultMap);
     }
 
-    @PostMapping(value = "/save")
-    public String save(String opt, FtServiceNode ftServiceNode, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    //    @RequiresPermissions("servicenode:ftServiceNode:edit")
+    @RequestMapping(value = "save")
+    public ResultDto save(String opt, FtServiceNode ftServiceNode, HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) {
         List<FtSysInfo> ftSysInfoList = ftSysInfoService.findList(new FtSysInfo());
         for (FtSysInfo fsi : ftSysInfoList) {
             if (fsi.getName().equalsIgnoreCase(ftServiceNode.getSystemName())) {
@@ -221,45 +212,51 @@ public class FtServiceNodeController extends BaseController {
             ftNodeMonitorService.updateNode(ftNodeMonitor);
 
         } else {
-            String msg = resultDto == null ? "操作错误" : resultDto.getMessage();
-            addMessage(redirectAttributes, msg);
+            String message = resultDto == null ? "操作错误" : resultDto.getMessage();
+            log.debug("message:{}",message);
+            return ResultDtoTool.buildError(message,null);
         }
-        return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode";
+        return ResultDtoTool.buildSucceed("成功",null);
     }
 
-    @RequiresPermissions("servicenode:ftServiceNode:edit")
+    //    @RequiresPermissions("servicenode:ftServiceNode:edit")
     @RequestMapping(value = "delete")
-    public String delete(FtServiceNode ftServiceNode, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-
+    public ResultDto delete(FtServiceNode ftServiceNode, HttpServletRequest request) {
+        String message = "";
         if (null != ftServiceNode && ftServiceNode.getState().equalsIgnoreCase("1")) {
-            addMessage(redirectAttributes, "不能删除正在运行的节点");
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode";
+            message = "不能删除正在运行的节点";
+            return ResultDtoTool.buildError(message);
         }
         ResultDto<String> resultDto = nodesService.del(ftServiceNode, request);
         if (ResultDtoTool.isSuccess(resultDto) && ftServiceNode != null && ftServiceNode.getName() != null) {
-            addMessage(redirectAttributes, "删除节点成功");
+            message = "删除节点成功";
             FtNodeMonitor ftNodeMonitor = new FtNodeMonitor();
             ftNodeMonitor.setNode(ftServiceNode.getName());
             ftNodeMonitorService.deleteNode(ftNodeMonitor);
 
         } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
+            message = resultDto.getMessage();
+            log.debug("message:{}",message);
+            return ResultDtoTool.buildError(message,null);
         }
-        return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode";
+        log.debug("message:{}",message);
+        return ResultDtoTool.buildSucceed(message,null);
     }
 
-    @RequiresPermissions("servicenode:ftServiceNode:view")
+    //    @RequiresPermissions("servicenode:ftServiceNode:view")
     @RequestMapping(value = "otherConf")
-    public String otherConf(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
+    public ResultDto otherConf(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response) {
 
+        Map<String,Object> resultMap = new HashMap<>();
         if (ftServiceNode.getName() != null) {
             request.getSession().setAttribute("ftServiceNodeOtherConf", ftServiceNode);
         } else {
             ftServiceNode = (FtServiceNode) request.getSession().getAttribute("ftServiceNodeOtherConf");
         }
         if (ftServiceNode.getState().trim().equals("0")) {
-            addMessage(redirectAttributes, "节点未连接，请开启客户端后，再次尝试！");
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode";
+            String message = "节点未连接，请开启客户端后，再次尝试！";
+            log.debug("message:{}", message);
+            return ResultDtoTool.buildError(message);
         } else if (ftServiceNode.getState().trim().equals("1")) {
             String getAllStr = MessageFactory.getInstance().nodeParam(new FtNodeParam(), "print");//生成查询报文
             TCPAdapter tcpAdapter = new TCPAdapter();
@@ -267,44 +264,45 @@ public class FtServiceNodeController extends BaseController {
             if (ResultDtoTool.isSuccess(resultDto)) {
                 try {
                     if (resultDto.getData() != null) {
-                        model.addAttribute("returnMsg", URLDecoder.decode(resultDto.getData(), "utf-8"));
+                        resultMap.put("returnMsg", URLDecoder.decode(resultDto.getData(), "utf-8"));
                     } else {
-                        model.addAttribute("returnMsg", "");
+                        resultMap.put("returnMsg", "");
                     }
                 } catch (IOException e) {
                     logger.error("", e);
                 }
             } else {
-                model.addAttribute("returnMsg", "");
+                resultMap.put("returnMsg", "");
             }
         }
-        return "modules/servicenode/ftServiceNodeOtherConf";
+        log.debug("resultMap:{}", resultMap);
+        return ResultDtoTool.buildSucceed("成功",resultMap);
     }
 
-    @RequiresPermissions("servicenode:ftServiceNode:view")
-    @RequestMapping(value = "listAll")
-    public String listAll(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model) {
-
-        ftServiceNode = (FtServiceNode) request.getSession().getAttribute("ftServiceNodeOtherConf");
-        String getAllStr = MessageFactory.getInstance().nodes(new FtServiceNode(), "print");//生成查询报文
-        TCPAdapter tcpAdapter = new TCPAdapter();
-        ResultDto<String> resultDto = tcpAdapter.invoke(getAllStr, ftServiceNode, String.class);//发送报文
-        if (ResultDtoTool.isSuccess(resultDto)) {
-            try {
-                if (resultDto.getData() != null) {
-                    model.addAttribute("returnMsg", URLDecoder.decode(resultDto.getData(), "utf-8"));
-                } else {
-                    model.addAttribute("returnMsg", "");
-                }
-            } catch (IOException e) {
-                logger.error("", e);
-            }
-        } else {
-            model.addAttribute("returnMsg", "");
-        }
-
-        return "modules/servicenode/ftServiceNodeListAll";
-    }
+//    @RequiresPermissions("servicenode:ftServiceNode:view")
+//    @RequestMapping(value = "listAll")
+//    public String listAll(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model) {
+//
+//        ftServiceNode = (FtServiceNode) request.getSession().getAttribute("ftServiceNodeOtherConf");
+//        String getAllStr = MessageFactory.getInstance().nodes(new FtServiceNode(), "print");//生成查询报文
+//        TCPAdapter tcpAdapter = new TCPAdapter();
+//        ResultDto<String> resultDto = tcpAdapter.invoke(getAllStr, ftServiceNode, String.class);//发送报文
+//        if (ResultDtoTool.isSuccess(resultDto)) {
+//            try {
+//                if (resultDto.getData() != null) {
+//                    model.addAttribute("returnMsg", URLDecoder.decode(resultDto.getData(), "utf-8"));
+//                } else {
+//                    model.addAttribute("returnMsg", "");
+//                }
+//            } catch (IOException e) {
+//                logger.error("", e);
+//            }
+//        } else {
+//            model.addAttribute("returnMsg", "");
+//        }
+//
+//        return "modules/servicenode/ftServiceNodeListAll";
+//    }
 
 
     @RequiresPermissions("servicenode:ftServiceNode:view")
@@ -316,7 +314,7 @@ public class FtServiceNodeController extends BaseController {
         String resultType = null;
         if ((!(null == fileName || fileName.isEmpty())) && fileName.equalsIgnoreCase("all")) {
             fileName = "nodes,user,file,file_clean,components,services_info,crontab" +
-                ",file_rename,flow,route,system,vsysmap";
+                    ",file_rename,flow,route,system,vsysmap";
             getAllStr = MessageFactory.getInstance().cfgSync(fileName, "nodeSync", ftServiceNode.getSystemName());//生成查询报文
             TCPAdapter tcpAdapter = new TCPAdapter();
             //发送报文

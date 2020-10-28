@@ -72,11 +72,4 @@ public class FtFileUploadServiceImpl extends CrudService<FtFileUploadDao, FtFile
 
 
 
-
-
-
-
-
-
-
 }

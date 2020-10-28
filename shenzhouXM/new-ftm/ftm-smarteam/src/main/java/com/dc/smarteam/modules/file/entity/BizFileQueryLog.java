@@ -1,6 +1,8 @@
 package com.dc.smarteam.modules.file.entity;
 
 import com.dc.smarteam.common.persistence.DataEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -20,6 +22,8 @@ public class BizFileQueryLog extends DataEntity<BizFileQueryLog> {
 
     /* 是否是最后一个分片 */
     private boolean downlastPiece;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date downcreatedTime;
     private boolean downsuss;
     private String downerrCode;

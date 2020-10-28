@@ -1,6 +1,5 @@
 package com.dc.smarteam.modules.file.web;
 
-import com.dc.smarteam.common.config.Global;
 import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.persistence.Page;
 import com.dc.smarteam.common.utils.StringUtils;
@@ -8,11 +7,7 @@ import com.dc.smarteam.helper.CurrNameNodeHelper;
 import com.dc.smarteam.modules.file.entity.BizFile;
 import com.dc.smarteam.modules.file.service.BizFileService;
 import com.dc.smarteam.modules.servicenode.entity.FtServiceNode;
-import com.dc.smarteam.util.PublicRepResultTool;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +45,7 @@ public class BizFileController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "list", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = {"list", ""})
     public Object list(BizFile bizFile, HttpServletRequest request, HttpServletResponse response) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {

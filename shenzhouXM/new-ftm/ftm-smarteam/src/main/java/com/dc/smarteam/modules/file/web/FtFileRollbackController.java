@@ -11,11 +11,8 @@ import com.dc.smarteam.modules.file.service.FtFileRollbackLogService;
 import com.dc.smarteam.modules.file.service.FtFileUploadLogService;
 import com.dc.smarteam.modules.monitor.putfiletomonitor.client.FtRollbackThread;
 import com.dc.smarteam.modules.servicenode.entity.FtServiceNode;
-import com.dc.smarteam.util.PublicRepResultTool;
 import com.google.gson.JsonObject;
 import lombok.extern.log4j.Log4j2;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -109,7 +106,7 @@ public class FtFileRollbackController extends BaseController {
      * @param request
      * @return
      */
-    @GetMapping(value = "/listLog")
+    @GetMapping(value ={ "/listLog",""})
     public Object listLog(FtFileRollbackLog ftFileRollbackLog,HttpServletRequest request) {
        /* try {
             Page<FtFileRollbackLog> page = ftFileRollbackService.findPage(new Page<FtFileRollbackLog>(request, response), ftFileRollbackLog);

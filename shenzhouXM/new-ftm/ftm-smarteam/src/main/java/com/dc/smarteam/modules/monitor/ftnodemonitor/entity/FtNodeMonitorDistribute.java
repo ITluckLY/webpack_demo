@@ -1,6 +1,8 @@
 package com.dc.smarteam.modules.monitor.ftnodemonitor.entity;
 
 import com.dc.smarteam.common.persistence.DataEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -9,18 +11,28 @@ import java.util.Date;
  */
 public class FtNodeMonitorDistribute extends DataEntity<FtNodeMonitorDistribute> {
 
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date createdTime;          //创建时间
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date modifiedTime;         //修改时间
     private String fileName;            //文件名
     private String fileVersion;         //文件版本
     private String nodeNamels;            //节点名
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date optTime;               //操作时间
     private String realFileName;        //真实文件名
     private String sysnamels;             //节点组
     private String state;                  //状态
     private String oriFilename;         //原始文件名
     private String tranCode;               //交易码
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date beginDate;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date endDate;
 
     public Date getBeginDate() {

@@ -1,19 +1,14 @@
 package com.dc.smarteam.modules.servicenode.web;
 
 import com.dc.smarteam.common.adapter.TCPAdapter;
-import com.dc.smarteam.common.config.Global;
 import com.dc.smarteam.common.json.ResultDto;
 import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.msggenerator.MessageFactory;
 import com.dc.smarteam.common.utils.StringUtils;
-import com.dc.smarteam.common.web.BaseController;
 import com.dc.smarteam.common.zk.ZkService;
 import com.dc.smarteam.modules.servicenode.entity.FtServiceNode;
-import com.dc.smarteam.util.PublicRepResultTool;
 import com.google.gson.JsonObject;
 import lombok.extern.log4j.Log4j2;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,16 +28,16 @@ import java.util.Map;
 @Log4j2
 @RestController
 @RequestMapping(value = "${adminPath}/servicenode/ftServiceNode")
-public class FtNodeStartStopController /*extends BaseController */{
+public class FtNodeStartStopController{
 
 //    @RequiresPermissions("servicenode:ftServiceNode:startStop")
     @RequestMapping(value = "startDatanode")
-    public Object startDatanode(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
+    public ResultDto startDatanode(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
         String message = "";
         if (StringUtils.equals(ftServiceNode.getState(), "1")) {
             message  = "不能启动正在运行的节点";
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         String datanodeName = ftServiceNode.getName();
         Map<String, JsonObject> dataNodeMap = ZkService.getInstance().getDataNodeMap();
@@ -52,7 +47,7 @@ public class FtNodeStartStopController /*extends BaseController */{
             if (StringUtils.equalsIgnoreCase(dataNodeNameTemp, datanodeName)) {
                 message  = "不能启动正在运行的节点";
                 log.debug("message:{}",message);
-                return PublicRepResultTool.sendResult("9999",message,null);
+                return ResultDtoTool.buildError(message);
             }
         }
         String monitorIp = null;
@@ -71,7 +66,7 @@ public class FtNodeStartStopController /*extends BaseController */{
         if (monitorIp == null) {
             message  =  "该节点监控端monitor未启动，请检查";
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         FtServiceNode ftServiceNode2 = new FtServiceNode();
         ftServiceNode2.setIpAddress(monitorIp);
@@ -84,20 +79,20 @@ public class FtNodeStartStopController /*extends BaseController */{
         } else {
             message  = resultDto.getMessage();
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         log.debug("message:{}",message);
-        return PublicRepResultTool.sendResult("0000",message,null);
+        return ResultDtoTool.buildSucceed(message,null);
     }
 
 //    @RequiresPermissions("servicenode:ftServiceNode:startStop")
     @RequestMapping(value = "stopDatanode")
-    public Object stopDatanode(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
+    public ResultDto stopDatanode(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
         String message = "";
         if (StringUtils.equals(ftServiceNode.getState(), "0")) {
             message = "不能停止未启动的节点";
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         String datanodeName = ftServiceNode.getName();
         Map<String, JsonObject> dataNodeMap = ZkService.getInstance().getDataNodeMap();
@@ -110,7 +105,7 @@ public class FtNodeStartStopController /*extends BaseController */{
         if (!liveDNList.contains(datanodeName)) {
             message = "不能停止未启动的节点";
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         String monitorIp = null;
         String monitorPort = null;
@@ -128,7 +123,7 @@ public class FtNodeStartStopController /*extends BaseController */{
         if (monitorIp == null) {
             message = "该节点监控端monitor未启动，请检查";
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         FtServiceNode ftServiceNode2 = new FtServiceNode();
         ftServiceNode2.setIpAddress(monitorIp);
@@ -141,9 +136,9 @@ public class FtNodeStartStopController /*extends BaseController */{
         } else {
             message = resultDto.getMessage();
             log.debug("message:{}",message);
-            return PublicRepResultTool.sendResult("9999",message,null);
+            return ResultDtoTool.buildError(message);
         }
         log.debug("message:{}",message);
-        return PublicRepResultTool.sendResult("0000",message,null);
+        return ResultDtoTool.buildSucceed(message,null);
     }
 }

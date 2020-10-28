@@ -23,28 +23,31 @@ import com.dc.smarteam.modules.serviceinfo.entity.GetAuthEntity;
 import com.dc.smarteam.modules.serviceinfo.entity.PutAuthEntity;
 import com.dc.smarteam.modules.servicenode.entity.FtServiceNode;
 import com.dc.smarteam.modules.user.entity.FtUser;
-import com.dc.smarteam.service.FlowService;
+import com.dc.smarteam.service.FlowServiceI;
+import com.dc.smarteam.service.RouteServiceI;
+import com.dc.smarteam.service.ServiceInfoServiceI;
 import com.dc.smarteam.service.UserServiceI;
 import com.dc.smarteam.service.impl.RouteServiceImpl;
 import com.dc.smarteam.service.impl.ServiceInfoServiceImpl;
 import com.dc.smarteam.util.EmptyUtils;
 import com.dc.smarteam.util.NullSafeUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户管理Controller
@@ -52,26 +55,27 @@ import java.util.List;
  * @author liwang
  * @version 2016-01-12
  */
-@Controller
+@Slf4j
+@RestController
 @RequestMapping(value = "${adminPath}/serviceinfo/ftServiceInfo")
-public class FtServiceInfoController extends BaseController {
+public class FtServiceInfoController {
 
-    @Resource
-    private ServiceInfoServiceImpl serviceInfoService;
-    @Resource
-    private FlowService flowService;
+    @Resource(name = "ServiceInfoServiceImpl")
+    private ServiceInfoServiceI serviceInfoService;
+    @Resource(name = "FlowServiceImpl")
+    private FlowServiceI flowService;
     @Resource(name = "UserServiceImpl")
     private UserServiceI userService;
-    @Autowired
-    private RouteServiceImpl routeService;
+    @Resource(name = "RouteServiceImpl")
+    private RouteServiceI routeService;
     public static final String REDIRECT = "redirect:";
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:view")
-    @RequestMapping(value = {"list", ""})
-    public String list(FtServiceInfo ftServiceInfo, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {// NOSONAR
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:view")*/
+    @GetMapping(value = {"/list", ""})
+    public ResultDto<? extends Object> list(FtServiceInfo ftServiceInfo, HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {// NOSONAR
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
-            return REDIRECT + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
+            return ResultDtoTool.buildError("节点为空");
         }
         ftServiceInfo.setSystemName(ftServiceNode.getSystemName());
 
@@ -93,16 +97,15 @@ public class FtServiceInfoController extends BaseController {
                 list.add(info);
             }
         } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
-            return REDIRECT + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
+            return ResultDtoTool.buildError(resultDto.getMessage());
         }
-        PageHelper.getInstance().getPage(FtServiceInfo.class, request, response, model, list);
-        return "modules/serviceinfo/ftServiceInfoList";
+        PageHelper.getInstance().getPage(FtServiceInfo.class, request, response, map, list);
+        return ResultDtoTool.buildSucceed("success", map);
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:view")
-    @RequestMapping(value = "addPage")
-    public String addPage(FtServiceInfo ftServiceInfo, HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) {
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:view")*/
+    @PostMapping(value = "/addPage")
+    public ResultDto<List<FtFlow>> addPage(@RequestBody @Valid FtServiceInfo ftServiceInfo, HttpServletRequest request) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         ftServiceInfo.setSystemName(ftServiceNode.getSystemName());
         ResultDto<List<FlowModel.Flow>> resultDto = flowService.selBySysname(ftServiceNode.getSystemName());
@@ -115,22 +118,22 @@ public class FtServiceInfoController extends BaseController {
                 ftFlowList.add(ftFlow);
             }
         }
-        model.addAttribute("ftFlowList", ftFlowList);
-        return "modules/serviceinfo/ftServiceInfoForm";
+        return ResultDtoTool.buildSucceed("success", ftFlowList);
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:view")
-    @RequestMapping(value = "form")
-    public String form(FtServiceInfo ftServiceInfo, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:view")*/
+    @GetMapping(value = "/form")
+    public ResultDto<? extends Object> form(@RequestBody @Valid FtServiceInfo ftServiceInfo, HttpServletRequest request) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
 
+        Map<String, Object> resultMap = new HashMap<>();
         ResultDto<ServiceModel.Service> resultDto = serviceInfoService.selByTrancodeAndSysname(ftServiceInfo);
         if (ResultDtoTool.isSuccess(resultDto)) {
             ServiceModel.Service service = resultDto.getData();
             FtServiceInfo info = new FtServiceInfo();
             CfgModelConverter.convertToWithoutAuth(service, info);
             info.setId(ftServiceInfo.getId());
-            model.addAttribute("ftServiceInfo", info);
+            resultMap.put("ftServiceInfo", info);
 
             ResultDto<List<FlowModel.Flow>> flowDto = flowService.selBySysname(ftServiceNode.getSystemName());
             List<FtFlow> ftFlowList = new ArrayList<>();
@@ -142,17 +145,17 @@ public class FtServiceInfoController extends BaseController {
                     ftFlowList.add(ftFlow);
                 }
             }
-            model.addAttribute("ftFlowList", ftFlowList);
-            return "modules/serviceinfo/ftServiceInfoEditForm";
+            resultMap.put("ftFlowList", ftFlowList);
+            return ResultDtoTool.buildSucceed("success", resultMap);
         } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
-            return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceInfo/?repage";//NOSONAR
+            //addMessage(redirectAttributes, resultDto.getMessage());
+            return ResultDtoTool.buildError(resultDto.getMessage());//NOSONAR
         }
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:edit")
-    @RequestMapping(value = "save")
-    public String save(FtServiceInfo ftServiceInfo, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:edit")*/
+    @PostMapping(value = "/save")
+    public ResultDto<Object> save(@RequestBody @Valid FtServiceInfo ftServiceInfo, HttpServletRequest request) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         ftServiceInfo.setSystemName(ftServiceNode.getSystemName());
         ResultDto<String> resultDto;
@@ -161,17 +164,15 @@ public class FtServiceInfoController extends BaseController {
         } else {
             resultDto = serviceInfoService.update(ftServiceInfo);
         }
-        if (ResultDtoTool.isSuccess(resultDto)) {
-            addMessage(redirectAttributes, "保存服务管理成功");
-        } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
+        if (log.isInfoEnabled()) {
+            log.info("{} instance {} was created.", FtServiceInfo.class.getSimpleName(), ftServiceInfo.getId());
         }
-        return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceInfo/?repage";
+        return ResultDtoTool.buildSucceed("success");
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:view")
-    @RequestMapping(value = "addPutAuth")
-    public String addPutAuth(FtServiceInfo ftServiceInfo, PutAuthEntity putAuthEntity, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:view")*/
+    @GetMapping(value = "/addPutAuth")
+    public ResultDto<List<FtUser>> addPutAuth(FtServiceInfo ftServiceInfo, PutAuthEntity putAuthEntity, HttpServletRequest request) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         ftServiceInfo.setSystemName(ftServiceNode.getSystemName());
         String trancodeTemp = ftServiceInfo.getTrancode();
@@ -188,14 +189,12 @@ public class FtServiceInfoController extends BaseController {
                 ftUserList.add(ftUser);
             }
         }
-        model.addAttribute("ftUserList", ftUserList);
-
-        return "modules/serviceinfo/ftServiceInfoAddPutAuth";
+        return ResultDtoTool.buildSucceed("success", ftUserList);
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:view")
-    @RequestMapping(value = "addGetAuth")
-    public String addGetAuth(FtServiceInfo ftServiceInfo, GetAuthEntity getAuthEntity, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:view")*/
+    @GetMapping(value = "/addGetAuth")
+    public ResultDto<List<FtUser>> addGetAuth(FtServiceInfo ftServiceInfo, HttpServletRequest request) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         ftServiceInfo.setSystemName(ftServiceNode.getSystemName());
         List<FtUser> ftUserList = new ArrayList<>();
@@ -208,89 +207,101 @@ public class FtServiceInfoController extends BaseController {
                 ftUserList.add(ftUser);
             }
         }
-        model.addAttribute("ftUserList", ftUserList);
-        return "modules/serviceinfo/ftServiceInfoAddGetAuth";
+
+        return ResultDtoTool.buildSucceed("success", ftUserList);
     }
 
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:edit")
-    @RequestMapping(value = "savePutAuth")
-    public String savePutAuth(FtServiceInfo ftServiceInfo, PutAuthEntity putAuthEntity, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:edit")*/
+    @PostMapping(value = "/savePutAuth")
+    public ResultDto<Object> savePutAuth(FtServiceInfo ftServiceInfo, PutAuthEntity putAuthEntity, HttpServletRequest request) {
 
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         ftServiceInfo.setSystemName(ftServiceNode.getSystemName());
         ResultDto<String> resultDto = serviceInfoService.savePutAuth(ftServiceInfo, putAuthEntity);
         if (ResultDtoTool.isSuccess(resultDto)) {
-            addMessage(redirectAttributes, "保存上传权限成功");
+            //addMessage(redirectAttributes, "保存上传权限成功");
+            return ResultDtoTool.buildSucceed("success");
         } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
+            return ResultDtoTool.buildError(resultDto.getMessage());
         }
-        return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceInfo/putGetTotal?trancode=" + ftServiceInfo.getTrancode() + "&systemName=" + ftServiceInfo.getSystemName();//NOSONAR
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:edit")
-    @RequestMapping(value = "delPutAuth")
-    public String delPutAuth(FtServiceInfo ftServiceInfo, PutAuthEntity putAuthEntity, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:edit")*/
+    @DeleteMapping(value = "/delPutAuth")
+    public ResultDto<Object> delPutAuth(FtServiceInfo ftServiceInfo, PutAuthEntity putAuthEntity, HttpServletRequest request) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         ftServiceInfo.setSystemName(ftServiceNode.getSystemName());
         ResultDto<String> resultDto = serviceInfoService.delPutAuth(ftServiceInfo, putAuthEntity);
-        if (ResultDtoTool.isSuccess(resultDto)) {
-            addMessage(redirectAttributes, "删除上传权限成功");
-        } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
+
+        if (log.isInfoEnabled()) {
+            log.info("{},{} instance {},{} was deleted.",
+                    FtServiceInfo.class.getSimpleName(),
+                    PutAuthEntity.class.getSimpleName(),
+                    ftServiceInfo.getId(),
+                    putAuthEntity.getId());
         }
-        return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceInfo/putGetTotal?trancode=" + ftServiceInfo.getTrancode() + "&systemName=" + ftServiceInfo.getSystemName();
+
+        if (ResultDtoTool.isSuccess(resultDto)) {
+            return ResultDtoTool.buildSucceed("success");
+        } else {
+            return ResultDtoTool.buildError(resultDto.getMessage());
+        }
+
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:edit")
-    @RequestMapping(value = "saveGetAuth")
-    public String saveGetAuth(FtServiceInfo ftServiceInfo, GetAuthEntity getAuthEntity, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:edit")*/
+    @PostMapping(value = "/saveGetAuth")
+    public ResultDto<Object> saveGetAuth(FtServiceInfo ftServiceInfo, GetAuthEntity getAuthEntity, HttpServletRequest request) {
 
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         ftServiceInfo.setSystemName(ftServiceNode.getSystemName());
         ResultDto<String> resultDto = serviceInfoService.saveGetAuth(ftServiceInfo, getAuthEntity);
         ResultDto<String> resultDto2 = routeService.addRouteByGetAuth(getAuthEntity);
         if (ResultDtoTool.isSuccess(resultDto) && ResultDtoTool.isSuccess(resultDto2)) {
-            addMessage(redirectAttributes, "保存下载权限成功");
+            //addMessage(redirectAttributes, "保存下载权限成功");
+            return ResultDtoTool.buildSucceed("success");
         } else {
-            addMessage(redirectAttributes, resultDto.getMessage()+resultDto2.getMessage());
+            return ResultDtoTool.buildError(resultDto.getMessage());
         }
-        return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceInfo/putGetTotal?trancode=" + ftServiceInfo.getTrancode() + "&systemName=" + ftServiceInfo.getSystemName();
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:edit")
-    @RequestMapping(value = "delGetAuth")
-    public String delGetAuth(FtServiceInfo ftServiceInfo, GetAuthEntity getAuthEntity, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:edit")*/
+    @DeleteMapping(value = "/delGetAuth")
+    public ResultDto<Object> delGetAuth(FtServiceInfo ftServiceInfo, GetAuthEntity getAuthEntity, HttpServletRequest request) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         ftServiceInfo.setSystemName(ftServiceNode.getSystemName());
         ResultDto<String> resultDto = serviceInfoService.delGetAuth(ftServiceInfo, getAuthEntity);
         if (ResultDtoTool.isSuccess(resultDto)) {
-            addMessage(redirectAttributes, "删除下载权限成功");
+            //addMessage(redirectAttributes, "删除下载权限成功");
+            return ResultDtoTool.buildSucceed("success");
         } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
+            return ResultDtoTool.buildError(resultDto.getMessage());
         }
-        return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceInfo/putGetTotal?trancode=" + ftServiceInfo.getTrancode() + "&systemName=" + ftServiceInfo.getSystemName();
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:edit")
-    @RequestMapping(value = "delete")
-    public String delete(FtServiceInfo ftServiceInfo, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:edit")*/
+    @DeleteMapping(value = "/delete")
+    public ResultDto<Object> delete(FtServiceInfo ftServiceInfo, HttpServletRequest request) {
         ResultDto<String> resultDto = serviceInfoService.del(ftServiceInfo);
         ResultDto<String> dto = routeService.del(ftServiceInfo);
         if (ResultDtoTool.isSuccess(resultDto) && ResultDtoTool.isSuccess(dto)) {
-            addMessage(redirectAttributes, "删除服务管理成功");
+            //addMessage(redirectAttributes, "删除服务管理成功");
+            log.info("删除服务管理成功");
         } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
+            //addMessage(redirectAttributes, resultDto.getMessage());
+            log.error(resultDto.getMessage());
         }
         FtRoute ftRoute = new FtRoute();
         ftRoute.setTran_code(ftServiceInfo.getTrancode());
         routeService.delByTranscode(ftRoute);
-        return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceInfo/?repage";
+        return ResultDtoTool.buildSucceed("success");
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:view")
-    @RequestMapping(value = "putGetTotal")
-    public String putGetTotal(FtServiceInfo ftServiceInfo, HttpServletRequest request, Model model) {
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:view")*/
+    @GetMapping(value = "/putGetTotal")
+    public ResultDto<Map<String, Object>> putGetTotal(@RequestBody @Valid FtServiceInfo ftServiceInfo) {
+        Map<String, Object> resultMap = new HashMap<>();
         List<PutAuthEntity> putAuthList = new ArrayList<>();
         List<GetAuthEntity> getAuthList = new ArrayList<>();
         ResultDto<ServiceModel.Service> resultDto = serviceInfoService.selByTrancodeAndSysname(ftServiceInfo);
@@ -318,9 +329,9 @@ public class FtServiceInfoController extends BaseController {
             }
         }
 
-        model.addAttribute("paeList", putAuthList);
-        model.addAttribute("gaeList", getAuthList);
-        return "modules/serviceinfo/transcodeWithList";
+        resultMap.put("paeList", putAuthList);
+        resultMap.put("gaeList", getAuthList);
+        return ResultDtoTool.buildSucceed("success", resultMap);
     }
 
 
@@ -342,11 +353,10 @@ public class FtServiceInfoController extends BaseController {
         return "modules/serviceinfo/ftServiceInfoConfComp";
     }
 
-    @RequiresPermissions("serviceinfo:ftServiceInfo:view")
-    @RequestMapping(value = "export")
-    public String exportcsv(FtServiceInfo ftServiceInfo, HttpServletRequest request,    //NOSONAR
-                            @RequestParam("filename") String filename,
-                            Model model, HttpServletResponse response) {
+    /*@RequiresPermissions("serviceinfo:ftServiceInfo:view")*/
+    @GetMapping(value = "/export")
+    public ResultDto<Object> exportcsv(@RequestParam("filename") String filename,
+                                       Model model, HttpServletResponse response) {
         try {
             filename = URLDecoder.decode(filename, "UTF-8"); //NOSONAR
             response.reset();
@@ -358,7 +368,7 @@ public class FtServiceInfoController extends BaseController {
 
             ResultDto<String> resultDto = serviceInfoService.serviceInfoExport();
             if (!ResultDtoTool.isSuccess(resultDto)) {
-                return "modules/serviceinfo/ftServiceInfoList";
+                return ResultDtoTool.buildError("error");
             }
             String sb = resultDto.getData();
             //添加UTF-8 BOM文件头
@@ -367,9 +377,9 @@ public class FtServiceInfoController extends BaseController {
             pw.flush();
             pw.close();
         } catch (Exception e) {
-            logger.error("导出异常" + e);
+            //logger.error("导出异常" + e);
         }
-        return "modules/serviceinfo/ftServiceInfoList";
+        return ResultDtoTool.buildSucceed("success");
     }
 
     @RequiresPermissions("serviceinfo:ftServiceInfo:view")

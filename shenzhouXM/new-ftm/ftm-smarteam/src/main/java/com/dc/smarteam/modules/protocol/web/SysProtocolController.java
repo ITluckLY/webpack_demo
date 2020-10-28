@@ -6,7 +6,6 @@ package com.dc.smarteam.modules.protocol.web;
 import com.dc.smarteam.cfgmodel.CfgModelConverter;
 import com.dc.smarteam.cfgmodel.RouteModel;
 import com.dc.smarteam.cfgmodel.SystemModel;
-import com.dc.smarteam.common.config.Global;
 import com.dc.smarteam.common.json.ResultDto;
 import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.msggenerator.MessageFactory;
@@ -26,17 +25,14 @@ import com.dc.smarteam.service.impl.RouteServiceImpl;
 import com.dc.smarteam.service.impl.ServiceInfoServiceImpl;
 import com.dc.smarteam.service.impl.SysServiceImpl;
 import com.dc.smarteam.util.CollectionUtil;
-import com.dc.smarteam.util.PublicRepResultTool;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -72,7 +68,7 @@ public class SysProtocolController extends BaseController {
     @Autowired
     private ServiceInfoServiceImpl serviceInfoService;
 
-    @RequestMapping(value = "list", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value =  {"list", ""})
     public Object list(SysProtocol sysProtocol, HttpServletRequest request, HttpServletResponse response, Map map) {
         FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
         if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
@@ -184,33 +180,33 @@ public class SysProtocolController extends BaseController {
             SystemModel.System system = dto.getData();
             CfgModelConverter.convertTo(system, newSysProtocol);
         } else {
-            return PublicRepResultTool.sendResult("9999",dto.getMessage(),null);
+            return ResultDtoTool.buildError(dto.getMessage());
         }
         res.put("sysProtocol", newSysProtocol);
         return  ResultDtoTool.buildSucceed("成功",res);
     }
 
 
-    /**
-     *   此处有待修改？？？？？？？？？？？？？？？
-     * @param request
-     * @param model
-     * @return
-     */
-    @RequiresPermissions("servicenode:ftServiceNode:view")
-    @RequestMapping(value = "otherConf")
-    public String otherConf(HttpServletRequest request,Model model) {
-        String getAllStr = MessageFactory.getInstance().system(new SysProtocol(), "print");//生成查询报文
-
-        FtServiceNodeHelper.getOtherConf(request, model, getAllStr);
-        return "modules/protocol/sysProtocolOtherConf";
-    }
+//    /**
+//     *   此处有待修改？？？？？？？？？？？？？？？
+//     * @param request
+//     * @param model
+//     * @return
+//     */
+//    @RequiresPermissions("servicenode:ftServiceNode:view")
+//    @RequestMapping(value = "otherConf")
+//    public String otherConf(HttpServletRequest request,Model model) {
+//        String getAllStr = MessageFactory.getInstance().system(new SysProtocol(), "print");//生成查询报文
+//
+//        FtServiceNodeHelper.getOtherConf(request, model, getAllStr);
+//        return "modules/protocol/sysProtocolOtherConf";
+//    }
 
 
 
     @RequestMapping(value = "telnet", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public Object telnet(String ip, String port) throws IOException, InterruptedException {
+    public ResultDto telnet(String ip, String port) throws IOException, InterruptedException {
         SocketAddress socketAddress = new InetSocketAddress(ip, Integer.valueOf(port));
         try (Socket socket = new Socket()) {
             socket.connect(socketAddress, 1000);

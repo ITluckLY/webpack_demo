@@ -6,7 +6,6 @@ package com.dc.smarteam.modules.flow.web;
 import com.dc.smarteam.cfgmodel.CfgModelConverter;
 import com.dc.smarteam.cfgmodel.ComponentModel;
 import com.dc.smarteam.cfgmodel.FlowModel;
-import com.dc.smarteam.common.config.Global;
 import com.dc.smarteam.common.json.ResultDto;
 import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.msggenerator.MessageFactory;
@@ -19,14 +18,13 @@ import com.dc.smarteam.modules.component.entity.FtComponent;
 import com.dc.smarteam.modules.flow.entity.FtFlow;
 import com.dc.smarteam.modules.servicenode.entity.FtServiceNode;
 import com.dc.smarteam.service.ComponentService;
-import com.dc.smarteam.service.FlowService;
+import com.dc.smarteam.service.FlowServiceI;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -43,12 +41,12 @@ import java.util.Map;
 @RequestMapping(value = "${adminPath}/flow/ftFlow")
 public class FtFlowController extends BaseController {
 
-  @Resource
-  private FlowService flowService;
+  @Resource(name = "FlowServiceImpl")
+  private FlowServiceI flowService;
   @Resource
   private ComponentService componentService;
 
-  @GetMapping(value = "/list")
+  @GetMapping(value =  {"list", ""})
   public Object list(FtFlow ftFlow, HttpServletRequest request, HttpServletResponse response, Map map) {
 
     FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);

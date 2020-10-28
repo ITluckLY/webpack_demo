@@ -15,9 +15,9 @@ import com.dc.smarteam.modules.serviceinfo.entity.BankSystem;
 import com.dc.smarteam.modules.serviceinfo.entity.FtServiceFlowVo;
 import com.dc.smarteam.modules.servicenode.entity.FtServiceNode;
 import com.dc.smarteam.service.*;
+import com.dc.smarteam.service.impl.FlowServiceImpl;
 import com.dc.smarteam.service.impl.ServiceInfoServiceImpl;
 import com.dc.smarteam.service.impl.SysServiceImpl;
-import com.dc.smarteam.service.impl.UserServiceImpl;
 import com.dc.smarteam.util.CollectionUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -63,7 +63,7 @@ public class FtServiceImportsController extends BaseController {
     private SysServiceImpl sysService;
 
     @Resource
-    private FlowService flowService;
+    private FlowServiceImpl flowService;
 
     @Value("${localUploadFilePath}")
     private String localUploadFilePath;
