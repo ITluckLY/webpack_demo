@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.file.dao.FileSyncDao">
+
+
+    <sql id="FileSyncColumns">
+        a.SYNC_START_TIME AS "syncStartTime",
+        a.SYNC_END_TIME AS "syncEndTime",
+        a.FILE_NAME AS "fileName",
+        a.REAL_FILE_NAME AS "realFileName",
+        a.NODENAME AS "NODENAME",
+        a.TRAN_CODE AS "tranCode",
+        a.ORIG_FLOW_NO AS "origFlowNo",
+        a.NEW_FLOW_NO AS  "newFlowNo",
+        a.ERR_CODE AS "errCode",
+        a.ERR_MSG AS "errMsg",
+        a.STATE AS "STATE"
+    </sql>
+
+    <select id="findList" resultType="FileSync">
+        SELECT
+        <include refid="FileSyncColumns"/>
+        FROM biz_file_cross_log a
+        <where>
+            1=1
+            <if test="syncStartTime != null and syncStartTime != ''">
+                AND a.SYNC_START_TIME = #{syncStartTime}
+            </if>
+            <if test="syncEndTime != null and syncEndTime != ''">
+                AND a.SYNC_END_TIME = #{syncEndTime}
+            </if>
+            <if test="STATE != null and STATE != ''">
+                <if test='STATE == "true"'>
+                    AND  (a.STATE = "2")
+                </if>
+                <if test='STATE == "false"'>
+                    AND  (a.STATE = "-1"OR a.STATE = "1" OR a.STATE = "0")
+                </if>
+            </if>
+            <if test="NODENAME != null and NODENAME != ''">
+                AND a.NODENAME = #{NODENAME}
+            </if>
+            <if test="tranCode != null and tranCode != ''">
+                AND a.TRAN_CODE = #{tranCode}
+            </if>
+            <if test="errCode != null and errCode != ''">
+                AND a.ERR_CODE = #{errCode}
+            </if>
+            <if test="errMsg != null and errMsg != ''">
+                AND a.ERR_MSG = #{errMsg}
+            </if>
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.SYNC_START_TIME &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.SYNC_START_TIME &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY a.SYNC_START_TIME DESC
+    </select>
+
+
+    <select id="findNodeNameList" resultType="String">
+        SELECT
+        NODENAME AS NODENAME
+        FROM biz_file_cross_log
+        GROUP BY NODENAME
+        ORDER BY NODENAME
+    </select>
+
+    <select id="findTranCodeList" resultType="String">
+        SELECT
+        TRAN_CODE AS TRAN_CODE
+        FROM biz_file_cross_log
+        GROUP BY TRAN_CODE
+        ORDER BY TRAN_CODE
+    </select>
+
+</mapper>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.file.dao.BizFileFlowNoLogDao">
+
+    <sql id="bizFileFlowNoLogColumns">
+       a.id AS "id",
+        a.clientIp AS "clientIp",
+        a.endTime AS "endTime",
+        a.fileName AS "fileName",
+        a.nodeName AS "nodeName",
+        a.startTime AS "startTime",
+        a.tranCode AS "tranCode",
+        a.uname AS "uname",
+        a.errCode AS "errCode",
+        a.flowNo AS "flowNo",
+        b.id AS "id",
+        b.clientIp AS "clientIp",
+        b.endTime AS "endTime",
+        b.fileName AS "fileName",
+        b.nodeName AS "nodeName",
+        b.startTime AS "startTime",
+        b.tranCode AS "tranCode",
+        b.uname AS "uname",
+        b.errCode AS "errCode",
+        b.flowNo AS "flowNo"
+    </sql>
+
+    <select id="findList" resultType="BizFileFlowNoLog">
+        (
+        SELECT
+        a.id,a.flowNo,a.tranCode,a.uname,a.clientIp,a.nodeName,a.fileName,a.startTime,a.endTime,a.errcode,"download" as status
+        FROM biz_file_download_log a
+        <where>
+            1=1
+            <if test="flowNo != null and flowNo != ''">
+                AND a.flowNo like "%"#{flowNo}"%"
+            </if>
+            <if test="tranCode != null and tranCode != ''">
+                AND a.tranCode = #{tranCode}
+            </if>
+            <if test="uname != null and uname != ''">
+                AND a.uname = #{uname}
+            </if>
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.startTime &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.startTime &lt;= #{endDate}
+            </if>
+        </where>)
+        union all
+        (
+        SELECT
+        b.id,b.flowNo,b.tranCode,b.uname,b.clientIp,b.nodeName,b.fileName,b.startTime,b.endTime,b.errcode,"upload" as status
+        FROM biz_file_upload_log b
+        <where>
+            1=1
+            <if test="flowNo != null and flowNo != ''">
+                AND b.flowNo like "%"#{flowNo}"%"
+            </if>
+            <if test="tranCode != null and tranCode != ''">
+                AND b.tranCode = #{tranCode}
+            </if>
+            <if test="uname != null and uname != ''">
+                AND b.uname = #{uname}
+            </if>
+            <if test="beginDate!=null and beginDate!=''">
+                AND b.startTime &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND b.startTime &lt;= #{endDate}
+            </if>
+        </where>)
+        ORDER BY startTime DESC
+    </select>
+
+
+</mapper>

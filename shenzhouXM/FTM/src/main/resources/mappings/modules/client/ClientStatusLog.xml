@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.client.dao.ClientSynDao">
+
+    <sql id="allColumns">
+        id AS "id",
+        node_name AS "name",
+        node_ip AS "ip",
+        user_domain_name AS "userDomainName",
+        node_port AS "port",
+        cmd_port AS "cmdPort",
+        sys_name AS "sysname",
+        start_time AS "startTime",
+        end_time AS "endTime",
+        status AS "status",
+        connect_server_id AS "connectServer",
+        err_code AS "errCode",
+        err_msg AS "errMsg",
+        created_Time AS "createdTime",
+        modified_Time AS "modifiedTime"
+    </sql>
+
+
+    <select id="get" resultType="com.dc.smarteam.modules.client.entity.ClientSyn">
+        SELECT
+        <include refid="allColumns"/>
+        FROM ft_node_status_log
+        WHERE id = #{id}
+    </select>
+
+    <select id="findSingleList" resultType="com.dc.smarteam.modules.client.entity.ClientSyn">
+        SELECT
+        <include refid="allColumns"/>
+        FROM ft_node_status_log b
+        <where>
+            1=1
+            <if test="name != null and name != ''">
+                AND b.node_name like "%"#{name}"%"
+            </if>
+            and b.ID in (select max(a.id)
+            from ft_node_status_log a
+            where
+            a.NODE_NAME is not null
+            and a.NODE_IP is not null
+            and a.NODE_PORT is not null
+            group by a.NODE_NAME,a.NODE_IP,a.NODE_PORT)
+        </where>
+        order by b.created_time
+    </select>
+
+    <select id="findList" resultType="com.dc.smarteam.modules.client.entity.ClientSyn">
+        SELECT
+        <include refid="allColumns"/>
+        FROM ft_node_status_log a
+        <where>
+            1=1
+            <if test="name != null and name != ''">
+                AND a.node_name=#{name}
+            </if>
+            <if test="ip != null and ip != ''">
+                AND a.node_ip=#{ip}
+            </if>
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.created_Time &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.created_Time &lt;= #{endDate}
+            </if>
+        </where>
+        order by a.created_Time desc
+    </select>
+
+    <select id="findRestartTimes" resultType="java.lang.Integer">
+        SELECT
+        count(1)
+        FROM ft_node_status_log
+        where
+             status = "stopped"
+            AND node_name=#{name}
+            AND node_ip=#{ip}
+            AND node_port=#{port}
+    </select>
+</mapper>

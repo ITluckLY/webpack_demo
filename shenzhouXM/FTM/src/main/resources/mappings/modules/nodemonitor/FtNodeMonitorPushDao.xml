@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.monitor.ftnodemonitor.dao.FtNodeMonitorPushDao">
+
+<sql id="basecolumns">
+	a.id AS "id",
+	a.created_time AS "createdTime",
+	a.modified_time AS "modifiedTime",
+	a.routeName AS "routeName",
+	a.fromUid AS "fromUid",
+	a.toUid AS "toUid",
+	a.ip AS "ip",
+	a.port AS "port",
+	a.tranCode AS "tranCode",
+	a.sysname AS "sysname",
+	a.serverFileName AS "serverFileName",
+	a.clientFileName AS "clientFileName",
+	a.sync AS "sync",
+	a.succ AS "succ",
+	a.errCode AS "errCode",
+	a.errMsg AS "errMsg",
+	a.msgId AS "msgId",
+	a.repushCount AS "repushCount",
+	a.prenano AS "prenano",
+	a.nano AS "nano",
+	a.flowNo AS "flowNo",
+	a.nodeName AS "nodeName"
+</sql>
+	<select id="findList" resultType="FtNodeMonitorPush">
+		SELECT
+		<include refid="basecolumns"/>
+		FROM biz_file_msg2client_log a
+		<where>
+			1=1
+			<if test="tranCode != null and tranCode != ''">
+				AND a.tranCode LIKE
+				<if test="dbName == 'oracle'">'%'||#{tranCode}||'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{tranCode}, '%')</if>
+				<if test="dbName == 'db2'">'%'||#{tranCode}||'%'</if>
+			</if>
+			<if test="sysname != null and sysname != ''">
+				AND a.sysname LIKE
+				<if test="dbName == 'oracle'">'%'||#{sysname}||'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{sysname}, '%')</if>
+				<if test="dbName == 'db2'">'%'||#{sysname}||'%'</if>
+			</if>
+			<if test="fromUid != null and fromUid != ''">
+				AND a.fromUid LIKE
+				<if test="dbName == 'oracle'">'%'||#{fromUid}||'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{fromUid}, '%')</if>
+				<if test="dbName == 'db2'">'%'||#{fromUid}||'%'</if>
+			</if>
+			<if test="toUid != null and toUid != ''">
+				AND a.toUid LIKE
+				<if test="dbName == 'oracle'">'%'||#{toUid}||'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{toUid}, '%')</if>
+				<if test="dbName == 'db2'">'%'||#{toUid}||'%'</if>
+			</if>
+			<if test="routeName != null and routeName != ''">
+				AND a.routeName = #{routeName}
+			</if>
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.modified_time &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.modified_time &lt;= #{endDate}
+			</if>
+			<if test="succ != null and succ != ''">
+				AND a.succ=#{succ}
+			</if>
+		</where>
+		ORDER BY a.created_time DESC
+	</select>
+
+
+
+	<select id="get" resultType="FtNodeMonitorPush">
+		SELECT
+		<include refid="basecolumns"/>
+		FROM biz_file_msg2client_log a
+		WHERE a.id = #{id}
+	</select>
+
+	
+</mapper>

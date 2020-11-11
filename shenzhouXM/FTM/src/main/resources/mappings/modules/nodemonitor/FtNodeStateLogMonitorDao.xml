@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.monitor.ftnodemonitor.dao.FtNodeStateLogMonitorDao">
+
+	<sql id="baseSql">
+		a.id as "id",
+		a.nodeName as "nodeNameTemp",
+	a.nodeType as "nodeType",
+	a.sysName as "sysName",
+	a.sendTime as "sendTime",
+	a.hostName as "hostName",
+	a.hostAddress as "hostAddress",
+	a.portInfo as "portInfo",
+	a.state as "state"
+</sql>
+
+
+	<select id="get" resultType="FtNodeStateLogMonitor">
+		SELECT
+		<include refid="baseSql"/>
+		FROM ft_node_state_log a
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="FtNodeStateLogMonitor">
+		SELECT
+		<include refid="baseSql"/>
+		FROM ft_node_state_log a
+		<where>
+			1=1
+			<if test="nodeNameTemp != null and nodeNameTemp != ''">
+				AND a.nodeName = #{nodeNameTemp}
+			</if>
+			<if test="nodeType != null and nodeType != ''">
+				AND a.nodeType = #{nodeType}
+			</if>
+			<if test="state!=null and state!=''">
+				AND a.state = #{state}
+			</if>
+		</where>
+		order by a.sendTime desc
+	</select>
+
+	<select id="findNodeNameList" resultType="String">
+		SELECT
+		nodeName
+		FROM ft_node_state_log
+		GROUP BY nodeName
+		ORDER BY nodeName
+	</select>
+
+	<select id="findNodeTypeList" resultType="String">
+        SELECT
+        nodeType
+        FROM ft_node_state_log
+        GROUP BY nodeType
+        ORDER BY nodeType
+    </select>
+
+	<select id="findListByTime" resultType="FtNodeStateLogMonitor" parameterType="java.util.Map">
+		SELECT *
+		FROM ft_node_state_log a
+		WHERE 1=1
+		<if test="beginDate!=null">
+			AND a.sendTime &gt;= #{beginDate}
+		</if>
+		<if test="endDate!=null">
+			AND a.sendTime &lt;= #{endDate}
+		</if>
+		order by a.sendTime desc
+	</select>
+
+	<select id="findStateLogOftenRecord" resultType="FtNodeStateLogMonitor" parameterType="java.util.Map">
+		SELECT *,count(nodeName) AS count from ft_node_state_log a
+		WHERE 1=1
+		<if test="beginDate!=null">
+			AND a.sendTime &gt;= #{beginDate}
+		</if>
+		<if test="endDate!=null">
+			AND a.sendTime &lt;= #{endDate}
+		</if>
+		group by nodeName order by count desc limit 1
+	</select>
+</mapper>

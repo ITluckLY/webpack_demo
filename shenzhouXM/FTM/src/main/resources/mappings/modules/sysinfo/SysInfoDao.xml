@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.sysinfo.dao.FtSysInfoDao">
+    <sql id="ftSysInfoColumns">
+        a.id AS "id",
+        a.name AS "name",
+        a.des AS "des",
+        a.admin AS "admin",
+        a.adminId as "adminId",
+        a.sysNodeModel AS "sysNodeModel",
+        a.switchModel AS "switchModel",
+        a.storeModel AS "storeModel",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag"
+    </sql>
+
+    <sql id="ftSysInfoJoins">
+    </sql>
+
+    <select id="get" resultType="FtSysInfo">
+        SELECT
+        <include refid="ftSysInfoColumns"/>
+        FROM ft_sys_info a
+        <include refid="ftSysInfoJoins"/>
+        WHERE a.id = #{id} and a.del_flag = #{DEL_FLAG_NORMAL}
+    </select>
+
+    <insert id="setRelation">
+        INSERT INTO ft_sys_to_admin (system, admin) VALUES
+            (#{system}, #{admin})
+    </insert>
+
+    <delete id="deleteRelation">
+        DELETE FROM ft_sys_to_admin
+        WHERE system = #{system}
+    </delete>
+
+    <select id="findList" resultType="FtSysInfo">
+        SELECT
+        <include refid="ftSysInfoColumns"/>
+        FROM ft_sys_info a
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="name != null and name != ''">
+                AND LOWER(a.name) LIKE
+                <if test="dbName == 'oracle'">'%'||LOWER(#{name})||'%'</if>
+                <if test="dbName == 'mysql'">CONCAT('%', LOWER(#{name}), '%')</if>
+                <if test="dbName == 'db2'">'%'||LOWER(#{name})||'%'</if>
+            </if>
+            <if test="admin != null and admin != ''">
+                AND LOWER(a.admin) LIKE
+                <if test="dbName == 'oracle'">'%'||LOWER(#{admin})||'%'</if>
+                <if test="dbName == 'mysql'">CONCAT('%', LOWER(#{admin}), '%')</if>
+                <if test="dbName == 'db2'">'%'||LOWER(#{admin})||'%'</if>
+            </if>
+        </where>
+    </select>
+
+
+    <select id="findAllList" resultType="FtSysInfo">
+        SELECT
+        <include refid="ftSysInfoColumns"/>
+        FROM ft_sys_info a
+        <include refid="ftSysInfoJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO ft_sys_info (
+            id,
+            name,
+            des,
+            admin,
+            adminId,
+            sysNodeModel,
+            switchModel,
+            storeModel,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            remarks,
+            del_flag
+        ) VALUES (
+            #{id},
+            #{name,jdbcType=VARCHAR},
+            #{des,jdbcType=VARCHAR},
+            #{admin,jdbcType=VARCHAR},
+            #{adminId,jdbcType=VARCHAR},
+            #{sysNodeModel,jdbcType=VARCHAR},
+            #{switchModel,jdbcType=VARCHAR},
+            #{storeModel,jdbcType=VARCHAR},
+            #{createBy.id,jdbcType=VARCHAR},
+            #{createDate},
+            #{updateBy.id,jdbcType=VARCHAR},
+            #{updateDate},
+            #{remarks,jdbcType=VARCHAR},
+            #{delFlag,jdbcType=CHAR}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE ft_sys_info
+        SET
+            name         = #{name,jdbcType=VARCHAR},
+            des          = #{des,jdbcType=VARCHAR},
+            admin        = #{admin,jdbcType=VARCHAR},
+            adminId      = #{adminId,jdbcType=VARCHAR},
+            sysNodeModel = #{sysNodeModel,jdbcType=VARCHAR},
+            switchModel  = #{switchModel,jdbcType=VARCHAR},
+            storeModel   = #{storeModel,jdbcType=VARCHAR},
+            update_by    = #{updateBy.id,jdbcType=VARCHAR},
+            update_date  = #{updateDate},
+            remarks      = #{remarks,jdbcType=VARCHAR}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateSystem">
+        UPDATE ft_sys_manager
+        SET
+            systems = #{name,jdbcType=VARCHAR},
+            adminId = #{adminId,jdbcType=VARCHAR}
+        WHERE name = #{admin}
+    </update>
+
+    <update id="delete">
+        UPDATE ft_sys_info
+        SET
+            del_flag = #{DEL_FLAG_DELETE,jdbcType=CHAR}
+        WHERE id = #{id}
+    </update>
+
+    <select id="getByName" resultType="FtSysInfo">
+        SELECT
+        <include refid="ftSysInfoColumns"/>
+        FROM ft_sys_info a
+        WHERE a.name = #{name} and a.del_flag = '0'
+    </select>
+
+    <select id="findSystemNameList" resultType="String">
+        SELECT name
+        FROM ft_sys_info
+        WHERE name IS NOT NULL AND del_flag = #{DEL_FLAG_NORMAL}
+    </select>
+
+</mapper>

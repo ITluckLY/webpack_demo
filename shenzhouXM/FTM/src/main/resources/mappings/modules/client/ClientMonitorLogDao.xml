@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.client.dao.ClientMonitorLogDao">
+
+    <sql id="clientMonitorLogColumns">
+        a.id AS "id",
+        a.tranCode AS "tranCode",
+        a.flowNo AS "flowNo",
+        a.fromUid AS "fromUid",
+        a.toUid AS "toUid",
+        a.fileName AS "fileName",
+        a.startTime AS "startTime",
+        a.endTime AS "endTime",
+        a.errMsg AS "errMsg",
+        a.state AS "state"
+    </sql>
+
+    <select id="get" resultType="ClientMonitorLog">
+        SELECT
+        <include refid="clientMonitorLogColumns"/>
+        FROM client_monitor_log a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="ClientMonitorLog">
+        SELECT
+        <include refid="clientMonitorLogColumns"/>
+        FROM client_monitor_log a
+        <where>
+            1=1
+            <if test="flowNo != null and flowNo != ''">
+                AND a.flowNo = #{flowNo}
+            </if>
+            <if test="fileName != null and fileName != ''">
+                AND a.fileName = #{fileName}
+            </if>
+            <if test="tranCode != null and tranCode != ''">
+                AND a.tranCode = #{tranCode}
+            </if>
+
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.startTime &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.startTime &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY a.startTime DESC
+    </select>
+    <select id="findListByTranCodeAndFileName" resultType="ClientMonitorLog">
+        SELECT  a.tranCode,a.fileName,a.startTime AS fileName
+        FROM client_monitor_log a
+        <where>
+            1=1
+            <if test="tranCode != null and tranCode != ''">
+                AND a.tranCode = #{tranCode}
+            </if>
+            <if test="fileName != null and fileName != ''">
+                AND a.fileName=#{fileName}
+            </if>
+        </where>
+        ORDER BY a.startTime DESC limit 1
+    </select>
+
+    <select id="findFileNameList" resultType="String">
+        SELECT
+        fileName
+        FROM client_monitor_log
+        GROUP BY fileName
+        ORDER BY fileName
+    </select>
+
+    <select id="findFlowNoList" resultType="String">
+        SELECT
+        flowNo
+        FROM client_monitor_log
+        GROUP BY flowNo
+        ORDER BY flowNo
+    </select>
+
+    <select id="findListByTime" resultType="long">
+        SELECT
+        count(1)
+        FROM client_monitor_log a
+        <where>
+            1=1
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.startTime &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.startTime &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+</mapper>

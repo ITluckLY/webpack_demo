@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.cfgfile.dao.CfgFileDao">
+
+    <sql id="allColumns">
+        'id' AS "id",
+        fileName AS "fileName",
+        content AS "content",
+        nodeType AS "nodeType",
+        system AS "system",
+        fileType AS "fileType",
+        fileSize AS "fileSize",
+        created_Time AS "createDate",
+        modified_Time AS "updateDate"
+    </sql>
+
+    <resultMap id="laotian" type="com.dc.smarteam.modules.cfgfile.entity.CfgFile">
+        <id property="id" column="id"/>
+        <result property="fileName" column="fileName"/>
+        <result property="content" column="content" javaType="java.lang.String" jdbcType="CLOB"/>
+        <result property="nodeType" column="nodeType"/>
+        <result property="system" column="system"/>
+        <result property="fileType" column="fileType"/>
+        <result property="fileSize" column="fileSize"/>
+        <result property="createDate" column="created_Time"/>
+        <result property="updateDate" column="modified_Time"/>
+    </resultMap>
+
+    <select id="get" resultType="com.dc.smarteam.modules.cfgfile.entity.CfgFile">
+        SELECT
+        <include refid="allColumns"/>
+        FROM BIZ_CFG_FILE
+        WHERE id = #{id}
+    </select>
+
+    <select id="findList" resultMap="laotian">
+        SELECT *
+        FROM BIZ_CFG_FILE
+        <where>
+            1=1
+            <if test="nodeType != null and nodeType != ''">
+                AND nodeType=#{nodeType}
+            </if>
+            <if test="system != null and system != ''">
+                AND system=#{system}
+            </if>
+            <if test="fileName != null and fileName != ''">
+                AND fileName=#{fileName}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO BIZ_CFG_FILE (
+        id,
+        fileName,
+        content,
+        nodeType,
+        system,
+        fileType,
+        fileSize,
+        created_Time,
+        modified_Time
+        ) VALUES (
+        #{id},
+        #{fileName,jdbcType=VARCHAR},
+        #{content,jdbcType=CLOB},
+        #{nodeType,jdbcType=VARCHAR},
+        #{system,jdbcType=VARCHAR},
+        #{fileType,jdbcType=VARCHAR},
+        #{fileSize,jdbcType=NUMERIC},
+        #{createDate},
+        #{updateDate}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE BIZ_CFG_FILE
+        SET
+        fileName      = #{fileName,jdbcType=VARCHAR},
+        content       = #{content,jdbcType=CLOB},
+        nodeType      = #{nodeType,jdbcType=VARCHAR},
+        system        = #{system,jdbcType=VARCHAR},
+        fileType      = #{fileType,jdbcType=VARCHAR},
+        fileSize      = #{fileSize,jdbcType=NUMERIC},
+        created_Time  = #{createDate},
+        modified_Time = #{updateDate}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateByFileNameAndNodeType">
+        UPDATE BIZ_CFG_FILE
+        SET
+        content       = #{content,jdbcType=CLOB},
+        system        = #{system,jdbcType=VARCHAR},
+        fileType      = #{fileType,jdbcType=VARCHAR},
+        fileSize      = #{fileSize,jdbcType=NUMERIC},
+        created_Time  = #{createDate},
+        modified_Time = #{updateDate}
+        WHERE nodeType = #{nodeType} AND fileName = #{fileName}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM BIZ_CFG_FILE
+        WHERE id = #{id}
+    </delete>
+</mapper>

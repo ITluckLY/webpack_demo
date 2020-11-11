@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.servicenode.dao.FtServiceNodeDao">
+    
+	<sql id="ftServiceNodeColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.systemName AS "systemName",
+		a.des AS "des",
+		a.ip_address AS "ipAddress",
+		a.cmdPort AS "cmdPort",
+		a.state AS "state",
+		a.isolState AS "isolState",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ftServiceNodeJoins">
+	</sql>
+    
+	<select id="get" resultType="FtServiceNode">
+		SELECT 
+			<include refid="ftServiceNodeColumns"/>
+		FROM ft_service_node a
+		<include refid="ftServiceNodeJoins"/>
+        <where>
+            a.id = #{id}
+        </where>
+	</select>
+
+	<!--<select id="getByName" resultType="FtServiceNode">
+		SELECT
+		<include refid="ftServiceNodeColumns"/>
+		FROM ft_service_node a
+		<include refid="ftServiceNodeJoins"/>
+		<where>
+			a.name = #{name}
+		</where>
+	</select>-->
+
+
+
+	
+	<select id="findList" resultType="FtServiceNode">
+		SELECT 
+			<include refid="ftServiceNodeColumns"/>
+		FROM ft_service_node a
+		<include refid="ftServiceNodeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test = "id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+            <if test = "systemName != null and systemName != ''">
+                AND a.systemName = #{systemName}
+            </if>
+
+            <if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+					<if test="dbName == 'db2'">'%'||#{name}||'%'</if>
+			</if>
+			<if test="des != null and des != ''">
+				AND a.des = #{des}
+			</if>
+			<if test="ipAddress != null and ipAddress != ''">
+				AND a.ip_address LIKE
+				<if test="dbName == 'oracle'">'%'||#{ipAddress}||'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ipAddress},'%')</if>
+				<if test="dbName == 'db2'">concat('%',#{ipAddress},'%')</if>
+			</if>
+			<if test="cmdPort != null and cmdPort != ''">
+				AND a.port LIKE
+				<if test="dbName == 'oracle'">'%'||#{cmdPort}||'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{cmdPort},'%')</if>
+				<if test="dbName == 'db2'">concat('%',#{cmdPort},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="FtServiceNode">
+		SELECT 
+			<include refid="ftServiceNodeColumns"/>
+		FROM ft_service_node a
+		<include refid="ftServiceNodeJoins"/>
+		<where>
+
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test = "systemName != null and systemName != ''">
+                AND a.systemName = #{systemName}
+            </if>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ft_service_node(
+			id,
+			name,
+			systemName,
+			des,
+			ip_address,
+			cmdPort,
+			state,
+			isolState,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{systemName},
+			#{des},
+			#{ipAddress},
+			#{cmdPort},
+			#{state},
+			#{isolState},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ft_service_node SET 	
+			name = #{name},
+			systemName = #{systemName},
+			des = #{des},
+			ip_address = #{ipAddress},
+			cmdPort = #{cmdPort},
+			state = #{state},
+			isolState = #{isolState},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ft_service_node SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.nodeparam.dao.FtNodeParamDao">
+    
+	<sql id="ftNodeParamColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.name AS "name",
+		a.value AS "value",
+		a.des AS "des",
+		a.node_id AS "nodeId",
+		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="ftNodeParamJoins">
+	</sql>
+    
+	<select id="get" resultType="FtNodeParam">
+		SELECT 
+			<include refid="ftNodeParamColumns"/>
+		FROM ft_node_param a
+		<include refid="ftNodeParamJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="FtNodeParam">
+		SELECT 
+			<include refid="ftNodeParamColumns"/>
+		FROM ft_node_param a
+		<include refid="ftNodeParamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="nodeId != null and nodeId != ''">
+				AND a.node_id = #{nodeId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="FtNodeParam">
+		SELECT 
+			<include refid="ftNodeParamColumns"/>
+		FROM ft_node_param a
+		<include refid="ftNodeParamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ft_node_param(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			name,
+			value,
+			des,
+			node_id,
+			remarks
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{name},
+			#{value},
+			#{des},
+			#{nodeId},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ft_node_param SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			name = #{name},
+			value = #{value},
+			des = #{des},
+			node_id = #{nodeId},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ft_node_param SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

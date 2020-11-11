@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.file.dao.BizFileQueryLogDao">
+
+    <sql id="bizFileQueryLogColumns">
+       e.NODENAME AS "NODENAME",
+       e.ORIG_FLOW_NO AS "origFlowNo",
+       e.STATE AS "STATE",
+       b.tranCode AS "tranCode",
+       b.uname AS "upuname",
+       b.suss AS "upsuss",
+       b.lastPiece AS "uplastPiece",
+       b.startTime AS "upcreatedTime",
+       b.errCode AS "uperrCode",
+       b.oriFilename AS "oriFilename",
+       b.flowNo AS "upflowNo",
+       b.id AS "upid",
+       a.id AS "downid",
+       a.clientIp AS "downclientIp",
+       a.serverIp AS "downserverIp",
+       a.uname AS "downuname",
+       a.lastPiece AS "downlastPiece",
+       a.startTime AS "downcreatedTime",
+       a.suss AS "downsuss",
+       a.errCode AS "downerrCode",
+       a.sysname AS "sysname",
+       a.nodeName AS "nodeNameTemp",
+       a.fileName AS "fileName",
+       a.flowNo AS "flowNo"
+    </sql>
+
+    <sql id="upanddownJoins">
+        LEFT JOIN  biz_file_download_log a ON a.fileName = b.fileName
+    </sql>
+    <!--<select id="get" resultType="BizFileQueryLog">-->
+    <!--SELECT-->
+    <!--<include refid="bizFileQueryLogColumns"/>-->
+    <!--FROM biz_file_download_log a-->
+    <!--WHERE a.id = #{downid}-->
+    <!--</select>-->
+
+    <select id="findList" resultType="BizFileQueryLog">
+        SELECT
+        <include refid="bizFileQueryLogColumns"/>
+        FROM biz_file_upload_log b
+        <!--<include refid="upanddownJoins"/>-->
+        LEFT JOIN (SELECT A.* FROM biz_file_download_log A,
+        (SELECT fileName,uname, MAX(id) max_id,MAX(lastPiece) max_lastPiece FROM biz_file_download_log d
+        <where>
+            <if test="beginDate!=null and beginDate!=''">
+                AND d.startTime &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND d.startTime &lt;= #{endDate}
+            </if>
+        </where>
+        GROUP BY fileName,uname) B WHERE A.fileName = B.fileName AND A.uname=B.uname AND A.lastPiece=B.max_lastPiece) a
+        ON a.fileName = b.fileName
+
+        LEFT JOIN  biz_file_cross_log E  ON  b.flowNo=E.ORIG_FLOW_NO
+        <where>
+            1=1
+            <if test="sysname != null and sysname != ''">
+                AND b.sysname = #{sysname}
+            </if>
+            <if test="nodeNameTemp != null and nodeNameTemp != ''">
+                AND b.nodeName = #{nodeNameTemp}
+            </if>
+            <if test="tranCode != null and tranCode != ''">
+                AND b.tranCode = #{tranCode}
+            </if>
+            <if test="upuname != null and upuname != ''">
+                AND b.uname = #{upuname}
+            </if>
+            <if test="downuname != null and downuname != ''">
+                AND a.uname = #{downuname}
+            </if>
+            <if test="NODENAME != null and NODENAME != ''">
+                AND e.NODENAME = #{NODENAME}
+            </if>
+            <if test="transuss != null and transuss != ''">
+                <if test='transuss == "true"'>
+                    AND (a.lastPiece = true AND b.lastPiece = true AND a.suss = true AND b.suss = true OR e.STATE = "2")
+                </if>
+                <if test='transuss == "false"'>
+                    AND (a.lastPiece = false OR b.lastPiece = false OR a.suss = false OR b.suss = false)
+                </if>
+            </if>
+            <if test="oriFilename != null and oriFilename != ''">
+                AND b.oriFilename like "%"#{oriFilename}"%"
+            </if>
+            <if test="beginDate!=null and beginDate!=''">
+                AND b.startTime &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND b.startTime &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY b.startTime DESC
+    </select>
+
+    <select id="findSystemNameList" resultType="String">
+        SELECT
+        sysname
+        FROM biz_file_download_log
+        GROUP BY sysname
+        ORDER BY sysname
+    </select>
+
+    <select id="findNodeNameList" resultType="String">
+        SELECT
+        nodeName
+        FROM biz_file_download_log
+        GROUP BY nodeName
+        ORDER BY nodeName
+    </select>
+
+    <select id="findDownloadListByRouteAndTime" resultType="long">
+        select IFNULL(t3.score,0)
+        from
+        (SELECT @cdate := date_add(@cdate,interval -1 day) days from
+        (SELECT @cdate := date_add(CURDATE(),interval +2 day) from biz_file_download_log) t1) t2
+        LEFT JOIN
+        (select date_format(a.created_time,'%Y-%m-%d') pay_day,
+        count(1) score from biz_file_download_log a
+        where
+                a.uname=(select distinct toUid from biz_file_msg2client_log b
+        <where>
+            1=1
+            <if test="client!=null and client!=''">
+                AND b.routeName = #{client}
+            </if>
+        </where>)
+        group by date_format(a.created_time,'%Y-%m-%d')) t3
+        on t2.days=t3.pay_day
+        <where>
+            1=1
+            <if test="beginDate!=null and beginDate!=''">
+                AND t2.days &gt;= date_format(#{beginDate},'%Y-%m-%d')
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND t2.days &lt;= date_format(#{endDate},'%Y-%m-%d')
+            </if>
+        </where>
+        order by t2.days
+    </select>
+
+    <select id="findUploadListByRouteAndTime" resultType="long">
+        select IFNULL(t3.score,0)
+        from
+        (SELECT @cdate := date_add(@cdate,interval -1 day) days from
+        (SELECT @cdate := date_add(CURDATE(),interval +2 day) from biz_file_upload_log) t1) t2
+        LEFT JOIN
+        (select date_format(a.created_time,'%Y-%m-%d') pay_day,
+        count(1) score from biz_file_upload_log a
+        <where>
+            1=1
+            <if test="client!=null and client!=''">
+                AND a.uname = LEFT (#{client},5)
+            </if>
+        </where>
+        group by date_format(a.created_time,'%Y-%m-%d')) t3
+        on t2.days=t3.pay_day
+        <where>
+            1=1
+            <if test="beginDate!=null and beginDate!=''">
+                AND t2.days &gt;= date_format(#{beginDate},'%Y-%m-%d')
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND t2.days &lt;= date_format(#{endDate},'%Y-%m-%d')
+            </if>
+        </where>
+        order by t2.days
+    </select>
+
+    <!--<select id="findListByTimeBySucc" resultType="long">-->
+    <!--SELECT-->
+    <!--count(1)-->
+    <!--FROM biz_file_download_log a-->
+    <!--<where>-->
+    <!--a.suss = '1'-->
+    <!--AND (a.errCode = '0000' OR a.errCode is NULL)-->
+    <!--AND a.lastPiece = '1'-->
+    <!--<if test="beginDate!=null and beginDate!=''">-->
+    <!--AND a.created_Time &gt;= #{beginDate}-->
+    <!--</if>-->
+    <!--<if test="endDate!=null and endDate!=''">-->
+    <!--AND a.created_Time &lt;= #{endDate}-->
+    <!--</if>-->
+    <!--</where>-->
+    <!--</select>-->
+
+
+</mapper>

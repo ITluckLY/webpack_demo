@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.monitor.ftnodemonitor.dao.FtNodeMonitorLogDao">
+
+	<sql id="sqlBase">
+		a.id AS "id",
+		a.time AS "time",
+		a.system AS "system",
+		a.node AS "node",
+		a.ip AS "ip",
+-- 		a.state AS "state",
+-- 		a.catalog AS "catalog",
+-- 		a.periods AS "periods",
+		a.filenumber AS "filenumber",
+		a.storage AS "storage",
+		a.cpu AS "cpu",
+		a.disk AS "disk",
+		a.flowrate AS "flowrate",
+		a.network AS "network",
+		a.memory AS "memory",
+		a.create_by AS "createBy",
+		a.create_date AS "createDate"
+-- 		a.update_by AS "updateBy",
+-- 		a.update_date AS "updateDate",
+-- 		a.remarks AS "remarks",
+-- 		a.del_flag AS "delFlag",
+-- 		a.port AS "port"
+	</sql>
+
+	<select id="get" resultType="FtNodeMonitorLog">
+		SELECT
+		<include refid="sqlBase"/>
+		FROM ft_node_monitor_log a
+		WHERE a.id = #{id}
+	</select>
+
+
+	<select id="findList" resultType="FtNodeMonitorLog">
+		SELECT
+		<include refid="sqlBase"/>
+		FROM ft_node_monitor_log a
+		<where>
+			1=1
+			<if test="system != null and system != ''">
+				AND a.system = #{system}
+			</if>
+			<if test="node != null and node != ''">
+				AND a.node = #{node}
+			</if>
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.time &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.time &lt;= #{endDate}
+			</if>
+		</where>
+		ORDER BY a.time DESC
+	</select>
+
+	<select id="findSystemNameList" resultType="String">
+		SELECT
+		system
+		FROM ft_node_monitor_log
+		GROUP BY system
+		ORDER BY system
+	</select>
+
+	<select id="findNodeNameList" resultType="String">
+		SELECT
+		node
+		FROM ft_node_monitor_log
+		GROUP BY node
+		ORDER BY node
+	</select>
+
+</mapper>

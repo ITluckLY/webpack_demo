@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.ftinterface.dao.FtInterfaceDao">
+
+    <sql id="allColumns">
+        tranCode AS "tranCode",
+        fileName AS "fileName"
+    </sql>
+
+
+    <select id="findFileList" resultType="com.dc.smarteam.modules.ftinterface.enity.FtFile">
+        SELECT
+        <include refid="allColumns"/>
+        FROM BIZ_FILE_UPLOAD_LOG
+        <where>
+            1=1
+            <if test="tranCode!=null and tranCode!=''">
+                AND tranCode = #{tranCode}
+            </if>
+        </where>
+    </select>
+
+</mapper>

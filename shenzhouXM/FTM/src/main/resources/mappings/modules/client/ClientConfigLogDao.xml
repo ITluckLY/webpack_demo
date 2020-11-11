@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.client.dao.ClientConfigLogDao">
+
+    <sql id="allColumns">
+       a.id AS "id",
+       a.ip AS "ip",
+       a.port AS "port",
+        a.clientName AS "clientName",
+        a.before_modify_value AS "beforeModifyValue",
+        a.after_modify_value AS "afterModifyValue",
+        a.cfg_file_name AS "cfgFileName",
+        a.modified_time AS "modifiedDate",
+        a.remarks AS "remarks"
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO client_config_log (
+           id,
+           ip,
+           port,
+          clientName,
+          BEFORE_MODIFY_VALUE,
+          AFTER_MODIFY_VALUE,
+          cfg_file_name,
+          modified_time,
+          remarks
+        ) VALUES (
+            #{id},
+            #{ip,jdbcType=VARCHAR},
+            #{port,jdbcType=VARCHAR},
+            #{clientName,jdbcType=VARCHAR},
+            #{beforeModifyValue,jdbcType=CLOB},
+            #{afterModifyValue,jdbcType=CLOB},
+            #{cfgFileName,jdbcType=VARCHAR},
+            now(),
+            #{remarks}
+        )
+    </insert>
+</mapper>

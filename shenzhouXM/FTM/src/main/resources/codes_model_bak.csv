@@ -1,0 +1,6 @@
+交易码       ,"文件生产方
+注(支持多个，逗号)","文件消费方
+注(支持多个，逗号)",交易码描述                   ,文件名
+ucd0000001,ucd01      ,cri04      ,统一额度推送征信系统额度基本信息        ,UCD_CREDIT_LIMIT_yyyyMMdd_001.txt
+ucd0000002,ucd01      ,cri04      ,统一额度推送征信系统额度批复信息        ,UCD_CREDIT_LIMIT_APPROVE_yyyyMMdd_001.txt
+ucd0000003,ucd01      ,aom03      ,统一额度推送自动化运维平台批量反馈结果end文件,UCD_EOD_AT_RZBAT_yyyyMMdd_001.end

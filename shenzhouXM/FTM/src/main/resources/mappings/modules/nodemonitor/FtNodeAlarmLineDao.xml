@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.monitor.ftnodemonitor.dao.FtNodeAlarmLineDao">
+    
+	<sql id="baseColumns">
+		a.id AS "id",
+		a.cpuline AS "cpuline",
+		a.memoryline AS "memoryline",
+		a.filenumberline AS "filenumberline",
+		a.cpuwarn AS "cpuwarn",
+		a.memorywarn AS "memorywarn",
+		a.filenumberwarn AS "filenumberwarn",
+		a.time AS "time",
+		a.storagewarn AS "storagewarn",
+		a.storageline AS "storageline"
+	</sql>
+
+    <select id="get" resultType="FtNodeAlarmLine">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM ft_node_alarm_line a
+        WHERE a.id = #{id}
+    </select>
+
+	<select id="findList" resultType="FtNodeAlarmLine">
+		SELECT 
+			<include refid="baseColumns"/>
+		FROM ft_node_alarm_line a
+	</select>
+
+	<update id="update">
+		UPDATE ft_node_alarm_line SET
+		cpuline = #{cpuline},
+        memoryline = #{memoryline},
+        filenumberline = #{filenumberline},
+        cpuwarn = #{cpuwarn},
+        memorywarn = #{memorywarn},
+        filenumberwarn = #{filenumberwarn},
+        time = #{time},
+        storagewarn = #{storagewarn},
+        storageline = #{storageline}
+        WHERE id = #{id}
+	</update>
+</mapper>

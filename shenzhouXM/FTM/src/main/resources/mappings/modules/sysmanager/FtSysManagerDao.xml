@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.sysmanager.dao.FtSysManagerDao">
+
+	<sql id="ftSysManagerColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.password AS "password",
+		a.phone AS "phone",
+		a.email AS "email",
+		a.company AS "company",
+		a.department AS "department",
+		a.systems AS "systems",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="ftSysManagerJoins">
+	</sql>
+
+	<!--<update id="updateSystem">-->
+		<!--UPDATE ft_sys_manager  SET-->
+		<!--systems = (SELECT a.name FROM ft_sys_info a,ft_sys_manager b WHERE  a.admin = b.name)-->
+	<!--</update>-->
+
+
+	<select id="get" resultType="FtSysManager">
+		SELECT
+		<include refid="ftSysManagerColumns"/>
+		FROM ft_sys_manager a
+		<include refid="ftSysManagerJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="FtSysManager">
+		SELECT
+		<include refid="ftSysManagerColumns"/>
+		FROM ft_sys_manager a
+		<include refid="ftSysManagerJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test = "id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="name != null and name != ''">
+				AND LOWER(a.name) LIKE
+				<if test="dbName == 'oracle'">'%'||LOWER(#{name})||'%'</if>
+				<if test="dbName == 'mysql'">concat('%',LOWER(#{name}),'%')</if>
+				<if test="dbName == 'db2'">concat('%',LOWER(#{name}),'%')</if>
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone = #{phone}
+			</if>
+			<if test="email != null and email != ''">
+				AND LOWER(a.email) LIKE
+				<if test="dbName == 'oracle'">'%'||LOWER(#{email})||'%'</if>
+				<if test="dbName == 'mysql'">concat('%',LOWER(#{email}),'%')</if>
+				<if test="dbName == 'db2'">concat('%',LOWER(#{email}),'%')</if>
+			</if>
+			<if test="department != null and department != ''">
+				AND a.port LIKE
+				<if test="dbName == 'oracle'">'%'||#{department}||'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{department},'%')</if>
+				<if test="dbName == 'db2'">concat('%',#{department},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findSystem" resultType="String">
+	SELECT system FROM ft_sys_to_admin WHERE admin=#{name}
+	</select>
+
+	<select id="findAllList" resultType="FtSysManager">
+		SELECT
+		<include refid="ftSysManagerColumns"/>
+		FROM ft_sys_manager a
+		<include refid="ftSysManagerJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ft_sys_manager(
+		id,
+		name,
+		password,
+		phone,
+		email,
+		company,
+		department,
+		systems,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{name},
+		#{password},
+		#{phone},
+		#{email},
+		#{company},
+		#{department},
+		#{systems},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ft_sys_manager SET
+		name = #{name},
+		password = #{password},
+		phone = #{phone},
+		email = #{email},
+		company = #{company},
+		department = #{department},
+		systems = #{systems},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ft_sys_manager SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+</mapper>

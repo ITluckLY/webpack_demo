@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.monitor.ftnodemonitor.dao.FtNodeMonitorDistributeDao">
+	<sql id="basecolumns" >
+	a.id AS "id",
+	b.tranCode AS "tranCode",
+	a.created_time AS "createdTime",
+	a.modified_time AS modifiedTime,
+	a.fileName AS "fileName",
+	a.fileVersion AS "fileVersion",
+	a.nodeName AS "nodeNamels",
+	a.optTime AS "optTime",
+	b.oriFilename AS "oriFilename",
+	a.state AS "state",
+	a.sysname AS "sysnamels",
+	a.realFileName AS "realFileName"
+</sql>
+	<select id="findList" resultType="FtNodeMonitorDistribute">
+		SELECT
+		<include refid="basecolumns" />
+		FROM biz_file_distribute_log a left join biz_file_upload_log b on a.fileName=b.fileName
+		<where>
+			1=1
+			<if test="tranCode != null and tranCode != ''">
+				AND b.tranCode LIKE
+				<if test="dbName == 'oracle'">'%'||#{tranCode}||'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{tranCode}, '%')</if>
+				<if test="dbName == 'db2'">'%'||#{tranCode}||'%'</if>
+			</if>
+			<if test="nodeNamels != null and nodeNamels != ''">
+				AND a.nodeName LIKE
+				<if test="dbName == 'oracle'">'%'||#{nodeNamels}||'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{nodeNamels}, '%')</if>
+				<if test="dbName == 'db2'">'%'||#{nodeNamels}||'%'</if>
+			</if>
+			<if test="sysnamels != null and sysnamels != ''">
+				AND a.sysname LIKE
+				<if test="dbName == 'oracle'">'%'||#{sysnamels}||'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{sysnamels}, '%')</if>
+				<if test="dbName == 'db2'">'%'||#{sysnamels}||'%'</if>
+			</if>
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.created_time &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.created_time &lt;= #{endDate}
+			</if>
+			<if test="state != null and state != ''">
+				AND a.state=#{state}
+			</if>
+
+		</where>
+		ORDER BY a.created_time DESC
+	</select>
+
+
+
+
+	<select id="get" resultType="FtNodeMonitorDistribute">
+		SELECT
+		<include refid="basecolumns" />
+		FROM biz_file_distribute_log a left join biz_file_upload_log b on a.fileName=b.fileName
+		WHERE a.id = #{id}
+	</select>
+</mapper>

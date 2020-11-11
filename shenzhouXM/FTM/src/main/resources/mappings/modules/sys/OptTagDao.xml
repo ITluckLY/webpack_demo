@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.sys.dao.OptTagDao">
+
+    <resultMap id="OptTag" type="com.dc.smarteam.modules.sys.entity.OptTag">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="dict_id" property="dictId" />
+        <result column="create_time" property="createTime" />
+        <result column="remark" property="remark" />
+        <result column="status" property="status" />
+        <result column="style" property="style" />
+        <association property="dict" column="dict_id"
+                     select="com.dc.smarteam.modules.sys.dao.DictDao.get">
+        </association>
+    </resultMap>
+
+    <resultMap id="OptTag2" type="com.dc.smarteam.modules.sys.entity.OptTag">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="dict_id" property="dictId" />
+        <result column="create_time" property="createTime" />
+        <result column="remark" property="remark" />
+        <result column="status" property="status" />
+        <result column="style" property="style" />
+    </resultMap>
+
+    <insert id="insert">
+        INSERT into opt_tag(id,name,dict_id,create_time,remark,status,style) VALUES (
+          #{id},#{name},#{dictId},#{createTime},#{remark},#{status},#{style}
+        )
+    </insert>
+
+    <select id="findList" resultMap="OptTag">
+      SELECT * from opt_tag where 1=1
+        AND status = 1
+      <if test="dictId!=null and dictId!=''">
+          AND dict_id=#{dictId}
+      </if>
+        <if test="name!=null and name!=''">
+          AND  `name` like CONCAT(CONCAT('%',#{name},'%'))
+        </if>
+        ORDER by create_time DESC
+    </select>
+
+    <delete id="delete">
+      DELETE from opt_tag where id=#{id}
+    </delete>
+
+    <select id="get" resultMap="OptTag">
+      select * from opt_tag where id=#{id}
+    </select>
+
+    <select id="select2" resultMap="OptTag2">
+        select * from opt_tag where id=#{id}
+    </select>
+
+    <update id="update">
+      UPDATE opt_tag set status=#{status}
+        <if test="name!=null and name!=''">
+          AND `name` = #{name}
+        </if>
+        <if test="remark!=null and remark!=''">
+            AND remark = #{remark}
+        </if>
+        <if test="dictId!=null and dictId!=''">
+            AND dict_id = #{dictId}
+        </if>
+        <if test="style!=null and style!=''">
+            AND style = #{style}
+        </if>
+      where id=#{id}
+    </update>
+
+</mapper>

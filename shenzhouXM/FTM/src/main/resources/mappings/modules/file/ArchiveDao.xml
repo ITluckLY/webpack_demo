@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.file.dao.ArchiveDao">
+
+    <sql id="ArchiveColumns">
+        a.id AS "id",
+        a.fileName AS "fileName",
+        a.fileSize AS "fileSize",
+        a.clientFileName AS "clientFileName",
+        a.clientIp AS "clientIp",
+        a.created_Time AS "createdTime",
+        a.uploadStartTime AS "uploadStartTime",
+        a.uploadEndTime AS "uploadEndTime",
+        a.flowNo AS  "flowNo",
+        a.user AS "user",
+        a.tranCode AS "tranCode",
+        a.uploadFlag AS "uploadFlag",
+        a.clearFlag AS "clearFlag"
+    </sql>
+
+
+    <select id="get" resultType="Archive">
+        SELECT
+            <include refid="ArchiveColumns"/>
+        FROM biz_file_upload_clear_log a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="Archive">
+        SELECT
+        <include refid="ArchiveColumns"/>
+        FROM biz_file_upload_clear_log a
+        <where>
+            1=1
+            <if test="user != null and user != ''">
+                AND a.user = #{user}
+            </if>
+            <if test="tranCode != null and tranCode != ''">
+                AND a.tranCode = #{tranCode}
+            </if>
+            <if test="uploadFlag != null and uploadFlag != ''">
+                <if test='uploadFlag == "Y"'>
+                    AND  (a.uploadFlag = "Y" and a.clearFlag="Y")
+                </if>
+                <if test='uploadFlag == "N"'>
+                    AND  (a.uploadFlag = "N" or a.clearFlag="N")
+                </if>
+            </if>
+            <if test="uploadStartTime != null and uploadStartTime != ''">
+                AND a.uploadStartTime = #{uploadStartTime}
+            </if>
+            <if test="uploadEndTime != null and uploadEndTime != ''">
+                AND a.uploadEndTime = #{uploadEndTime}
+            </if>
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.uploadStartTime &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.uploadStartTime &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY a.created_time DESC
+    </select>
+
+
+    <select id="findUserNameList" resultType="String">
+        SELECT
+        user
+        FROM biz_file_upload_clear_log
+        GROUP BY user
+        ORDER BY user
+    </select>
+
+    <select id="findTranCodeList" resultType="String">
+        SELECT
+        tranCode
+        FROM biz_file_upload_clear_log
+        GROUP BY tranCode
+        ORDER BY tranCode
+    </select>
+
+</mapper>

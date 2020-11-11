@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.file.dao.BizFileDao">
+
+    <sql id="bizFileColumns">
+        a.id AS "id",
+        a.filePath AS "filePath",
+        a.requestFilePath AS "requestFilePath",
+        a.fileName AS "fileName",
+        a.fileSize AS "fileSize",
+        a.fileExt AS "fileExt",
+        a.nodeName AS "nodeNameBiz",
+        a.systemName AS "systemName",
+        a.clientUserName AS "clientUserName",
+        a.clientFileName AS "clientFileName",
+        a.clientFilePath AS "clientFilePath",
+        a.originalFilePath AS "originalFilePath",
+        a.clientIp AS "clientIp",
+        a.created_Time AS "createdTime",
+        a.modified_Time AS "modifiedTime",
+        a.uploadStartTime AS "uploadStartTime",
+        a.uploadEndTime AS "uploadEndTime",
+        a.state AS "state",
+        a.fileMd5 AS "fileMd5",
+        a.flowNo AS  "flowNo"
+    </sql>
+
+
+    <select id="get" resultType="BizFile">
+        SELECT
+            <include refid="bizFileColumns"/>
+        FROM biz_file a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="BizFile">
+        SELECT
+            <include refid="bizFileColumns"/>
+        FROM biz_file a
+        <where>
+            1=1
+            <if test="clientUserName != null and clientUserName != ''">
+                AND LOWER(a.clientUserName) LIKE
+                <if test="dbName == 'oracle'">'%'||LOWER(#{clientUserName})||'%'</if>
+                <if test="dbName == 'mysql'">CONCAT('%', LOWER(#{clientUserName}), '%')</if>
+                <if test="dbName == 'db2'">CONCAT('%', LOWER(#{clientUserName}), '%')</if>
+            </if>
+            <if test="nodeNameBiz != null and nodeNameBiz != ''">
+                AND LOWER(a.nodeName) LIKE
+                <if test="dbName == 'oracle'">'%'||LOWER (#{nodeNameBiz})||'%'</if>
+                <if test="dbName == 'mysql'">CONCAT('%', LOWER(#{nodeNameBiz}), '%')</if>
+                <if test="dbName == 'db2'">CONCAT('%', LOWER(#{nodeNameBiz}), '%')</if>
+            </if>
+            <if test="clientFileName != null and clientFileName != ''">
+                AND LOWER(a.clientFileName) LIKE
+                <if test="dbName == 'oracle'">'%'||LOWER(#{clientFileName})||'%'</if>
+                <if test="dbName == 'mysql'">CONCAT('%', LOWER(#{clientFileName}), '%')</if>
+                <if test="dbName == 'db2'">CONCAT('%', LOWER(#{clientFileName}), '%')</if>
+            </if>
+        </where>
+    </select>
+
+    <select id="findSystemNameList" resultType="String">
+        SELECT
+        systemName
+        FROM biz_file
+        GROUP BY systemName
+        ORDER BY systemName
+    </select>
+
+    <select id="findClientUserNameList" resultType="String">
+        SELECT
+        clientUserName
+        FROM biz_file
+        GROUP BY clientUserName
+        ORDER BY clientUserName
+    </select>
+
+    <select id="findNodeNameList" resultType="String">
+        SELECT
+        nodeName
+        FROM biz_file
+        GROUP BY nodeName
+        ORDER BY nodeName
+    </select>
+
+
+
+</mapper>

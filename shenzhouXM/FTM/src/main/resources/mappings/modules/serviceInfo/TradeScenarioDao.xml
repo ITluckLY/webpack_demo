@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.serviceinfo.dao.TradeScenarioDao">
+
+    <!--<sql id="baseColumns">
+        a.uname AS "fromUid",
+        b.uname AS "toUid",
+        a.tranCode AS "tranCode",
+        COUNT(DISTINCT a.uname,a.clientIp,a.tranCode ) AS "tradeScenarioPass"
+    </sql>-->
+
+    <sql id="upanddownJoins">
+		LEFT JOIN  biz_file_download_log b
+		ON a.fileName = b.fileName
+		/*ON a.flowNo = b.flowNo*/
+	</sql>
+
+    <select id="findListSuss" resultType="com.dc.smarteam.modules.serviceinfo.entity.TradeScenario">
+        SELECT
+        a.uname AS "fromUid",
+        b.uname AS "toUid",
+        a.tranCode AS "tranCode",
+        COUNT(1) AS "tradeScenarioPass"
+
+        FROM biz_file_upload_log AS a
+        <include refid="upanddownJoins"/>
+
+        WHERE
+        (a.suss = TRUE AND a.lastPiece = TRUE
+        AND b.suss=TRUE AND b.lastPiece=TRUE)
+        <if test="startTime != null and endTime != null and startTime != '' and endTime != ''">
+            AND (a.endTime BETWEEN #{startTime} AND #{endTime})
+        </if>
+        GROUP BY a.tranCode,a.uname,b.uname
+    </select>
+
+    <select id="findListFail" resultType="com.dc.smarteam.modules.serviceinfo.entity.TradeScenario">
+        SELECT
+        a.fromUid AS "fromUid",
+        a.toUid AS "toUid",
+        a.tranCode AS "tranCode",
+        COUNT(1) AS "tradeScenarioFailed"
+
+        FROM biz_file_msg2client_log AS a
+        LEFT JOIN biz_file_download_log AS b
+        ON a.flowNo = b.flowNo AND a.toUid = b.uname AND a.ip = b.clientIp
+
+        WHERE
+        ((a.succ = FALSE AND (a.repushCount = 3 OR a.errCode = 'TBLFTSE2012')) OR
+        (b.suss = FALSE OR (b.lastPiece = FALSE AND b.errcode IS NOT NULL)))
+        <if test="startTime != null and endTime != null and startTime != '' and endTime != ''">
+            AND (a.modified_time BETWEEN #{startTime} AND #{endTime})
+        </if>
+        GROUP BY a.fromUid, a.toUid, a.tranCode;
+    </select>
+
+    <select id="findUploadFail" resultType="com.dc.smarteam.modules.serviceinfo.entity.TradeScenario">
+        SELECT
+        a.uname AS "fromUid",
+        a.tranCode AS "tranCode",
+        COUNT(1) AS "tradeScenarioFailed"
+
+        FROM biz_file_upload_log AS a
+        WHERE
+        (a.lastPiece = FALSE || a.suss = FALSE )
+        AND (a.errcode != 'TACFTSE2004')
+        <if test="startTime != null and endTime != null and startTime != '' and endTime != ''">
+            AND (a.modified_time BETWEEN #{startTime} AND #{endTime})
+        </if>
+        GROUP BY a.uname, a.tranCode
+    </select>
+
+</mapper>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.sysmng.dao.EamSystemDao">
+    
+	<sql id="eamSystemColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.chinese_name AS "chineseName",
+		a.eam_bank AS "eamBank",
+		a.eam_sysgroup_id AS "eamSysgroupId",
+		a.eam_aa_layer_id AS "eamAaLayerId",
+		a.eam_org_layer_id AS "eamOrgLayerId",
+		a.eam_build_type AS "eamBuildType",
+		a.eam_build_state AS "eamBuildState",
+		a.eam_trend AS "eamTrend",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="eamSystemJoins">
+	</sql>
+    
+	<select id="get" resultType="EamSystem">
+		SELECT 
+			<include refid="eamSystemColumns"/>
+		FROM eam_system a
+		<include refid="eamSystemJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="EamSystem">
+		SELECT 
+			<include refid="eamSystemColumns"/>
+		FROM eam_system a
+		<include refid="eamSystemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+					<if test="dbName == 'db2'">'%'||#{name}||'%'</if>
+			</if>
+			<if test="chineseName != null and chineseName != ''">
+				AND a.chinese_name = #{chineseName}
+			</if>
+			<if test="eamBuildState != null and eamBuildState != ''">
+				AND a.eam_build_state = #{eamBuildState}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="EamSystem">
+		SELECT 
+			<include refid="eamSystemColumns"/>
+		FROM eam_system a
+		<include refid="eamSystemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO eam_system(
+			id,
+			name,
+			chinese_name,
+			eam_bank,
+			eam_sysgroup_id,
+			eam_aa_layer_id,
+			eam_org_layer_id,
+			eam_build_type,
+			eam_build_state,
+			eam_trend,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{chineseName},
+			#{eamBank},
+			#{eamSysgroupId},
+			#{eamAaLayerId},
+			#{eamOrgLayerId},
+			#{eamBuildType},
+			#{eamBuildState},
+			#{eamTrend},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE eam_system SET 	
+			name = #{name},
+			chinese_name = #{chineseName},
+			eam_bank = #{eamBank},
+			eam_sysgroup_id = #{eamSysgroupId},
+			eam_aa_layer_id = #{eamAaLayerId},
+			eam_org_layer_id = #{eamOrgLayerId},
+			eam_build_type = #{eamBuildType},
+			eam_build_state = #{eamBuildState},
+			eam_trend = #{eamTrend},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE eam_system SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

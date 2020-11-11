@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.file.dao.FtFileRollbackLogDao">
+
+	<sql id="BaseColumns">
+		a.id AS "id",
+		a.dataNodeName AS "dataNodeName",
+		a.bakFileName AS "bakFileName",
+		a.monitor_ip AS "monitorIp",
+		a.monitor_cmd_port AS "monitorCmdPort",
+		a.retCode AS "retCode",
+		a.retData AS "retData",
+		a.retMsg AS "retMsg",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="FtFileRollbackLogJoins">
+	</sql>
+
+    <select id="get" resultType="FtFileRollbackLog">
+        SELECT
+        <include refid="BaseColumns"/>
+        FROM ft_file_rollback_log a
+        <include refid="FtFileRollbackLogJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+
+	<select id="findAll" resultType="FtFileRollbackLog">
+		SELECT
+			<include refid="BaseColumns"/>
+		FROM ft_file_rollback_log a
+		<where>
+			1=1
+			<if test="dataNodeName != null and dataNodeName != ''">
+				AND a.dataNodeName LIKE #{dataNodeName}
+				<if test="dbName == 'oracle'">'%,'||#{dataNodeName}||',%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{dataNodeName}, '%')</if>
+				<if test="dbName == 'db2'">CONCAT('%', #{dataNodeName}, '%')</if>
+			</if>
+		</where>
+		ORDER BY a.update_date DESC
+	</select>
+
+	<select id="findList" resultType="FtFileRollbackLog">
+		SELECT
+			<include refid="BaseColumns"/>
+		FROM ft_file_rollback_log a
+		<where>
+			1=1
+			<if test="dataNodeName != null and dataNodeName != ''">
+				AND a.dataNodeName LIKE #{dataNodeName}
+				<if test="dbName == 'oracle'">'%,'||#{dataNodeName}||',%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{dataNodeName}, '%')</if>
+				<if test="dbName == 'db2'">CONCAT('%', #{dataNodeName}, '%')</if>
+			</if>
+		</where>
+		ORDER BY a.update_date DESC
+	</select>
+
+	<insert id="save">
+		INSERT INTO ft_file_rollback_log(
+		id,
+		dataNodeName,
+		bakFileName,
+		monitor_ip,
+		monitor_cmd_port,
+		retCode,
+		retData,
+		retMsg,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{dataNodeName},
+		#{bakFileName},
+		#{monitorIp},
+		#{monitorCmdPort},
+		#{retCode},
+		#{retData},
+		#{retMsg},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+</mapper>

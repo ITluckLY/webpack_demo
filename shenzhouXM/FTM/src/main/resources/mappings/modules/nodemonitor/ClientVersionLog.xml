@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.monitor.ftnodemonitor.dao.ClientVersionDao">
+
+
+
+	<select id="findClientLog" resultType="ClientVersionLog">
+		SELECT clientVersion,MIN(startTime) startTime
+		FROM biz_nodelist_get_log
+		WHERE 1=1
+
+		<if test="clientIp != null and clientIp != ''">
+			AND clientIp=#{clientIp}
+		</if>
+		<if test="uid != null and uid != ''">
+			AND uid=#{uid}
+		</if>
+		AND auth = TRUE
+		GROUP BY clientVersion ORDER BY startTime desc
+	</select>
+
+
+	<select id="findList" resultType="ClientVersionLog">
+		SELECT DISTINCT t.uid,t.clientIp,t.created_time createdTime,t.clientVersion
+		FROM biz_nodelist_get_log t
+		INNER JOIN (
+		SELECT clientIp, MAX(created_time) AS MaxDate,uid
+		FROM biz_nodelist_get_log
+		GROUP BY clientIp,uid
+		) tm ON t.clientIp = tm.clientIp
+		AND t.uid=tm.uid and t.created_time = tm.MaxDate
+
+		<if test="clientIp != null and clientIp != ''">
+			WHERE t.clientIp=#{clientIp}
+		</if>
+		<if test="uid != null and uid != ''">
+			AND t.uid=#{uid}
+		</if>
+		<if test="clientVersion != null and clientVersion != ''">
+			AND t.clientVersion=#{clientVersion}
+		</if>
+		<if test="beginDate!=null and beginDate!=''">
+			AND t.created_time &gt;= #{beginDate}
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			AND t.created_time &lt;= #{endDate}
+		</if>
+		AND t.auth = TRUE
+		ORDER BY t.created_time DESC
+	</select>
+
+
+
+</mapper>

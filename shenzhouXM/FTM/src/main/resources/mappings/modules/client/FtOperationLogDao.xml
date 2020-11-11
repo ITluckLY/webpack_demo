@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.client.dao.FtOperationLogDao">
+
+    <sql id="ftOperationLogColumns">
+        a.id AS "id",
+        a.`system` AS "system",
+        a.param_update_type AS "paramUpdateType",
+        a.before_modify_value AS "beforeModifyValue",
+        a.after_modify_value AS "afterModifyValue",
+        a.param_name AS "paramName",
+        a.cfg_file_name AS "cfgFileName",
+        a.node_type AS "nodeType",
+        a.modified_time AS "modifiedDate",
+        a.ope_id AS "opeId",
+        a.ope_name AS "opeName",
+        a.remarks1 AS "remark1",
+        a.remarks AS "remarks"
+    </sql>
+
+    <select id="findList" resultType="com.dc.smarteam.modules.client.entity.FtOperationLog">
+        SELECT
+        <include refid="ftOperationLogColumns"/>
+        FROM ft_operation_log a
+        <where>
+            1=1
+            <if test="cfgFileName!=null and cfgFileName!=''">
+                AND a.cfg_file_name = #{cfgFileName}
+            </if>
+            <if test="remark1!=null and remark1!=''">
+                AND a.remarks1 like CONCAT(CONCAT('%',#{remark1},'%'))
+            </if>
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.modified_time &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.modified_time &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY a.modified_time DESC
+    </select>
+
+    <select id="findById" resultType="com.dc.smarteam.modules.client.entity.FtOperationLog">
+        SELECT
+        <include refid="ftOperationLogColumns"/>
+        FROM ft_operation_log a
+        <where>
+             a.id = #{id}
+        </where>
+    </select>
+
+    <select id="findFileName" resultType="com.dc.smarteam.modules.client.entity.FtOperationLog">
+        SELECT
+        a.CFG_FILE_NAME cfgFileName
+        FROM ft_operation_log a
+        group by a.CFG_FILE_NAME
+    </select>
+
+    <select id="findtags" resultType="com.dc.smarteam.modules.client.entity.FtOperationLog">
+        SELECT
+        a.REMARKS1 remark1
+        FROM ft_operation_log a
+        where a.REMARKS1 != ""
+        group by a.REMARKS1
+    </select>
+
+    <update id="addTag" >
+        update
+        ft_operation_log a
+        set
+        a.remarks1 = #{remark1}
+        <where>
+            a.id = #{id}
+        </where>
+    </update>
+
+    <insert id="insert">
+        INSERT INTO FT_OPERATION_LOG (
+          id,
+          `system`,
+          param_update_type,
+          BEFORE_MODIFY_VALUE,
+          AFTER_MODIFY_VALUE,
+          param_name,
+          cfg_file_name,
+          node_type,
+          ope_id,
+          ope_name,
+          modified_time,
+          remarks,
+          remarks1,
+          remarks2
+
+        ) VALUES (
+            #{id},
+            #{system,jdbcType=VARCHAR},
+            #{paramUpdateType,jdbcType=VARCHAR},
+            #{beforeModifyValue,jdbcType=CLOB},
+            #{afterModifyValue,jdbcType=CLOB},
+            #{paramName,jdbcType=VARCHAR},
+            #{cfgFileName,jdbcType=VARCHAR},
+            #{nodeType},
+            #{opeId},
+            #{opeName},
+            #{modifiedDate},
+            #{remarks},
+            #{remark1},
+            #{remark2}
+        )
+    </insert>
+</mapper>

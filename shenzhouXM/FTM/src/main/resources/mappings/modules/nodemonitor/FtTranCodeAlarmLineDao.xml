@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.monitor.ftnodemonitor.dao.FtTranCodeAlarmLineDao">
+
+	<resultMap id="FtTranCodeAlarmLine" type="com.dc.smarteam.modules.monitor.ftnodemonitor.entity.FtTranCodeAlarmLine">
+		<id column="tran_code" property="tranCode" />
+		<result column="put_user" property="putUser" />
+		<result column="get_user" property="getUser" />
+		<result column="file_name" property="fileName" />
+		<result column="timeout" property="timeout" />
+	</resultMap>
+
+    <select id="get" resultType="FtTranCodeAlarmLine">
+        SELECT *
+        FROM ft_trancode_alarm_line
+        WHERE tran_code = #{tranCode}
+    </select>
+
+	<select id="findList" resultType="FtTranCodeAlarmLine">
+		SELECT 
+			*
+		FROM ft_trancode_alarm_line
+		<where>
+            1=1
+			<if test="tranCode != null and tranCode != ''">
+				AND tran_code like concat(concat('%',#{tranCode}),'%')
+			</if>
+		</where>
+	</select>
+
+	<insert id="insert">
+		INSERT into ft_trancode_alarm_line(tran_code,put_user,get_user,file_name,timeout)
+		VALUES (
+		  #{tranCode},#{putUser},#{getUser},#{fileName},#{timeout}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ft_trancode_alarm_line SET file_name=#{fileName},timeout = #{timeout},put_user = #{putUser},get_user = #{getUser}
+		where tran_code = #{tranCode}
+	</update>
+
+	<delete id="delete">
+		DELETE from ft_trancode_alarm_line where tran_code = #{tranCode}
+	</delete>
+</mapper>

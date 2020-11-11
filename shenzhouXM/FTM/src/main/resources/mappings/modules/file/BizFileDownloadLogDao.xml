@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.file.dao.BizFileDownloadLogDao">
+
+    <sql id="bizFileDownloadLogColumns">
+        a.id AS "id",
+        a.created_Time AS "createdTime",
+        a.modified_Time AS "modifiedTime",
+        a.authFlag AS "authFlag",
+        a.clientFileName AS "clientFileName",
+        a.clientIp AS "clientIp",
+        a.compressFlag AS "compressFlag",
+        a.contLen AS "contLen",
+        a.ebcdicFlag AS "ebcdicFlag",
+        a.endTime AS "endTime",
+        a.fileExists AS "fileExists",
+        a.fileIndex AS "fileIndex",
+        a.fileMsgFlag AS "fileMsgFlag",
+        a.fileName AS "fileName",
+        a.fileRenameCtrl AS "fileRenameCtrl",
+        a.fileRetMsg AS "fileRetMsg",
+        a.fileSize AS "fileSize",
+        a.lastPiece AS "lastPiece",
+        a.nodeList AS "nodeList",
+        a.nodeName AS "nodeNameTemp",
+        a.offset AS "offset",
+        a.pieceNum AS "pieceNum",
+        a.scrtFlag AS "scrtFlag",
+        a.serverIp AS "serverIp",
+        a.serverName AS "serverName",
+        a.startTime AS "startTime",
+        a.suss AS "suss",
+        a.sysname AS "sysname",
+        a.tarFileName AS "tarFileName",
+        a.tarSysName AS "tarSysName",
+        a.tranCode AS "tranCode",
+        a.uname AS "uname",
+        a.nano AS "nano",
+        a.errCode AS "errCode",
+        a.flowNo AS "flowNo"
+    </sql>
+
+    <select id="get" resultType="BizFileDownloadLog">
+        SELECT
+        <include refid="bizFileDownloadLogColumns"/>
+        FROM biz_file_download_log a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="BizFileDownloadLog">
+        SELECT
+        <include refid="bizFileDownloadLogColumns"/>
+        FROM biz_file_download_log a,
+        (SELECT fileName,uname,MAX(id) max_id, MAX(lastPiece) max_lastPiece FROM biz_file_download_log d
+        <where>
+            <if test="beginDate!=null and beginDate!=''">
+                AND d.startTime &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND d.startTime &lt;= #{endDate}
+            </if>
+        </where>
+        GROUP BY fileName,uname) B
+        <where>
+            1=1
+            AND A.fileName = B.fileName AND A.uname=B.uname AND a.lastPiece=B.max_lastPiece
+            <if test="sysname != null and sysname != ''">
+                AND a.sysname = #{sysname}
+            </if>
+            <if test="nodeNameTemp != null and nodeNameTemp != ''">
+                AND a.nodeName = #{nodeNameTemp}
+            </if>
+            <if test="tranCode != null and tranCode != ''">
+                AND a.tranCode = #{tranCode}
+            </if>
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.startTime &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.startTime &lt;= #{endDate}
+            </if>
+            <if test="downloadSuss != null and downloadSuss != ''">
+                <if test='downloadSuss == "true"'>
+                    AND (a.suss=true AND a.lastPiece=true)
+                </if>
+                <if test='downloadSuss == "false"'>
+                    AND (a.suss = false OR a.lastPiece = false)
+                </if>
+            </if>
+        </where>
+        ORDER BY a.created_time DESC
+    </select>
+    <select id="findListByTranCodeAndFileName" resultType="BizFileDownloadLog">
+        SELECT a.tranCode,a.fileName,a.startTime
+        FROM biz_file_download_log a
+        <where>
+            1=1
+            <if test="tranCode != null and tranCode != ''">
+                AND a.tranCode = #{tranCode}
+            </if>
+            <if test="fileName != null and fileName != ''">
+                AND a.fileName=#{fileName}
+            </if>
+        </where>
+        ORDER BY a.startTime DESC limit 1
+    </select>
+
+    <select id="findSystemNameList" resultType="String">
+        SELECT
+        sysname
+        FROM biz_file_download_log
+        GROUP BY sysname
+        ORDER BY sysname
+    </select>
+
+    <select id="findNodeNameList" resultType="String">
+        SELECT
+        nodeName
+        FROM biz_file_download_log
+        GROUP BY nodeName
+        ORDER BY nodeName
+    </select>
+
+    <select id="findListByTime2" resultType="long">
+        SELECT
+        count(1)
+        FROM biz_file_download_log a
+        <where>
+            1=1
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.created_Time &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.created_Time &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+
+    <select id="findListByTime" resultType="long">
+        SELECT
+        IFNULL(t3.score,0)
+        FROM
+        (SELECT @cdate := date_add(@cdate,interval -1 day) days from
+        (SELECT @cdate := date_add(CURDATE(),interval +2 day)
+        from biz_file_download_log) t1) t2
+        LEFT JOIN
+        (SELECT date_format(created_time,'%Y-%m-%d') pay_day,count(1) score
+        from biz_file_download_log
+        group by date_format(created_time,'%Y-%m-%d')) t3
+        on t2.days=t3.pay_day
+        <where>
+            1=1
+            <if test="beginDate!=null and beginDate!=''">
+                AND t2.days &gt;= date_format(#{beginDate},'%Y-%m-%d')
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND t2.days &lt;= date_format(#{endDate},'%Y-%m-%d')
+            </if>
+        </where>
+        order by t2.days
+    </select>
+
+
+    <select id="findListByTranCodeAndTime" resultType="long">
+        SELECT
+        IFNULL(t3.score,0)
+        FROM
+        (SELECT @cdate := date_add(@cdate,interval -1 day) days from
+        (SELECT @cdate := date_add(CURDATE(),interval +2 day)
+        from biz_file_download_log) t1) t2
+        LEFT JOIN
+        (SELECT date_format(created_time,'%Y-%m-%d') pay_day,count(1) score
+         from biz_file_download_log
+        <where>
+            1=1
+            <if test="tranCode!=null and tranCode!=''">
+                AND tranCode = #{tranCode}
+            </if>
+        </where>
+        group by date_format(created_time,'%Y-%m-%d')) t3
+        on t2.days=t3.pay_day
+        <where>
+            1=1
+            <if test="beginDate!=null and beginDate!=''">
+                AND t2.days &gt;= date_format(#{beginDate},'%Y-%m-%d')
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND t2.days &lt;= date_format(#{endDate},'%Y-%m-%d')
+            </if>
+        </where>
+        order by t2.days
+    </select>
+
+    <select id="findListBySysAndTime" resultType="long">
+        SELECT
+        IFNULL(t3.score,0)
+        FROM
+        (SELECT @cdate := date_add(@cdate,interval -1 day) days from
+        (SELECT @cdate := date_add(CURDATE(),interval +2 day)
+        from biz_file_download_log) t1) t2
+        LEFT JOIN
+        (SELECT date_format(created_time,'%Y-%m-%d') pay_day,count(1) score
+        from biz_file_download_log
+        <where>
+            1=1
+            <if test="user!=null and user!=''">
+                AND uname = #{user}
+            </if>
+        </where>
+        group by date_format(created_time,'%Y-%m-%d')) t3
+        on t2.days=t3.pay_day
+        <where>
+            1=1
+            <if test="beginDate!=null and beginDate!=''">
+                AND t2.days &gt;= date_format(#{beginDate},'%Y-%m-%d')
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND t2.days &lt;= date_format(#{endDate},'%Y-%m-%d')
+            </if>
+        </where>
+        order by t2.days
+    </select>
+
+    <select id="findListBySysTime" resultType="long">
+        SELECT
+        IFNULL(t3.score,0)
+        FROM
+        (SELECT @cdate := date_add(@cdate,interval -1 day) days from
+        (SELECT @cdate := date_add(CURDATE(),interval +2 day)
+        from biz_file_download_log) t1) t2
+        LEFT JOIN
+        (SELECT date_format(created_time,'%Y-%m-%d') pay_day,count(1) score
+        from biz_file_download_log
+        <where>
+            1=1
+            <if test="sys!=null and sys!=''">
+                AND uname like #{sys}"%"
+            </if>
+        </where>
+        group by date_format(created_time,'%Y-%m-%d')) t3
+        on t2.days=t3.pay_day
+        <where>
+            1=1
+            <if test="beginDate!=null and beginDate!=''">
+                AND t2.days &gt;= date_format(#{beginDate},'%Y-%m-%d')
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND t2.days &lt;= date_format(#{endDate},'%Y-%m-%d')
+            </if>
+        </where>
+        order by t2.days
+    </select>
+
+    <select id="findListByTimeBySucc" resultType="long">
+        SELECT
+        count(1)
+        FROM biz_file_download_log a
+        <where>
+            a.suss = '1'
+            AND (a.errCode = '0000' OR a.errCode is NULL)
+            AND a.lastPiece = '1'
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.created_Time &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.created_Time &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+    <select id="findListByTimeByFail" resultType="BizFileDownloadLog">
+        SELECT
+        a.flowNo,a.uname
+        FROM biz_file_download_log a
+        <where>
+            1=1
+            AND (a.suss = '0'
+            OR a.lastPiece = '0')
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.created_Time &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.created_Time &lt;= #{endDate}
+            </if>
+        </where>
+
+    </select>
+    <select id="findsussDownloadLogByunameAndFlow" resultType="BizFileDownloadLog">
+        SELECT
+        <include refid="bizFileDownloadLogColumns"/>
+        FROM biz_file_download_log a
+        <where>
+            a.startTime &gt;= #{beginDate}
+            AND a.startTime &lt;= #{endDate}
+            AND a.flowNo = #{flowNo}
+            AND a.uname = #{uname}
+            AND a.suss=true AND a.lastPiece=true
+        </where>
+    </select>
+
+    <select id="findsussDownloadLogByunameAndFileName" resultType="BizFileDownloadLog">
+        SELECT
+        <include refid="bizFileDownloadLogColumns"/>
+        FROM biz_file_download_log a
+        <where>
+            a.startTime &gt;= #{beginDate}
+            AND a.startTime &lt;= #{endDate}
+            AND a.fileName = #{fileName}
+            AND a.uname = #{uname}
+            AND a.suss=true AND a.lastPiece=true
+        </where>
+    </select>
+    <select id="finddownloadsussByflowNoAndUname" resultType="long">
+        SELECT count(1)
+        FROM biz_file_download_log a
+        <where>
+            a.suss=TRUE AND a.lastPiece=TRUE
+            AND a.flowNo= #{flowNo}
+            AND a.uname= #{uname}
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.created_Time &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.created_Time &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+
+</mapper>

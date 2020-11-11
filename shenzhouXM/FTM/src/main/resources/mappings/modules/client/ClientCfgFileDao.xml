@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.client.dao.ClientCfgFileDao">
+
+    <sql id="allColumns">
+        id AS "id",
+        fileName AS "fileName",
+        content AS "content",
+        nodeType AS "nodeType",
+        ip AS "ip",
+        port AS "port",
+        `system` AS "system",
+        fileType AS "fileType",
+        fileSize AS "fileSize",
+        created_Time AS "createDate",
+        modified_Time AS "updateDate"
+    </sql>
+
+
+    <select id="get" resultType="com.dc.smarteam.modules.client.entity.ClientCfgFile">
+        SELECT
+        <include refid="allColumns"/>
+        FROM client_cfg_file
+        WHERE id = #{id}
+    </select>
+
+    <select id="findList" resultType="com.dc.smarteam.modules.client.entity.ClientCfgFile">
+        SELECT
+        <include refid="allColumns"/>
+        FROM client_cfg_file
+        <where>
+            1=1
+            <if test="nodeType != null and nodeType != ''">
+                AND nodeType=#{nodeType}
+            </if>
+            <if test="system != null and system != ''">
+                AND `system`=#{system}
+            </if>
+            <if test="ip != null and ip != ''">
+                AND ip=#{ip}
+            </if>
+            <if test="port != null and port != ''">
+                AND port=#{port}
+            </if>
+            <if test="fileName != null and fileName != ''">
+                AND fileName=#{fileName}
+            </if>
+        </where>
+    </select>
+
+    <select id="findByNameAndFile" resultType="com.dc.smarteam.modules.client.entity.ClientCfgFile">
+        SELECT
+        <include refid="allColumns"/>
+        FROM client_cfg_file
+        <where>
+            1=1
+            <if test="nodeType != null and nodeType != ''">
+                AND nodeType=#{nodeType}
+            </if>
+            <if test="ip != null and ip != ''">
+                AND ip=#{ip}
+            </if>
+            <if test="port != null and port != ''">
+                AND port=#{port}
+            </if>
+            <if test="system != null and system != ''">
+                AND `system`=#{system}
+            </if>
+            <if test="fileName != null and fileName != ''">
+                AND fileName=#{fileName}
+            </if>
+        </where>
+    </select>
+
+
+    <insert id="insert">
+        INSERT INTO client_cfg_file (
+            id,
+            fileName,
+            content,
+            nodeType,
+            ip,
+            port,
+            `system`,
+            fileType,
+            fileSize,
+            created_Time,
+            modified_Time
+        ) VALUES (
+            #{id},
+            #{fileName,jdbcType=VARCHAR},
+            #{content,jdbcType=CLOB},
+            #{nodeType,jdbcType=VARCHAR},
+            #{ip,jdbcType=VARCHAR},
+            #{port,jdbcType=VARCHAR},
+            #{system,jdbcType=VARCHAR},
+            #{fileType,jdbcType=VARCHAR},
+            #{fileSize,jdbcType=NUMERIC},
+            #{createDate},
+            #{updateDate}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE client_cfg_file
+        SET
+            fileName      = #{fileName,jdbcType=VARCHAR},
+            content        = #{content,jdbcType=CLOB},
+            nodeType      = #{nodeType,jdbcType=VARCHAR},
+            ip              = #{ip,jdbcType=VARCHAR},
+            port           = #{port,jdbcType=VARCHAR},
+            `system`       = #{system,jdbcType=VARCHAR},
+            fileType      = #{fileType,jdbcType=VARCHAR},
+            fileSize      = #{fileSize,jdbcType=NUMERIC},
+            created_Time  = #{createDate},
+            modified_Time = #{updateDate}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateByFileNameAndNodeType">
+        UPDATE client_cfg_file
+        SET
+            content       = #{content,jdbcType=CLOB},
+            `system`        = #{system,jdbcType=VARCHAR},
+            fileType      = #{fileType,jdbcType=VARCHAR},
+            fileSize      = #{fileSize,jdbcType=NUMERIC},
+            created_Time  = #{createDate},
+            modified_Time = #{updateDate}
+        WHERE nodeType = #{nodeType} AND fileName = #{fileName}
+        AND ip = #{ip} AND port = #{port}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM client_cfg_file
+        WHERE id = #{id}
+    </delete>
+</mapper>

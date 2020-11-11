@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.file.dao.FtFileUploadDao">
+    
+	<sql id="BaseColumns">
+		a.id AS "id",
+		a.fileName AS "fileName",
+		a.renameFileName AS "renameFileName",
+		a.systemName AS "systemName",
+		a.nodeName AS "nodeName",
+		a.uploadUser AS "uploadUser",
+		a.fileType AS "fileType",
+		a.fileSize AS "fileSize",
+		a.uploadPath AS "uploadPath",
+		a.sendNodeName AS "sendNodeName",
+		a.monitorNodeIp AS "monitorNodeIp",
+		a.monitorForDataNodePort AS "monitorForDataNodePort",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.realFileName AS "realFileName",
+		a.bakFileName AS "bakFileName",
+		a.retCode AS "retCode",
+		a.retMsg AS "retMsg",
+		a.updateType AS "updateType"
+	</sql>
+	
+	<sql id="ftFileUploadJoins">
+	</sql>
+
+    <select id="get" resultType="FtFileUpload">
+        SELECT
+        <include refid="BaseColumns"/>
+        FROM ft_file_upload a
+        <include refid="ftFileUploadJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+	<select id="findList" resultType="FtFileUpload">
+		SELECT
+		<include refid="BaseColumns"/>
+		FROM ft_file_upload a
+		<where>
+			1=1
+		</where>
+		ORDER BY a.update_date DESC
+	</select>
+
+	<select id="findAll" resultType="FtFileUpload">
+		SELECT
+			<include refid="BaseColumns"/>
+		FROM ft_file_upload a
+		<where>
+			1=1
+			<if test="systemName != null and systemName != ''">
+				AND a.systemName = #{systemName}
+			</if>
+			<if test="fileName != null and fileName != ''">
+				AND a.fileName LIKE #{fileName}
+				<if test="dbName == 'oracle'">'%'||#{fileName}||'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{fileName}, '%')</if>
+				<if test="dbName == 'db2'">'%'||#{fileName}||'%'</if>
+			</if>
+		</where>
+	</select>
+
+	<insert id="save">
+		INSERT INTO ft_file_upload(
+		id,
+		fileName,
+		renameFileName,
+		systemName,
+		nodeName,
+		uploadUser,
+		fileType,
+		fileSize,
+		uploadPath,
+		sendNodeName,
+		monitorNodeIp,
+		monitorForDataNodePort,
+		realFileName,
+		bakFileName,
+		retCode,
+		retMsg,
+		updateType,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{fileName},
+		#{renameFileName},
+		#{systemName},
+		#{nodeName},
+		#{uploadUser},
+		#{fileType},
+		#{fileSize},
+		#{uploadPath},
+		#{sendNodeName},
+		#{monitorNodeIp},
+		#{monitorForDataNodePort},
+		#{realFileName},
+		#{bakFileName},
+		#{retCode},
+		#{retMsg},
+		#{updateType},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+			UPDATE ft_file_upload SET
+			sendNodeName = #{sendNodeName},
+			monitorNodeIp = #{monitorNodeIp},
+			monitorForDataNodePort = #{monitorForDataNodePort},
+			update_date = #{updateDate},
+			realFileName = #{realFileName},
+			bakFileName = #{bakFileName},
+			retCode = #{retCode},
+			retMsg = #{retMsg},
+			updateType = #{updateType}
+			WHERE id = #{id}
+	</update>
+
+    <delete id="delOne" parameterType="String">
+		DELETE FROM ft_file_upload WHERE id=#{id}
+	</delete>
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.monitor.ftnodemonitor.dao.FtNodeAlarmLogMonitorDao">
+
+    <sql id="baseSql">
+		a.id as "id",
+		a.time as "time",
+		a.nodeName as "nodeNameTemp",
+		a.message as "message",
+		a.createTime as "createTime",
+		a.msgType as "msgType"
+	</sql>
+
+    <select id="get" resultType="FtNodeAlarmLogMonitor">
+        SELECT
+        <include refid="baseSql"/>
+        FROM ft_node_alarm_log a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="FtNodeAlarmLogMonitor">
+        SELECT
+        <include refid="baseSql"/>
+        FROM ft_node_alarm_log a
+        <where>
+            1=1
+            <if test="nodeNameTemp != null and nodeNameTemp != ''">
+                AND a.nodeName = #{nodeNameTemp}
+            </if>
+            <if test="beginDate!=null and beginDate!=''">
+                AND a.time &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                AND a.time &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY a.time DESC
+    </select>
+
+    <select id="findNodeNameList" resultType="String">
+		SELECT
+		nodeName
+		FROM ft_node_alarm_log
+		GROUP BY nodeName
+		ORDER BY nodeName
+	</select>
+
+    <select id="findListByTime" resultType="long">
+        SELECT count(1)
+        FROM ft_node_alarm_log a
+        WHERE 1=1
+        <if test="beginDate!=null and beginDate!=''">
+            AND a.time &gt;= #{beginDate}
+        </if>
+        <if test="endDate!=null and endDate!=''">
+            AND a.time &lt;= #{endDate}
+        </if>
+    </select>
+
+    <select id="findListByTimeByComm" resultType="long">
+        SELECT count(1)
+        FROM ft_node_alarm_log a
+        WHERE 1=1
+        <if test="beginDate!=null and beginDate!=''">
+            AND a.time &gt;= #{beginDate}
+        </if>
+        <if test="endDate!=null and endDate!=''">
+            AND a.time &lt;= #{endDate}
+        </if>
+        <if test="1==1">
+            AND a.message LIKE '%warning%'
+        </if>
+    </select>
+
+    <select id="findListByTimeBySeri" resultType="long">
+        SELECT count(1)
+        FROM ft_node_alarm_log a
+        WHERE 1=1
+        <if test="beginDate!=null and beginDate!=''">
+            AND a.time &gt;= #{beginDate}
+        </if>
+        <if test="endDate!=null and endDate!=''">
+            AND a.time &lt;= #{endDate}
+        </if>
+        <if test="1==1">
+            AND a.message LIKE '%critical%'
+        </if>
+    </select>
+
+
+    <select id="findAlarmOftenRecord" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT nodeName, count(nodeName) AS nodeCount
+        FROM ft_node_alarm_log a
+        WHERE 1=1
+        <if test="beginDate!=null">
+            AND a.time &gt;= #{beginDate}
+        </if>
+        <if test="endDate!=null">
+            AND a.time &lt;= #{endDate}
+        </if>
+        group by nodeName HAVING count(nodeName)>0 ORDER BY count(nodeName) DESC
+    </select>
+</mapper>

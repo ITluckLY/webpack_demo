@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.file.dao.BizFileTransLogWarnDao">
+	<sql id="BizFileTranslogWarnDaoColumns">
+		a.id AS "id" ,
+		a.flowNo AS "flowno" ,
+		a.tranCode AS "trancode" ,
+		a.created_time AS "createdTime" ,
+		a.modified_time AS "modifiedTime" ,
+		a.operator AS "operator" ,
+		a.operateType AS "operatetype" ,
+		a.operateIp AS "operateip" ,
+		a.fileName AS "filename" ,
+		a.zipFileList AS "zipfilelist" ,
+		a.fileSize AS "filesize" ,
+		a.errCode AS "errcode" ,
+		a.errMsg AS "errmsg" ,
+		a.nodeName AS "nodename" ,
+		a.startTime AS "starttime" ,
+		a.endTime AS "endtime" ,
+		a.suss AS "suss" ,
+		a.noticeTime AS "noticetime" ,
+		a.noticeStat AS "noticestat" ,
+		a.noticeType AS "noticetype" ,
+		a.noticeSendTo AS "noticesendto" ,
+		a.noticeNum AS "noticenum" ,
+
+	</sql>
+	<select id="findListBytime" resultType="BizFileTransLogWarn">
+		SELECT
+		<include refid="BizFileTranslogWarnDaoColumns"/>
+		FROM biz_file_translog_warn a
+		<where>
+			1=1
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.endtime &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.endtime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<!--统计所有上传和下载成功的个数-->
+	<select id="findTotalSuss" resultType="long">
+		SELECT
+		count(1)
+		FROM biz_file_translog_warn a
+		<where>
+			a.suss = '1'
+			AND (a.errCode = '0000' OR a.errCode is NULL)
+			<!--AND a.lastPiece = '1'-->
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.endtime &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.endtime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<!--统计所有的上传和下载的个数-->
+	<select id="findTotal" resultType="long">
+		SELECT
+		count(1)
+		FROM biz_file_translog_warn a
+		<where>
+			1=1
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.endtime &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.endtime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<!--统计所有的流量-->
+	<select id="findTotalFlow" resultType="long">
+
+		SELECT
+		COALESCE(SUM(a.fileSize),0)
+		FROM biz_file_translog_warn a
+		<where>
+			1=1
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.endtime &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.endtime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<!--统计上传成功的个数-->
+	<select id="findUploadTotalSuss" resultType="long">
+		SELECT
+		count(1)
+		FROM biz_file_translog_warn a
+		<where>
+			a.suss = '1'
+			AND (a.errCode = '0000' OR a.errCode is NULL)
+			<!--AND a.lastPiece = '1'-->
+			AND a.operateType = '1'
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.endtime &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.endtime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<!--统计下载成功的个数-->
+	<select id="findDownloadTotalSuss" resultType="long">
+		SELECT
+		count(1)
+		FROM biz_file_translog_warn a
+		<where>
+			a.suss = '1'
+			AND (a.errCode = '0000' OR a.errCode is NULL)
+			<!--AND a.lastPiece = '1'-->
+			AND a.operateType = '0'
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.endtime &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.endtime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<!--统计所有下载的个数-->
+	<select id="findDownloadTotal" resultType="long">
+		SELECT
+		count(1)
+		FROM biz_file_translog_warn a
+		<where>
+			1=1
+			AND a.operateType = '0'
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.endtime &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.endtime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<!--统计所有下载的流量-->
+	<select id="findDownloadTotalFlow" resultType="long">
+		SELECT
+		COALESCE(SUM(a.fileSize),0)
+		FROM biz_file_translog_warn a
+		<where>
+			1=1
+			AND a.operateType = '0'
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.endtime &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.endtime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<!--统计所有上传的个数-->
+	<select id="findUploadTotal" resultType="long">
+		SELECT
+		count(1)
+		FROM biz_file_translog_warn a
+		<where>
+			1=1
+			AND a.operateType = '1'
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.endtime &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.endtime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<!--统计所有上传的流量-->
+	<select id="findUploadTotalFlow" resultType="long">
+		SELECT
+		COALESCE(SUM(a.fileSize),0)
+		FROM biz_file_translog_warn a
+		<where>
+			1=1
+			AND a.operateType = '1'
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.endtime &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.endtime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+
+	<!--统计所有下载的流量20170904-->
+	<select id="findDownloadFlow" resultType="long">
+		SELECT
+		COALESCE(SUM(a.fileSize),0)
+		FROM biz_file_download_log a
+		<where>
+			1=1
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.created_Time &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.created_Time &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+
+	<!--统计所有上传的流量20170904-->
+	<select id="findUploadFlow" resultType="long">
+		SELECT
+		COALESCE(SUM(a.fileSize),0)
+		FROM biz_file_upload_log a
+		<where>
+			1=1
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.endtime &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.endtime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+
+	<!--插入操作-->
+	<insert id="insert">
+
+
+		insert into biz_file_translog_warn (id, flowNo, tranCode,
+		created_time, modified_time, operator,
+		operateType, operateIp, fileName,
+		zipFileList, fileSize, errCode,
+		errMsg, nodeName, startTime,
+		endTime, suss, noticeTime,
+		noticeStat, noticeType, noticeSendTo,
+		noticeNum)
+		values (#{id}, #{flowno}, #{trancode},
+		#{createdTime}, #{modifiedTime}, #{operator},
+		#{operatetype}, #{operateip}, #{filename},
+		#{zipfilelist}, #{filesize}, #{errcode},
+		#{errmsg}, #{nodename}, #{starttime},
+		#{endtime}, #{suss}, #{noticetime},
+		#{noticestat}, #{noticetype}, #{noticesendto},
+		#{noticenum})
+
+
+	</insert>
+    
+
+
+</mapper>

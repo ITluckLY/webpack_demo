@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.smarteam.modules.monitor.ftnodemonitor.dao.FtNodeMonitorDao">
+    
+	<sql id="ftNodeMonitorColumns">
+		a.id AS "id",
+		a.system AS "system",
+		a.ip AS "ip",
+		a.port AS "port",
+		a.node AS "node",
+		a.time AS "time",
+		a.periods AS "periods",
+		a.state AS "state",
+		a.catalog AS "catalog",
+		a.filenumber AS "filenumber",
+		a.storage AS "storage",
+		a.cpu AS "cpu",
+		a.disk AS "disk",
+		a.network AS "network",
+		a.memory AS "memory",
+		a.flowrate AS "flowrate",
+		a.filenumberwarn AS "filenumberwarn",
+		a.storagewarn AS "storagewarn",
+		a.cpuwarn AS "cpuwarn",
+		a.diskwarn AS "diskwarn",
+		a.memorywarn AS "memorywarn",
+		a.networkwarn AS "networkwarn",
+		a.filenumberline AS "filenumberline",
+		a.storageline AS "storageline",
+		a.cpuline AS "cpuline",
+		a.diskline AS "diskline",
+		a.memoryline AS "memoryline",
+		a.networkline AS "networkline",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="ftNodeMonitorLog">
+		a.id AS "id",
+		a.system AS "system",
+		a.ip AS "ip",
+		a.port AS "port",
+		a.node AS "node",
+		a.periods AS "periods",
+		a.time AS "time",
+		a.state AS "state",
+		a.catalog AS "catalog",
+		a.filenumber AS "filenumber",
+		a.storage AS "storage",
+		a.cpu AS "cpu",
+		a.disk AS "disk",
+		a.flowrate AS "flowrate",
+		a.network AS "network",
+		a.memory AS "memory",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="ftNodeMonitorLogSimple">
+		a.id AS "id",
+		a.time AS "time",
+		a.cpu AS "cpu",
+		a.disk AS "disk",
+		a.flowrate AS "flowrate",
+		a.memory AS "memory",
+		a.update_date AS "updateDate"
+	</sql>
+
+	<select id="findLog" resultType="FtNodeMonitor">
+		SELECT
+		<include refid="ftNodeMonitorLog"/>
+		FROM ft_node_monitor_log a
+		<include refid="ftNodeMonitorJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="time != null and time != ''">
+				AND a.system LIKE
+				<if test="dbName == 'oracle'">'%'||#{time}||'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{time},'%')</if>
+				<if test="dbName == 'db2'">'%'||#{time}||'%'</if>
+			</if>
+			<if test="system != null and system != ''">
+				AND a.system LIKE
+				<if test="dbName == 'oracle'">'%'||#{system}||'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{system},'%')</if>
+				<if test="dbName == 'db2'">'%'||#{system}||'%'</if>
+			</if>
+			<if test="node != null and node != ''">
+				AND a.node LIKE
+				<if test="dbName == 'oracle'">'%'||#{node}||'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{node},'%')</if>
+				<if test="dbName == 'db2'">'%'||#{node}||'%'</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<insert id="insertNodeInfo">
+		INSERT INTO ft_node_monitor_log(
+		id,
+		system,
+		node,
+		time,
+		ip,
+		port,
+		periods,
+		state,
+		filenumber,
+		storage,
+		catalog,
+		cpu,
+		disk,
+		flowrate,
+		network,
+		memory,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{system,jdbcType=VARCHAR},
+		#{node,jdbcType=VARCHAR},
+		#{time},
+		#{ip,jdbcType=VARCHAR},
+		#{port,jdbcType=VARCHAR},
+		#{periods,jdbcType=VARCHAR},
+		#{state,jdbcType=VARCHAR},
+		#{filenumber,jdbcType=VARCHAR},
+		#{storage,jdbcType=VARCHAR},
+		#{catalog,jdbcType=VARCHAR},
+		#{cpu,jdbcType=VARCHAR},
+		#{disk,jdbcType=VARCHAR},
+		#{flowrate,jdbcType=VARCHAR},
+		#{network,jdbcType=VARCHAR},
+		#{memory,jdbcType=VARCHAR},
+		#{createBy.id,jdbcType=VARCHAR},
+		#{createDate},
+		#{updateBy.id,jdbcType=VARCHAR},
+		#{updateDate},
+		#{remarks,jdbcType=VARCHAR},
+		#{delFlag,jdbcType=CHAR}
+		)
+	</insert>
+
+
+	<update id="setNodeInfo">
+		UPDATE ft_node_monitor SET
+		cpu = #{cpu},
+		disk=#{disk},
+		periods=#{periods},
+		ip=#{ip},
+		memory = #{memory},
+		flowrate = #{flowrate},
+		time = #{time},
+		filenumber = #{filenumber},
+		system = #{system}
+		WHERE node = #{node}
+	</update>
+
+	<update id="setNetState">
+		UPDATE ft_node_monitor SET
+		state = #{state}
+		WHERE node = #{node}
+	</update>
+
+	<update id="setThreshold">
+		UPDATE ft_node_monitor SET
+		cpuline=#{cpuline,jdbcType=VARCHAR},
+		diskline = #{diskline,jdbcType=VARCHAR},
+		memoryline = #{memoryline,jdbcType=VARCHAR},
+		networkline = #{networkline,jdbcType=VARCHAR},
+		storageline = #{storageline,jdbcType=VARCHAR},
+		filenumberline = #{filenumberline,jdbcType=VARCHAR},
+		cpuwarn=#{cpuwarn,jdbcType=VARCHAR},
+		diskwarn = #{diskwarn,jdbcType=VARCHAR},
+		memorywarn = #{memorywarn,jdbcType=VARCHAR},
+		networkwarn = #{networkwarn,jdbcType=VARCHAR},
+		storagewarn = #{storagewarn,jdbcType=VARCHAR},
+		filenumberwarn = #{filenumberwarn,jdbcType=VARCHAR}
+		WHERE id = #{id}
+	</update>
+
+	<sql id="ftNodeMonitorJoins">
+	</sql>
+    
+	<select id="get" resultType="FtNodeMonitor">
+		SELECT 
+			<include refid="ftNodeMonitorColumns"/>
+		FROM ft_node_monitor a
+		<include refid="ftNodeMonitorJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+
+	<select id="findList" resultType="FtNodeMonitor">
+		SELECT 
+			<include refid="ftNodeMonitorColumns"/>
+		FROM ft_node_monitor a
+
+	</select>
+
+	<select id="getNode" resultType="FtNodeMonitor">
+		SELECT
+		<include refid="ftNodeMonitorColumns"/>
+		FROM ft_node_monitor a
+		<include refid="ftNodeMonitorJoins"/>
+		WHERE a.node = #{node}
+		ORDER BY a.time ASC
+	</select>
+
+	<select id="getNodeLog" resultType="FtNodeMonitor">
+		SELECT
+		<include refid="ftNodeMonitorLog"/>
+		FROM ft_node_monitor_log a
+		<include refid="ftNodeMonitorJoins"/>
+		WHERE a.node = #{node}
+		ORDER BY a.time ASC
+	</select>
+
+	<select id="getNodeLogList" resultType="FtNodeMonitor" parameterType="java.util.Map">
+		SELECT
+		<include refid="ftNodeMonitorLogSimple"/>
+		FROM ft_node_monitor_log a
+		WHERE
+		1=1
+		<if test="node!=null">
+			AND a.node = #{node}
+		</if>
+		<!--<if test="beginDate!=null">
+			AND a.time &gt;= to_date(#{beginDate}, 'YYYY-MM-DD HH24:MI:SS')
+		</if>
+		<if test="endDate!=null">
+			AND a.time &lt;= to_date(#{endDate}, 'YYYY-MM-DD HH24:MI:SS')
+		</if>-->
+		<if test="beginDate!=null">
+			AND a.time &gt;= #{beginDate}
+		</if>
+		<if test="endDate!=null">
+			AND a.time &lt;= #{endDate}
+		</if>
+		ORDER BY a.time DESC
+	</select>
+
+	<select id="findAllList" resultType="FtNodeMonitor">
+		SELECT 
+			<include refid="ftNodeMonitorColumns"/>
+		FROM ft_node_monitor a
+		<include refid="ftNodeMonitorJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+
+	<!--<update id="delete">
+		UPDATE ft_node_monitor SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>-->
+
+	<delete id="delete">
+		DELETE FROM ft_node_monitor
+		WHERE id = #{id}
+	</delete>
+
+	<select id="findSystemNameList" resultType="String">
+		SELECT
+		system
+		FROM ft_node_monitor WHERE system IS NOT NULL
+	</select>
+
+	<select id="findNodeNameList" resultType="String">
+		SELECT
+		node
+		FROM ft_node_monitor
+	</select>
+
+	<select id="findListByTotal" resultType="long">
+		SELECT  count(1)
+		FROM ft_node_monitor a
+		<where>
+		  	1=1
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.create_date &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.create_date &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<select id="findListByDisable" resultType="long">
+		SELECT  count(1)
+		FROM ft_node_monitor a
+		<where>
+			1=1 AND a.state='0'
+			<if test="beginDate!=null and beginDate!=''">
+				AND a.create_date &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND a.create_date &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<insert id="insert">
+		INSERT INTO ft_node_monitor (
+			id,
+			statetime,
+			state,
+			node,
+			system,
+			ip,
+			port,
+			create_by,
+            create_date,
+            update_by,
+            update_date
+		) VALUES (
+			#{id},
+			#{stateTime},
+			#{state,jdbcType=VARCHAR},
+			#{node,jdbcType=VARCHAR},
+			#{system,jdbcType=VARCHAR},
+			#{ip,jdbcType=VARCHAR},
+			#{port,jdbcType=VARCHAR},
+			#{createBy.id,jdbcType=VARCHAR},
+            #{createDate},
+            #{updateBy.id,jdbcType=VARCHAR},
+            #{updateDate}
+		)
+	</insert>
+	<delete id="deleteNode">
+		DELETE FROM ft_node_monitor
+		WHERE node = #{node}
+	</delete>
+
+	<update id="updateNode">
+		UPDATE ft_node_monitor SET
+		ip=#{ip},
+		port=#{port}
+		WHERE node=#{node}
+	</update>
+</mapper>
