@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<nodes>
+    <node name="FSD001" type="datanode" ip="192.168.184.57" cmd_port="6000" ftp_serv_port="6001" ftp_manage_port="6002" receive_port="6003"
+          state="0" isolState="0" model="more">
+        <system storeModel="async">esb</system>
+    </node>
+    <node name="FSD049" type="datanode" ip="192.168.184.59" cmd_port="6000" ftp_serv_port="6001" ftp_manage_port="6002" receive_port="6003"
+          state="0" isolState="0" model="more">
+        <system storeModel="async">esb</system>
+    </node>
+    <node name="FSD047" type="datanode" ip="10.5.183.247" cmd_port="6000" ftp_serv_port="6001" ftp_manage_port="6002" receive_port="6003"
+          state="0" isolState="0" model="single">
+        <system storeModel="single">esc</system>
+    </node>
+    <node name="FSD011" type="datanode" ip="10.5.183.247" cmd_port="7000" ftp_serv_port="7001" ftp_manage_port="7002" receive_port="7003"
+          state="0" isolState="0" model="ms-m">
+        <system storeModel="async" switchModel="auto">cms</system>
+    </node>
+    <node name="FSD012" type="datanode" ip="10.5.183.249" cmd_port="7000" ftp_serv_port="7001" ftp_manage_port="7002" receive_port="7003"
+          state="0" isolState="0" model="ms-s">
+        <system storeModel="async" switchModel="auto">cms</system>
+    </node>
+    <node name="FSN131" type="namenode" ip="192.168.184.57" cmd_port="5000" ftp_serv_port="5001" ftp_manage_port="5002" receive_port="5003"
+          state="0" isolState="0"/>
+    <node name="FSL247" type="lognode" ip="10.5.183.247" state="0" cmd_port="7000"/>
+    <node name="FSL249" type="lognode" ip="10.5.183.249" state="0" cmd_port="7000"/>
+    <node name="FSD70" type="datanode" ip="192.168.184.70" cmd_port="6000" ftp_serv_port="6001" ftp_manage_port="6002" receive_port="6003"
+          state="0" isolState="0" model="more">
+        <system storeModel="async">esb</system>
+    </node>
+    <node name="FSN121" type="namenode" ip="192.168.184.59" cmd_port="5000" ftp_serv_port="5001" ftp_manage_port="5002" receive_port="5003"
+          state="0" isolState="0"/>
+    <node name="FSD081" type="datanode" ip="192.168.184.81" cmd_port="6000" ftp_serv_port="6001" ftp_manage_port="6002" receive_port="6003"
+          state="0" isolState="0" model="more">
+        <system storeModel="async">esb</system>
+    </node>
+    <node name="FSD082" type="datanode" ip="192.168.184.82" cmd_port="6000" ftp_serv_port="6001" ftp_manage_port="6002" receive_port="6003"
+          state="0" isolState="0" model="more">
+        <system storeModel="async">esb</system>
+    </node>
+    <node name="FSD003" type="datanode" ip="192.168.184.3" cmd_port="6000" ftp_serv_port="6001" ftp_manage_port="6002" receive_port="6003"
+          state="0" isolState="0" model="more">
+        <system storeModel="async">esb</system>
+    </node>
+    <node name="FSD102" type="datanode" ip="192.168.1.102" cmd_port="6000" ftp_serv_port="6001" ftp_manage_port="6002" receive_port="6003"
+          state="1" isolState="0" model="more">
+        <system storeModel="async">esb</system>
+    </node>
+    <node name="FSN070" type="namenode" ip="192.168.184.70" cmd_port="5000" ftp_serv_port="5001" ftp_manage_port="5002" receive_port="5003"
+          state="0" isolState="0"/>
+</nodes>

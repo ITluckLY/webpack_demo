@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <fileClean id="1" srcPath="/esb" keepTime="100" isBackup="true" backupPath="/d" desc="test" state="1" system="esb"/>
+    <fileClean id="2" srcPath="/picp" keepTime="100" isBackup="true" backupPath="/c" desc="" state="1" system="esc"/>
+    <fileClean id="3" srcPath="/cms" keepTime="100" isBackup="true" backupPath="/d" desc="test" state="1" system="esb"/>
+</root>

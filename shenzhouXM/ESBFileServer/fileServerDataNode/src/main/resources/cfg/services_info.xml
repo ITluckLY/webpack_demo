@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<services timestamp="1477552766925">
+    <service sysname="esb" trancode="0001" flow="DefStandardFlow" describe="333" rename="0" filePeriod="60" priority="3" size="20">
+        <putAuth>
+            <user directoy="/0002/esb/hugh">hugh</user>
+            <user directoy="/0002/esc/hugh">hugh</user>
+        </putAuth>
+        <getAuth>
+            <user>hugh</user>
+            <user>hugh2</user>
+        </getAuth>
+    </service>
+    <service sysname="esb" trancode="0002" flow="DefStandardFlow" describe="111" rename="1" filePeriod="10" priority="3" size="20">
+        <putAuth>
+            <user directoy="/0002/hugh">hugh</user>
+        </putAuth>
+        <getAuth>
+            <user>hugh</user>
+        </getAuth>
+    </service>
+    <service sysname="esb" trancode="0003" flow="DefStandardFlow" describe="文件路由" rename="0" filePeriod="60" priority="3" size="20">
+        <putAuth>
+            <user directoy="/0003/esb/aaa">aaa</user>
+        </putAuth>
+        <getAuth>
+            <user>aaa</user>
+        </getAuth>
+    </service>
+</services>

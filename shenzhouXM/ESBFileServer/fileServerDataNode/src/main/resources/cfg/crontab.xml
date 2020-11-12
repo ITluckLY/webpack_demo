@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<schedules timestamp="1473307356362">
+    <task ID="1" taskName="aaa" description="" status="0" count="0">
+        <!-- 1-运行，0-停止 -->
+        <!--格式: MM dd hh mm ss -->
+        <!-- * 表示任意时间 -->
+        <timeExp>* * 12 * 00</timeExp>
+        <mission>FileDownload</mission>
+        <params>pathType=local,localFile=/a.txt,remoteFile=/esb/b.txt,destination=ftp001</params>
+    </task>
+    <task ID="2" taskName="bbb" description="" status="0" count="0">
+        <timeExp>* * 12 * 00</timeExp>
+        <mission>FileDownload</mission>
+        <params>pathType=local,localFile=/a.txt,remoteFile=/esb/b.txt,destination=ftp001</params>
+    </task>
+    <task ID="3" taskName="ccc" description="" status="0" count="1">
+        <timeExp>* * * * 00</timeExp>
+        <mission>NodeFileUpload</mission>
+        <params>localFile=/esb/aaa/asdsad.txt,remoteFile=/esc/bbb/asad.txt,nodeName=FS01</params>
+    </task>
+</schedules>

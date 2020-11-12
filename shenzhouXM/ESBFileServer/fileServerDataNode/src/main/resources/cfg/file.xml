@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<FileRoot timestamp="1477472443782">
+    <BaseFile name="/esb/ssssd" path="esb/ssssd">
+        <grant user="aaaa" type="R"/>
+    </BaseFile>
+    <BaseFile name="/esb/aaa" path="esb/aaa">
+        <grant user="aaa" type="A"/>
+    </BaseFile>
+    <BaseFile name="/esb/asdff" path="esb/asdff"/>
+    <BaseFile name="/esb/sss/aaa" path="esb/sss/aaa"/>
+    <BaseFile name="/esb/Test" path="esb/Test"/>
+    <BaseFile name="/esb/esb/esc" path="esb/esb/esc"/>
+    <BaseFile name="/esb/cms/test" path="esb/cms/test"/>
+</FileRoot>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<systems timestamp="1472093751697">
+    <system name="smsp" protocol="ftp">
+        <ip>192.168.101.87</ip>
+        <port>21</port>
+        <username>root</username>
+        <password>${3DES}qvWw67k7FzcwajASg0fzug==</password>
+    </system>
+    <system name="fsESC" protocol="fsftp">
+        <ip>192.168.184.57</ip>
+        <port>6005</port>
+        <username>root</username>
+        <password>${3DES}qvWw67k7FzcwajASg0fzug==</password>
+    </system>
+</systems>

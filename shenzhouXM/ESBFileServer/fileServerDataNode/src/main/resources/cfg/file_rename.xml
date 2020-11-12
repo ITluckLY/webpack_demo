@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root timestamp="1477472444087">
+    <rule id="1" type="dir" path="/esb/jj" sysname="esb"/>
+    <rule id="2" type="dir" path="/esb/aaa" sysname="esb"/>
+    <rule id="51d02228-3474-42f5-82e6-570116c6efa3" type="file" path="/esb/aaa/b.txt" sysname="esb"/>
+</root>

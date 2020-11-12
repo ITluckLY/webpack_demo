@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<flows>
+
+  <flow name="FilesProcesFlow"
+        components="ResouceCtrlBySetCliHandler,UploadDecryptHandler,UploadDecompressHandler,SaveUploadFileByEsbFileHandler,FileDistributeByTailHandler,SyncDistributeUploadHandler,FileRouteHandler,LogOnFinishHandler"
+        describe="校验流程">*
+  </flow>
+</flows>

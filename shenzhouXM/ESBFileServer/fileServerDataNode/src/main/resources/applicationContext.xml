@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd"
+       default-lazy-init="true">
+
+    <context:property-placeholder location="classpath:/efs.properties,classpath:/efs-local.properties"
+                                  ignore-resource-not-found="true" ignore-unresolvable="true" local-override="true"/>
+
+    <context:component-scan base-package="com.dcfs.esb.ftp.spring,com.dcfs.esb.ftp.datanode,com.dcfs.esc.ftp">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <aop:aspectj-autoproxy/>
+    <context:annotation-config/>
+
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="java.lang.System"/>
+        <property name="targetMethod" value="setProperty"/>
+        <property name="arguments">
+            <list>
+                <value>system.project_name</value>
+                <value>${system.project_name}</value>
+            </list>
+        </property>
+    </bean>
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="java.lang.System"/>
+        <property name="targetMethod" value="setProperty"/>
+        <property name="arguments">
+            <list>
+                <value>ESB_FS_CFG_PATH</value>
+                <value>${ESB_FS_CFG_PATH}</value>
+            </list>
+        </property>
+    </bean>
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="java.lang.System"/>
+        <property name="targetMethod" value="setProperty"/>
+        <property name="arguments">
+            <list>
+                <value>io.netty.eventLoopThreads</value>
+                <value>${netty.workerThreadCount}</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="cacheSeconds" value="${message.cache_seconds}"/>
+        <property name="useCodeAsDefaultMessage" value="true"/>
+        <property name="basenames">
+            <list>
+                <value>${message.common_path}</value>
+                <value>${message.website_path}</value>
+                <value>${message.admin_path}</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="validationMessageSource" ref="messageSource"/>
+    </bean>
+    -->
+    <bean id="nodeCfgSyncService" class="com.dcfs.esb.ftp.impls.EmptyNodeCfgSyncService"/>
+    <bean id="cachedCfgDoc" class="com.dcfs.esb.ftp.server.config.CachedCfgDoc"/>
+    <bean id="cfgFileReceiver" class="com.dcfs.esb.ftp.datanode.sync.DataNodeCfgFileReceiver"/>
+    <bean id="fileTargetNodeService" class="com.dcfs.esb.ftp.datanode.service.FileTargetNodeByLnService"/>
+    <bean id="fileMsg2ClientServiceFactory" class="com.dcfs.esc.ftp.datanode.factory.FileMsg2ClientServiceFactory"/>
+</beans>

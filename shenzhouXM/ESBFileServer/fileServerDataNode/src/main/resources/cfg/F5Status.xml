@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>
+        ESB文件传输系统配置文件
+        标示探测请求返回的状态值 true: 正常运行；false：隔离
+        探测报文DETE
+    </comment>
+    <entry key="F5Status">true</entry>
+</properties>

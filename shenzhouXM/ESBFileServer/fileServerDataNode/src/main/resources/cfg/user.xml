@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<UserRoot>
+    <UserInfo>
+        <Uid home="/cms" describe="cms系统2">cms</Uid>
+        <Grant type="A"/>
+        <Passwd>${3DES}Unv4YuvoyHqS5jE2eOufAw==</Passwd>
+        <IP status="1" IPDescribe="asdddasdas">127.0.0.1</IP>
+        <IP status="0" IPDescribe="">127.0.0.12</IP>
+    </UserInfo>
+    <UserInfo>
+        <Uid home="/esb" describe="esb系统">esb</Uid>
+        <Grant type="A"/>
+        <Passwd>${3DES}B/QIzSwJCq0=</Passwd>
+        <IP status="0" IPDescribe="xxx">127.0.0.1</IP>
+    </UserInfo>
+    <UserInfo>
+        <Uid home="/picp" describe="picp">picp</Uid>
+        <Grant type="R"/>
+        <Passwd>${3DES}0IifxeHFCUqFmArusscMAw==</Passwd>
+        <IP status="1" IPDescribe="xxx">192.168.113.33</IP>
+    </UserInfo>
+    <UserInfo>
+        <Uid home="/aaa" describe="null">aaa</Uid>
+        <Passwd>${3DES}hUyhbXau24Q=</Passwd>
+        <Grant type="W"/>
+        <IP status="1" IPDescribe="xxx">127.0.0.1</IP>
+    </UserInfo>
+    <UserInfo>
+        <Uid home="/xxx" describe="">xxx</Uid>
+        <Passwd>${3DES}vT4ymrLpwJFcZUCk16ffkQ==</Passwd>
+        <Grant type="A"/>
+    </UserInfo>
+    <UserInfo>
+        <Uid home="/esb5" describe="null">esb5</Uid>
+        <Passwd>${3DES}9meUTYAwnvc=</Passwd>
+        <Grant type="A"/>
+    </UserInfo>
+    <UserInfo>
+        <Uid home="/aaaa" describe="sss">aaaa</Uid>
+        <Passwd>${3DES}H6/D2ejSFnZcZUCk16ffkQ==</Passwd>
+        <Grant type="A"/>
+    </UserInfo>
+    <UserInfo>
+        <Uid home="/bbbb" describe="aa">bbbb</Uid>
+        <Passwd>${3DES}lNhya57oy5tcZUCk16ffkQ==</Passwd>
+        <Grant type="A"/>
+    </UserInfo>
+    <UserInfo>
+        <Uid home="/xxxxx" describe="">xxxxx</Uid>
+        <Passwd>${3DES}qYVsZMcY4NVcZUCk16ffkQ==</Passwd>
+        <Grant type="R"/>
+    </UserInfo>
+    <UserInfo>
+        <Uid home="/www" describe="v">www</Uid>
+        <Passwd>${3DES}Fh6kEidSBIVcZUCk16ffkQ==</Passwd>
+        <Grant type="A"/>
+    </UserInfo>
+    <UserInfo>
+        <Uid home="/xxxx" describe="ss">xxxx</Uid>
+        <Passwd>${3DES}tOlWJYgXSSRcZUCk16ffkQ==</Passwd>
+        <Grant type="A"/>
+    </UserInfo>
+    <UserInfo>
+        <Uid home="/xxx" describe="">xxx</Uid>
+        <Passwd>${3DES}/8KXmHeuJSE=</Passwd>
+        <Grant type="R"/>
+        <IP status="1" IPDescribe="">127.0.0.1</IP>
+    </UserInfo>
+    <UserInfo>
+        <Uid home="/zzzzzzzzzz" describe="">zzzzzzzzzz</Uid>
+        <Passwd>${3DES}Je14Al9ekoBcZUCk16ffkQ==</Passwd>
+        <Grant type="R"/>
+    </UserInfo>
+</UserRoot>

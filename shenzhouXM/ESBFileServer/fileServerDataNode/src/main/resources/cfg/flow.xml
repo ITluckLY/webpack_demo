@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<flows>
+    <flow name="DefStandardFlow"
+          components="IsolStateCheckService,IPCheckService,PwdAuthWithSeqService,PushDataNodeListService,InitService,FileRenameService,ResourceCtrlService,FileQueryService"
+          describe="默认流程">*</flow>
+    <flow name="FullCheckFlow"
+          components="IsolStateCheckService,ApiVersionCheckService,IPCheckService,PwdAuthWithSeqService,PushDataNodeListService,InitService,FileRenameService,ResourceCtrlService,FileQueryService"
+          describe="全部流程，包含API版本校验">*</flow>
+</flows>
+
+

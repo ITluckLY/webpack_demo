@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<properties>
+    <entry key="NODE_NAME" describe="节点名称(唯一)">FSD001</entry>
+    <entry key="FILE_ROOT_PATH" describe="文件存放根目录">${mypro.cfgRootDir}/esbfile</entry>
+    <entry key="FILE_BACKUP_ROOT_PATH" describe="文件备份存放根目录">${mypro.cfgRootDir}/esbfileBackup</entry>
+    <entry key="CMD_PORT" describe="外部调用服务器端口">6000</entry>
+    <entry key="FTP_SERV_PORT" describe="文件传输服务端口">6001</entry>
+    <entry key="FTP_MANAGE_PORT" describe="">6002</entry>
+    <entry key="DISTRIBUTE_FILE_RECEIVE_PORT" describe="分布式文件接收端口">6003</entry>
+    <entry key="FTP_MAX_FILE_SIZE" describe="最大文件大小(单位：M)">2048</entry>
+    <entry key="FTP_PIECE_NUM" describe="分片大小(单位：K)">511</entry>
+    <entry key="FTP_POOL_SIZE" describe="线程池大小">64</entry>
+    <entry key="ROUTE_POOL_SIZE" describe="路由处理线程池">32</entry>
+    <entry key="IP_CHECK" describe="IP检查开关">false</entry>
+    <entry key="HOST_IP" describe="本机IP地址">127.0.0.1</entry>
+    <entry key="HOST_NAME" describe="hostName"/>
+    <entry key="MANAGER_IP" describe="管理端IP地址">127.0.0.1</entry>
+    <entry key="SYSTEM_NAME" describe="系统名称">comm</entry>
+    <entry key="TOKEN_POOL" describe="令牌池">100,100,100,100,100</entry>
+    <entry key="MAX_NETWORK_SPEED" describe="最大流量（单位：M）">1000</entry>
+    <entry key="NETWORK_CTRL_THRESHOLD" describe="网络流量控制阀值（单位：M）">500</entry>
+    <entry key="NETWORK_CTRL_SLEEP_TIME" describe="流控睡眠时间（单位毫秒）">2000</entry>
+    <entry key="CFG_BAK_KEEP_TIME" describe="备份配置文件保留时间（单位小时）">168</entry>
+    <entry key="FILE_MSG_PUSH_DELAY_TIME" describe="文件消息推送延迟（单位毫秒）">3000</entry>
+    <entry key="MOUNT_FILE_PATH" describe="挂载目录"/>
+    <entry key="DISTRIBUTE_NODE_NUM" describe="小文件分发节点个数">2</entry>
+</properties>

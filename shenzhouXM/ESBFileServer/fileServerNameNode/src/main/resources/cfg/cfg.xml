@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<properties>
+    <entry key="NODE_NAME" describe="节点名称(唯一)">FSN001</entry>
+    <entry key="FILE_ROOT_PATH" describe="文件存放根目录">${mypro.cfgRootDir}/esbfile</entry>
+    <entry key="FILE_BACKUP_ROOT_PATH" describe="文件备份存放根目录">${mypro.cfgRootDir}/esbfileBackup</entry>
+    <entry key="CMD_PORT" describe="外部调用服务器端口">5000</entry>
+    <entry key="FTP_SERV_PORT" describe="文件传输服务端口">5001</entry>
+    <entry key="FTP_MANAGE_PORT" describe="文件传输管理端口">5002</entry>
+    <entry key="DISTRIBUTE_FILE_RECEIVE_PORT" describe="分布式文件接收端口">5003</entry>
+    <entry key="FTP_MAX_FILE_SIZE" describe="最大文件大小(单位：M)">2048</entry>
+    <entry key="FTP_PIECE_NUM" describe="分片大小(单位：K)">512</entry>
+    <entry key="FTP_POOL_SIZE" describe="线程池大小">50</entry>
+    <entry key="IP_CHECK" describe="IP检查开关">true</entry>
+    <entry key="HOST_IP" describe="本机IP地址">192.168.43.226</entry>
+    <entry key="HOST_NAME" describe="hostName"/>
+    <entry key="MANAGER_IP" describe="管理端IP地址">192.168.43.226</entry>
+    <entry key="REDIS_SENTINEL" describe="Redis Sentinel地址(IP:PORT,IP:PORT)">${mypro.redis.sentinel}</entry>
+    <entry key="REDIS_POOLSIZE" describe="Redis连接池大小">20</entry>
+    <entry key="REDIS_MASTER" describe="Redis主节点名称">${mypro.redis.master}</entry>
+    <entry key="REDIS_PASSWD" describe="Redis密码">${mypro.redis.passwd}</entry>
+    <entry key="REDIS_TIMEOUT" describe="Redis过期时间(单位：毫秒)">10000</entry>
+</properties>

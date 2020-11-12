@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules>
+    <rule user="esb" tran_code="0001" type="s" mode="syn" destination="smsp"/>
+    <rule user="esb" tran_code="0003" type="s" mode="syn" destination="smsp"/>
+    <rule user="" tran_code="0003" type="s" mode="syn" destination="smsp"/>
+    <rule user="" tran_code="0005" type="s" mode="syn" destination="fsESC"/>
+</rules>
