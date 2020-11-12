@@ -1,0 +1,44 @@
+{
+    "SYS_HEAD": {
+      "BRANCH_ID": "0101",
+              "CUSTOMER_ID": "",
+              "DEST_BRANCH_NO": "9901",
+              "MODULE_ID": "RB",
+              "SEQ_NO": "1231232",
+              "SERVICE_CODE": "Financial",
+      		"MESSAGE_TYPE": "1000",
+      		"MESSAGE_CODE": "0101",
+      		"USER_LANG": "CHINESE",
+              "SOURCE_BRANCH_NO": "0101",
+              "SOURCE_TYPE": "MT",
+              "TRAN_DATE": "20151204",
+              "TRAN_TIMESTAMP": "172023004",
+              "USER_ID": "CP0102",
+              "AUTH_FLAG":"N",
+              "AUTH_USER_ID":"CP0204",
+              "WS_ID": "001",
+              "TRAN_CODE": "O",
+              "TRAN_TYPE": "1000",
+              "SERVER_ID":"127.0.0.1",
+              "PROGRAM_ID":"RB31",
+              "SOURCE_MODULE":"RB",
+              "TRAN_MODE":"ONLINE"
+    },
+    "BODY": {
+		"BASE_ACCT_NO":"RB101990100000008668",
+        		"PROD_TYPE":"RB101",
+        		"ACCT_CCY":"CNY",
+        		"ACCT_SEQ_NO":"0",
+        		"INPUT_BAL_TYPE":"",
+        		"TRAN_TYPE": "1000",
+        		"TRAN_AMT":"3",
+        		"EFFECT_DATE":"",
+        		"CASH_ITEM":"1",
+        		"COMMISSION_CLIENT_NO":"",
+        		"COMMISSION_CLIENT_NAME":"",
+        		"COMMISSION_GLOBAL_ID_TYPE":"",
+        		"COMMISSION_GLOBAL_ID":"",
+		"SERV_DETAIL":[
+      ]
+    }
+}

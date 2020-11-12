@@ -1,0 +1,191 @@
+<html lang="zh">
+<title>VRRAT</title>
+</head>
+<body>
+<canvas id="canvas"></canvas>	
+
+<script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
+<script src="js/jtopo-0.4.8-min.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+	var canvas = document.getElementById('canvas');
+	canvas.width = 1500;
+	canvas.height = 1000;
+	var stage = new JTopo.Stage(canvas); // 创建一个舞台对象
+	var scene = new JTopo.Scene(stage); // 创建一个场景对象
+	//scene.background = './bg4.jpg';
+	
+	// 节点
+	function newNode(x, y, w, h, text,path){
+		var node = new JTopo.Node(text);
+		if(null!=path){
+			node.setImage(path, false);
+		}
+		node.setLocation(x, y);
+		node.setSize(w, h);
+		node.fontColor = '155,123,2';
+		node.font = 'bold 16px 微软雅黑';
+		scene.add(node);
+		return node;
+	}
+	
+	// 简单连线
+	function newLink(nodeA, nodeZ, text, dashedPattern){
+		var link = new JTopo.Link(nodeA, nodeZ, text);        
+		link.lineWidth = 3; // 线宽
+		//link.dashedPattern = dashedPattern; // 虚线
+		link.bundleOffset = 60; // 折线拐角处的长度
+		link.bundleGap = 20; // 线条之间的间隔
+		link.textOffsetY = 3; // 文本偏移量（向下3个像素）
+		//link.strokeColor = '0,200,255';
+		scene.add(link);
+		return link;
+	}
+	
+	// 折线
+	function newFoldLink(nodeA, nodeZ, text, direction, dashedPattern){
+		var link = new JTopo.FoldLink(nodeA, nodeZ, text);
+		link.direction = direction || 'horizontal';
+		link.arrowsRadius = 15; //箭头大小
+		link.lineWidth = 3; // 线宽
+		link.bundleOffset = 60; // 折线拐角处的长度
+		link.bundleGap = 20; // 线条之间的间隔
+		link.textOffsetY = 3; // 文本偏移量（向下3个像素）
+		//link.strokeColor = JTopo.util.randomColor(); // 线条颜色随机
+		//link.dashedPattern = dashedPattern;
+		scene.add(link);
+		return link;
+	}
+	
+	// 二次折线
+	/*
+	function newFlexionalLink(nodeA, nodeZ, text, direction, dashedPattern){
+		var link = new JTopo.FoldLink(nodeA, nodeZ, text);//FlexionalLink
+		link.direction = direction || 'horizontal';//horizontal
+		link.arrowsRadius = 10;
+		link.lineWidth = 3; // 线宽
+		link.offsetGap = 35;
+		link.bundleGap = 15; // 线条之间的间隔
+		link.textOffsetY = 10; // 文本偏移量（向下15个像素）
+		link.strokeColor = '0,250,0';
+		link.dashedPattern = dashedPattern; 
+		scene.add(link);
+		return link;
+	}
+	*/
+	
+	// 二次折线
+	function newFlexionalLink(nodeA, nodeZ, text, direction, dashedPattern){
+		var link = new JTopo.FlexionalLink(nodeA, nodeZ, text);
+		link.direction = direction || 'horizontal';
+		link.arrowsRadius = 10;
+		link.lineWidth = 3; // 线宽
+		link.offsetGap = 35;
+		link.bundleGap = 15; // 线条之间的间隔
+		link.textOffsetY = 10; // 文本偏移量（向下15个像素）
+		link.strokeColor = '0,250,0';
+		//link.dashedPattern = dashedPattern; 
+		scene.add(link);
+		return link;
+	}
+	// 曲线
+	function newCurveLink(nodeA, nodeZ, text){
+		var link = new JTopo.CurveLink(nodeA, nodeZ, text);
+		link.lineWidth = 3; // 线宽
+		scene.add(link);
+		return link;
+	}
+	
+	var json =  {war:"war",software:[
+		{name:"Mongo",db:[{ip:"10.23.3.31",port:"80",dbName:"daf-manager"}]}
+		,{name:"Mysql",db:[{ip:"10.23.102.7",port:"80",dbName:"daf-manager"},{ip:"10.23.102.72:80",port:"80",dbName:"daf-manager"}]}
+		,{name:"Mq",db:[{ip:"10.23.102.7",port:"80",dbName:"daf-manager"},{ip:"10.23.102.72:80",port:"80",dbName:"daf-manager"},{ip:"10.23.102.7",port:"80",dbName:"daf-manager"},{ip:"10.23.102.72:80",port:"80",dbName:"daf-manager"}]}
+		,{name:"Redis",db:[{ip:"10.23.3.31",port:"80",dbName:"daf-manager"}]}
+		,{name:"Hive",db:[{ip:"10.23.3.31",port:"80",dbName:"daf-manager"}]}
+		,{name:"Hive",db:[{ip:"10.23.102.7",port:"80",dbName:"daf-manager"},{ip:"10.23.102.72:80",port:"80",dbName:"daf-manager"},{ip:"10.23.102.7",port:"80",dbName:"daf-manager"},{ip:"10.23.102.72:80",port:"80",dbName:"daf-manager"}]}
+		]};
+	drawFromDb(json);
+	function drawFromDb(data){
+		
+		var warNode_y = data.software.length/2*100;
+		var node1 = newNode(50, warNode_y, 50, 50,data.war,"./War.png");
+		var tempNode = newNode(node1.x+100, node1.y + 20, 10, 10," ");
+		node1.mousedrag(function(event){     
+			tempNode.y = node1.y +20;
+		});
+		tempNode.mousedrag(function(event){     
+			node1.y = tempNode.y -20;
+		});
+		//建立连线
+		var link = newLink(node1, tempNode, ' ', 2);
+		
+		$.each(data.software, function(i,val){
+
+			var icoPic = "";
+			if(val.name == "Mysql"){
+				icoPic = "./Mysql.png";
+			}else if(val.name == "Mongo"){
+				icoPic = "./Mongo.jpg";
+			}else if(val.name == "Mq"){
+				icoPic = "./Mq.png";
+			}else if(val.name == "Redis"){
+				icoPic = "./Redis.png";
+			}else if(val.name == "Hive"){
+				icoPic = "./Hive.png";
+			}
+			//var y = tempNode.y +20 - (80 * data.child.length / 2) + i*80;
+			//var y = tempNode.y +30 - (100 * data.child.length / 2) + i*100;
+			var x = tempNode.x+100+(i%2)*100;
+			var y = tempNode.y +30 - (100 * data.software.length / 2) + i*100;
+			var a = newNode(x, y, 50, 50,val.name,icoPic);
+			newFoldLink(tempNode, a, ' ', 'vertical', 2);
+
+			if(val.db.length>1){
+			
+				var tempNode2 = newNode(a.x+100, a.y + 20, 10, 10," ");
+				a.mousedrag(function(event){     
+					tempNode2.y = a.y +20;
+				});
+				tempNode2.mousedrag(function(event){     
+					a.y = tempNode2.y -20;
+				});
+				newLink(a, tempNode2, ' ', 2);
+				$.each(val.db, function(i,vals){
+					var b = new JTopo.TextNode(vals.ip+":"+vals.port+" "+vals.dbName);
+					b.font = 'bold 16px 微软雅黑';
+					b.fontColor = "";
+					
+					var x = tempNode2.x+100+(i%2)*100;
+					var y = tempNode2.y +2 - (20 * val.db.length / 2) + i*20;
+					b.setLocation(tempNode2.x+100, y);
+					scene.add(b);
+					
+					newFoldLink(tempNode2, b, ' ', 'vertical', 2);
+				});
+				
+			}else{
+				//设置文字节点作为文字描述
+				var textNode = new JTopo.TextNode(val.db[0].ip+":"+val.db[0].port+" "+val.db[0].dbName);
+				textNode.font = 'bold 16px 微软雅黑';
+				textNode.fontColor = "";
+				textNode.setLocation(a.x+100, a.y +10);
+				scene.add(textNode);
+				
+				//设置文字和图标拖动
+				textNode.mousedrag(function(event){ 
+					a.x	= textNode.x-100;
+					a.y = textNode.y-10 ;
+				});
+				a.mousedrag(function(event){
+					textNode.x = a.x+100;
+					textNode.y = a.y+10;
+				});
+				
+				newFoldLink(a, textNode, ' ', 'vertical', 2);
+				
+			}
+		});
+	}
+</script>
+</body>
+</html>

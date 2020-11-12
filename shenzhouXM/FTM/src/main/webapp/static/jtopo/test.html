@@ -1,0 +1,266 @@
+<html lang="zh">
+<title>VRRAT</title>
+</head>
+<body>
+<canvas id="canvas"></canvas>	
+
+<script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
+<script src="js/jtopo-0.4.8-min.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+	var canvas = document.getElementById('canvas');
+	canvas.width = 1500;
+	canvas.height = 1000;
+	var stage = new JTopo.Stage(canvas); // 创建一个舞台对象
+	var scene = new JTopo.Scene(stage); // 创建一个场景对象
+	//scene.background = './bg4.jpg';
+	
+	var appleNode = new JTopo.Node();
+	appleNode.alpha = 0.7;
+	appleNode.setImage('./rw.png', true);
+	appleNode.setLocation(320, 80);
+	appleNode.showSelected = false; // 不显示选中矩形
+	scene.add(appleNode)
+	
+	// 节点
+	function newNode(x, y, w, h, text,path){
+		var node = new JTopo.Node(text);
+		if(null!=path){
+			node.setImage(path, false);
+		}
+		node.setLocation(x, y);
+		node.setSize(w, h);
+		node.fontColor = '155,123,2';
+		node.font = 'bold 16px 微软雅黑';
+		scene.add(node);
+		return node;
+	}
+	
+	// 简单连线
+	function newLink(nodeA, nodeZ, text, dashedPattern){
+		var link = new JTopo.Link(nodeA, nodeZ, text);        
+		link.lineWidth = 3; // 线宽
+		//link.dashedPattern = dashedPattern; // 虚线
+		link.bundleOffset = 60; // 折线拐角处的长度
+		link.bundleGap = 20; // 线条之间的间隔
+		link.textOffsetY = 3; // 文本偏移量（向下3个像素）
+		//link.strokeColor = '0,200,255';
+		scene.add(link);
+		return link;
+	}
+	
+	// 折线
+	function newFoldLink(nodeA, nodeZ, text, direction, dashedPattern){
+		var link = new JTopo.FoldLink(nodeA, nodeZ, text);
+		link.direction = direction || 'horizontal';
+		link.arrowsRadius = 15; //箭头大小
+		link.lineWidth = 3; // 线宽
+		link.bundleOffset = 60; // 折线拐角处的长度
+		link.bundleGap = 20; // 线条之间的间隔
+		link.textOffsetY = 3; // 文本偏移量（向下3个像素）
+		//link.strokeColor = JTopo.util.randomColor(); // 线条颜色随机
+		//link.dashedPattern = dashedPattern;
+		scene.add(link);
+		return link;
+	}
+	
+	// 二次折线
+	/*
+	function newFlexionalLink(nodeA, nodeZ, text, direction, dashedPattern){
+		var link = new JTopo.FoldLink(nodeA, nodeZ, text);//FlexionalLink
+		link.direction = direction || 'horizontal';//horizontal
+		link.arrowsRadius = 10;
+		link.lineWidth = 3; // 线宽
+		link.offsetGap = 35;
+		link.bundleGap = 15; // 线条之间的间隔
+		link.textOffsetY = 10; // 文本偏移量（向下15个像素）
+		link.strokeColor = '0,250,0';
+		link.dashedPattern = dashedPattern; 
+		scene.add(link);
+		return link;
+	}
+	*/
+	
+	// 二次折线
+	function newFlexionalLink(nodeA, nodeZ, text, direction, dashedPattern){
+		var link = new JTopo.FlexionalLink(nodeA, nodeZ, text);
+		link.direction = direction || 'horizontal';
+		link.arrowsRadius = 10;
+		link.lineWidth = 3; // 线宽
+		link.offsetGap = 35;
+		link.bundleGap = 15; // 线条之间的间隔
+		link.textOffsetY = 10; // 文本偏移量（向下15个像素）
+		link.strokeColor = '0,250,0';
+		//link.dashedPattern = dashedPattern; 
+		scene.add(link);
+		return link;
+	}
+	// 曲线
+	function newCurveLink(nodeA, nodeZ, text){
+		var link = new JTopo.CurveLink(nodeA, nodeZ, text);
+		link.lineWidth = 3; // 线宽
+		scene.add(link);
+		return link;
+	}
+	
+	var json =  {name:"war",child:[
+		{name:"Mongo",ip:["10.23.3.31:808"]}
+		,{name:"Mysql",ip:["10.23.102.7:80","10.23.102.72:80"]}
+		,{name:"Mq",ip:["10.23.105.102:8089 daf-manager","10.23.105.102:8089 logstash","10.23.105.102:8089"]}
+		,{name:"Redis",ip:["10.23.13.31:528"]}
+		,{name:"Hive",ip:["10.23.105.68:763"]}
+		//,{name:"Hive",ip:["10.23.105.68:763"]}
+		]};
+	drawFromDb(json);
+	function drawFromDb(data){
+		var node1 = newNode(50, 200, 50, 50,data.name,"./War.png");
+		var tempNode = newNode(node1.x+100, node1.y + 20, 10, 10," ");
+		node1.mousedrag(function(event){     
+			tempNode.y = node1.y +20;
+		});
+		tempNode.mousedrag(function(event){     
+			node1.y = tempNode.y -20;
+		});
+		//建立连线
+		var link = newLink(node1, tempNode, ' ', 2);
+		
+		$.each(data.child, function(i,val){
+
+			var icoPic = "";
+			if(val.name == "Mysql"){
+				icoPic = "./Mysql.png";
+			}else if(val.name == "Mongo"){
+				icoPic = "./Mongo.jpg";
+			}else if(val.name == "Mq"){
+				icoPic = "./Mq.png";
+			}else if(val.name == "Redis"){
+				icoPic = "./Redis.png";
+			}else if(val.name == "Hive"){
+				icoPic = "./Hive.png";
+			}
+			//var y = tempNode.y +20 - (80 * data.child.length / 2) + i*80;
+			//var y = tempNode.y +30 - (100 * data.child.length / 2) + i*100;
+			var x = tempNode.x+100+(i%2)*100;
+			var y = tempNode.y +30 - (100 * data.child.length / 2) + i*100;
+			var a = newNode(x, y, 50, 50,val.name,icoPic);
+			newFoldLink(tempNode, a, ' ', 'vertical', 2);
+
+			if(val.ip.length>1){
+			
+				var tempNode2 = newNode(a.x+100, a.y + 20, 10, 10," ");
+				a.mousedrag(function(event){     
+					tempNode2.y = a.y +20;
+				});
+				tempNode2.mousedrag(function(event){     
+					a.y = tempNode2.y -20;
+				});
+				newLink(a, tempNode2, ' ', 2);
+				$.each(val.ip, function(i,vals){
+					var b = new JTopo.TextNode(vals);
+					b.font = 'bold 16px 微软雅黑';
+					b.fontColor = "";
+					
+					var x = tempNode2.x+100+(i%2)*100;
+					var y = tempNode2.y +2 - (20 * val.ip.length / 2) + i*20;
+					b.setLocation(tempNode2.x+100, y);
+					scene.add(b);
+					
+					newFoldLink(tempNode2, b, ' ', 'vertical', 2);
+				});
+				
+			}else{
+				//设置文字节点作为文字描述
+				var textNode = new JTopo.TextNode(val.ip);
+				textNode.font = 'bold 16px 微软雅黑';
+				textNode.fontColor = "";
+				textNode.setLocation(a.x+100, a.y +10);
+				scene.add(textNode);
+				
+				//设置文字和图标拖动
+				textNode.mousedrag(function(event){ 
+					a.x	= textNode.x-100;
+					a.y = textNode.y-10 ;
+				});
+				a.mousedrag(function(event){
+					textNode.x = a.x+100;
+					textNode.y = a.y+10;
+				});
+			}
+		});
+	}
+	
+	//draw();
+	function draw(){
+		//先定义两个节点
+		var nodes1 = newNode(50, 200, 50, 50,"War包","./War.png");
+		var tempNode = newNode(nodes1.x+100, nodes1.y + 20, 10, 10," ");
+		//节点拖拽事件，保证在同一直线上
+		nodes1.mousedrag(function(event){     
+			tempNode.y = nodes1.y +20;
+		});
+		tempNode.mousedrag(function(event){     
+			nodes1.y = tempNode.y -20;
+		});
+		
+		
+		var nodes2 = newNode(tempNode.x+100, 100, 50, 50,"Tomcat","./Tomcat.png");
+		var tempNode2 = newNode(nodes2.x+100, nodes2.y + 20, 10, 10," ");
+		nodes2.mousedrag(function(event){     
+			tempNode2.y = nodes2.y +20;
+		});
+		tempNode2.mousedrag(function(event){     
+			nodes2.y = tempNode2.y -20;
+		});
+		
+		
+		var nodes4 = newNode(tempNode2.x+100, tempNode2.y+50, 30, 30,"XX");
+		var nodes5 = newNode(tempNode2.x+100, tempNode2.y - 50, 30, 30,"IP");
+		
+		var nodes3 = newNode(tempNode.x+100, 300, 100, 50,"Nginx","./Nginx.jpg");
+		
+		var link = newLink(nodes1, tempNode, ' ', 2);
+		
+		var link1 = newFoldLink(tempNode, nodes2, ' ', 'vertical', 2);
+		var link2 = newFoldLink(tempNode, nodes3, ' ', 'vertical', 2);//vertical
+		
+		var link22 = newLink(nodes2, tempNode2, ' ', 2);
+		var link3 = newFoldLink(tempNode2, nodes4, ' ', 'vertical', 2);
+		var link4 = newFoldLink(tempNode2, nodes5, ' ', 'vertical', 2);
+	
+	}
+	
+	
+	
+	
+	
+	
+	
+	/*
+	var link = newLink(nodes1, nodes2, '划分为', 10);
+	var link2 = newLink(nodes1, nodes3, '划分为', 10);
+	link.arrowsRadius = 10;
+	link2.arrowsRadius = 10;
+	setInterval(function(){
+		if(nodes3.alarm == '二级告警'){
+			nodes3.alarm = null;
+		}else{
+			nodes3.alarm = '二级告警'
+		}
+	}, 600);
+
+	
+	var effect = JTopo.Effect.spring({
+		minLength: 200 // 节点之间最短距离
+	});
+	
+	effect.addNode(nodes1, nodes2);
+	effect.addNode(nodes2, nodes1);
+	effect.addNode(nodes1, nodes3);
+	effect.addNode(nodes3, nodes1);
+	
+	// 播放
+	effect.play();
+		*/
+</script>
+</body>
+</html>
