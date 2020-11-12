@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fts-project</artifactId>
+        <groupId>com.dc.fts</groupId>
+        <version>1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fts-namenode</artifactId>
+
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <!-- Compiler 插件, 设定JDK版本 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <showWarnings>true</showWarnings>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <excludes>
+                        <exclude>*.properties</exclude>
+                        <exclude>*.xml</exclude>
+                        <exclude>*.conf</exclude>
+                        <exclude>*.*</exclude>
+                        <exclude>cfg</exclude>
+                        <exclude>cfg/*.*</exclude>
+                        <exclude>apiCfg</exclude>
+                        <exclude>apiCfg/*.*</exclude>
+                    </excludes>
+                    <!--<includes>
+                        <include>**/*.class</include>
+                    </includes>-->
+                    <!--<archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>-->
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>com.dcfs.esb.ftp.server.namenode.StartFileServer</mainClass>
+                        </manifest>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.dc.fts</groupId>
+            <artifactId>fts-server</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <!--db-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.0.29</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.41</version>
+        </dependency>
+        <!--<dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc-jdk5</artifactId>
+            <version>6.0.0</version>
+        </dependency>-->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>12.1.0.2</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/ojdbc6-12.1.0.2.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.ibm.db2.jcc</groupId>
+            <artifactId>db2jcc4</artifactId>
+            <version>4.9.78</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/db2jcc4-4.9.78.jar</systemPath>
+        </dependency>
+        <!--db end-->
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>jarwar</id>
+            <build>
+                <plugins>
+                    <!--打包jar-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.6</version>
+                        <configuration>
+                            <finalName>${project.artifactId}</finalName>
+                            <attach>false</attach>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--打包war-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <configuration>
+                            <target>
+                                <echo>toDir:${project.basedir}/../jarwar/${project.artifactId}</echo>
+                                <delete dir="${project.basedir}/../jarwar/${project.artifactId}"/>
+                                <copy todir="${project.basedir}/../jarwar">
+                                    <fileset dir="${project.build.directory}/${project.artifactId}-distribution"/>
+                                </copy>
+                                <copy todir="${project.basedir}/../jarwar/${project.artifactId}/classes" overwrite="true">
+                                    <fileset dir="${project.build.outputDirectory}">
+                                        <exclude name="com/**"/>
+                                        <exclude name="efs-local.properties"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.basedir}/../jarwar/${project.artifactId}" failonerror="false">
+                                    <fileset dir="${project.basedir}/cmd"/>
+                                </copy>
+                                <!--copy jars in lib -->
+                                <copy todir="${project.basedir}/../jarwar/${project.artifactId}/lib" failonerror="false">
+                                    <fileset dir="${project.basedir}/lib"/>
+                                    <fileset dir="${parent.relativePath}/../fileServer/lib"/>
+                                </copy>
+                            </target>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>simplejarwar</id>
+            <build>
+                <plugins>
+                    <!--打包jar-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.6</version>
+                        <configuration>
+                            <finalName>${project.artifactId}</finalName>
+                            <attach>false</attach>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--打包war-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <configuration>
+                            <target>
+                                <echo>fromDir:${project.build.directory}/${project.artifactId}-distribution</echo>
+                                <echo>toDir:${project.basedir}/../simplejarwar/${project.artifactId}</echo>
+                                <delete dir="${project.basedir}/../simplejarwar/${project.artifactId}"/>
+                                <copy todir="${project.basedir}/../simplejarwar">
+                                    <fileset dir="${project.build.directory}/${project.artifactId}-distribution">
+                                        <include name="**/fts-*.jar"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.basedir}/../simplejarwar/${project.artifactId}/classes" overwrite="true">
+                                    <fileset dir="${project.build.outputDirectory}">
+                                        <exclude name="com/**"/>
+                                        <exclude name="efs-local.properties"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.basedir}/../simplejarwar/${project.artifactId}" failonerror="false">
+                                    <fileset dir="${project.basedir}/cmd"/>
+                                </copy>
+                                <!--copy jars in lib -->
+                                <!--<echo>dir1:${project.basedir}/lib</echo>
+                                <echo>dir2:${parent.relativePath}/../fileServer/lib</echo>
+                                <copy todir="${project.basedir}/../simplejarwar/${project.artifactId}/lib" failonerror="false">
+                                    <fileset dir="${project.basedir}/lib"/>
+                                    <fileset dir="${parent.relativePath}/../fileServer/lib"/>
+                                </copy>-->
+                            </target>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

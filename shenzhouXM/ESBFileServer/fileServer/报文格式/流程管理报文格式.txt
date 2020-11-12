@@ -1,0 +1,32 @@
+flow:	报文格式：000000{
+							"target":"flow",
+							"operateType":"add",
+							"data":{
+									"name":"asdf",
+									"describe":"adfadf",
+									"components":"NewFilePathService,FileService",
+									"sysName":"esb"
+									}
+						}   
+		源文件：
+			<?xml version="1.0" encoding="UTF-8"?>
+			<flows>
+				<flow name="StandardFlow" components="FileService,RNService" describe="">esb</flow>
+				<flow name="IPCheckFlow" components="IPCheckService,FileService,RNService" describe="">esb</flow>
+			</flows>
+
+
+			
+		操作规则：operateType:
+					add:添加组件  
+						：需要data中所有数据，name,flow必要
+					del：删除参数 
+						：只需要data中key值数据
+					update：更新参数值
+						；需要data中所有数据，name必要
+					select：查询全部    
+						；不需要data数据
+					selByName：按name查询一个
+						；需要name值数据
+					print:打印xml配置文件
+                    	；不需要data数据

@@ -1,0 +1,60 @@
+service:	报文格式：000000{
+								"target":"service",
+								"operateType":"add",
+								"data":{
+										"trancode":"0002",
+										"describe":"adfadf",
+										"flow":"IPCheckFlow",
+										"sysName":"esb",
+										"rename":"1",
+										"filePeriod":"60",
+										"priority":"3",
+										"size":"20",
+										"uname":"hugh",
+										"directoy":"/0002/esb/hugh"
+										}
+							}   
+		其中key(节点参数名称)
+		源文件：
+			<?xml version="1.0" encoding="UTF-8"?>
+			<services>
+				<service sysname="esb" trancode="0001" flow="IPCheckFlow" describe="222" rename="1" filePeriod="60" priority="3" size="20">
+                        <putAuth>
+                            <user directoy="/0002/esb/hugh">hugh</user>
+                        </putAuth>
+                        <getAuth>
+                            <user>hugh</user>
+                            <user>hugh2</user>
+                        </getAuth>
+                    </service>
+			</services>
+
+        说明：
+        filePeriod：文件保留期限 单位分钟
+        priority  : 优先级 1-5
+        size      ：服务数量 >=0
+
+
+		操作规则：operateType:
+					add:添加服务
+						trancode必要
+					del：删除参数 
+						：只需要data中trancode数据
+					update：更新参数值
+						；需要data中所有数据，trancode必要
+					select：查询全部    
+						；不需要data数据
+					selectOne：查询其中一个
+                    	；需要sysName、trancode
+					selByTrancode：按trancode查询一个
+						；需要trancode值数据
+					print:打印xml配置文件
+                    	；不需要data数据
+                    addPutAuth:添加文件上传权限
+                        ；需要sysName、trancode、uname、directoy
+                    delPutAuth:删除文件上传权限
+                        ；需要sysName、trancode、uname、directoy
+                    addGetAuth:添加文件下载权限
+                        ；需要sysName、trancode、uname
+                    delGetAuth:删除文件下载权限
+                        ；需要sysName、trancode、uname

@@ -1,0 +1,41 @@
+clientStatusInfo:	报文格式：000000{
+							"target":"clientStatusInfo",
+							"operateType":"add",
+							"data":{
+                                "id": "127.0.0.2:18000",
+                                "status": "stop",
+                                "type": "enable",
+                                "mode": "auto"
+							}
+						}
+						000147{
+                                "target": "clientStatusInfo",
+                                "operateType": "add",
+                                "data": {"id":"127.0.0.2:18000","status":"start","type":"enable","mode":"auto"}
+                            }
+
+		源文件：
+		    <?xml version="1.0" encoding="UTF-8"?>
+            <clients timestamp="1472093751697">
+                <!--
+                客户端状态记录。
+                id="127.0.0.1:18000"
+                status="stop"客户端状态
+                type 类型：启用“enable”和禁用“disable”只有注册，默认为启用。
+                mode重传模式，自动"auto" 和手动"manual"
+                -->
+                <client id="127.0.0.1:18000" status="stop" type="enable" mode="auto"/>
+            </clients>
+
+			
+		操作规则：operateType:
+					add:添加客户端状态
+                        ：需要data中所有数据，均必要
+                    del:删除客户端状态
+                        ：只需要data中id值
+                    update:更新客户端状态
+                        ：需要data中待改动的数据，id必要
+					select:查询全部
+                        ：不需要data数据
+					print:打印xml配置文件
+					    ：不需要data数据

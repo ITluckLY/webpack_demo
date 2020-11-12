@@ -1,0 +1,52 @@
+auth:	报文格式：000000{
+							"target":"auth",
+							"operateType":"add",
+							"data":{
+									"name":"/esb",
+									"path":"esb",
+									"permession":"aaa=A,bbb=R"
+									}
+							}   	
+		源文件：
+			<?xml version="1.0" encoding="UTF-8"?>
+			<FileRoot rootpath="E:/esbfile" >
+				<BaseFile name="/esb" path="esb">
+					<grant user="esb" type="A" />
+				</BaseFile>
+
+				<BaseFile name="/picp" path="picp">
+					<grant user="picp" type="A" />
+				</BaseFile>
+
+				<BaseFile name="/cms" path="cms">
+					<grant user="cms" type="A" />
+					<grant user="picp" type="R" />
+				</BaseFile>
+			</FileRoot>
+
+	
+		操作规则：operateType:
+					add:添加用户目录
+						name,path必要
+					del：删除用户目录
+						：只需要data中name数据
+					update：更新参数值
+						；需要data中所有数据，name必要
+					select：查询全部    
+						；不需要data数据
+					selByName：按name查询一个
+						；需要name值数据
+                    queryAuthDirOfUser:查询一个用户可以操作哪些目录
+                        name:用户名称;
+                    queryAuthUserOfDir:查询一个目录可以被哪些用户操作
+                        name:系统名称，path:目录;
+                    queryAuthUserOfSys:查询一个系统的用户目录权限列表
+                        name:系统名称，必须
+                    addUserAuth:添加用户目录权限
+                        name、permession必须,注意permession格式
+                    delUserAuth:删除用户目录权限
+                        name、permession必须,注意permession格式
+                    print:打印xml配置文件
+                    	；不需要data数据
+                    queryAllOrderbySys:查询所有系统的用户目录权限列表
+                        ；不需要data数据

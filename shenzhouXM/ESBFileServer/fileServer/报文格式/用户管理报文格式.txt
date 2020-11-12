@@ -1,0 +1,66 @@
+user:	报文格式：000000{
+							"target":"user",
+							"operateType":"addUser",
+							"data":{
+								"uid":"cms",
+								"home":"/cms",
+								"sysname":"系统名称",
+								"describe":"用户描述,如中文名称",
+								"passwd":"1234",
+								"grant":"A",
+								"IP":"192.168.113.25",
+								"status":"0",
+								"IPDescribe":""
+							}
+						}   
+		源文件：
+				<?xml version="1.0" encoding="UTF-8"?>
+				<UserRoot>
+					<UserInfo>
+						<Uid home="/cms" name="cms系统" describe="cms系统">cms</Uid>
+						<Passwd>${3DES}2uobwMqQ2jhCkVWkE3hCmg==</Passwd>
+						<!-- 状态为0为禁止，1为允许 -->
+						<IP status="0" IPDescribe="">192.168.113.28</IP>
+						<IP status="0" IPDescribe="">192.168.113.27</IP>
+					</UserInfo>
+					<UserInfo>
+						<Uid home="/esb" name="esb系统" describe="cms系统">esb</Uid>
+						<Passwd>${3DES}ZT16MWj0OIA=</Passwd>
+						<!-- 状态为0为禁止，1为允许 -->
+						<IP status="0" IPDescribe="">192.168.113.26</IP>
+						<IP status="0" IPDescribe="">192.168.113.25</IP>
+					</UserInfo>
+					<UserInfo>
+						<Uid home="/pick" name="pick系统" describe="cms系统">picp</Uid>
+						<Passwd>${3DES}KEiOq98Hmy5C5OLHi8MLm1xlQKTXp9+R</Passwd>
+						<!-- 状态为0为禁止，1为允许 -->
+						<IP status="0" IPDescribe="">192.168.113.24</IP>
+						<IP status="0" IPDescribe="">192.168.113.23</IP>
+					</UserInfo>
+				</UserRoot>
+			
+		操作规则：operateType:
+					addUser:添加用户
+						：需要data中所有数据，sysname、uid和passwd必要
+					delUser：删除参数 
+						：只需要data中uid值
+					updateUser：更新参数值(修改密码也用此接口，需要数据sysname、uid和passwd)
+						；sysname、uid和被修改数据必要
+					select：查询全部    
+						；不需要data数据
+					selOneUser：按uid查询一个
+						；需要sysname、uid值数据
+						
+					addIP:添加IP
+						：sysname、uid，IP 必要
+					delIP：删除某个uid下的某个IP
+						：sysname、uid,IP必要
+					updateIP：更新IP属性
+						：sysname、uid,IP和需要更新的属性值必要
+					selByUser：查询一个用户下的所有IP
+						：sysname、uid必要
+					selectUserBySys：查询一个系统的所有用户
+					    ：sysname必要
+					print:打印xml配置文件
+                    	；不需要data数据
+					

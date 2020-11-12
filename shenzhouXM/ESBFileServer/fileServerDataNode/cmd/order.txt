@@ -1,0 +1,2 @@
+fts-datanode.tar
+fts-datanode-init.sh

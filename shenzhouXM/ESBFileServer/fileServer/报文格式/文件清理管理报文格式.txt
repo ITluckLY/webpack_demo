@@ -1,0 +1,31 @@
+fileClean:	报文格式：000000{
+							"target":"fileClean",
+							"operateType":"add",
+							"data":{
+									"id":"2",
+									"srcPath":"/cms",
+									"keepTime":"60",
+									"isBackup":"true",
+									"backupPath":"/cms",
+									"desc":"",
+									"state":"1",
+									"system":"esb"
+									}
+						}
+		
+			
+		操作规则：operateType:
+                    add:添加服务
+					    :id,srcPath,keepTime,isBackup,state,system 必要，keepTime以分钟为单位
+					del：删除参数
+						：只需要data中ID数据
+					update：更新参数值
+						: 需要data中除system外的所有数据，ID必要,是key
+					select：查询全部
+						: 不需要data数据
+					query：按ID查询一个
+						: 需要ID值数据
+					clean:调用指定id的文件清理任务
+						：id 必须,多个以逗号分隔
+					print:打印xml配置文件
+                        : 不需要data数据

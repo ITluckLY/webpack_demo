@@ -1,0 +1,36 @@
+sysInfo:	报文格式：000000{
+							"target":"sysInfo",
+							"operateType":"add",
+							"data":{
+                                "name": "smsp",
+                                "protocol": "ftp",
+                                "ip": "192.168.101.87",
+                                "port": "21",
+                                "username": "root",
+                                "password": "root"
+							}
+						}   
+		源文件：
+				<?xml version="1.0" encoding="UTF-8"?>
+				<systems>
+                    <system name="smsp" protocol="ftp">
+                        <ip>192.168.101.87</ip>
+                        <port>21</port>
+                        <username>root</username>
+                        <password>root</password>
+                    </system>
+                </systems>
+			
+		操作规则：operateType:
+					add:添加系统
+                        ：需要data中所有数据，均必要
+                    del:删除系统
+                        ：只需要data中name值
+                    update:更新系统
+                        ：需要data中待改动的数据，name必要
+					select:查询全部
+                        ：不需要data数据
+					selByName:根据系统名查询
+                        ：只需要data中name值
+					print:打印xml配置文件
+					    ：不需要data数据

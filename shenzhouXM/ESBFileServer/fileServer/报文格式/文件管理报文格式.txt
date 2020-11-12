@@ -1,0 +1,36 @@
+file:	报文格式：000000{
+							"target":"file",
+							"operateType":"subDir",
+							"data":{
+									"key":"adfadf",   
+									"rename":"adfadf",
+									"oldCharset":"asdf",
+									"newCharset":"adfadf",
+									"cryptogramType":"adsfasdfasdf"
+									}
+						}   
+		
+			
+		操作规则：operateType:
+					query:按条件查找对应的文件
+						：key 
+					subDir:返回esefile下的所有目录 
+						：空data
+					selByKey:返回一个路径下的所有文件信息
+						: key
+					download：返回指定文件内容   		
+						：key
+					rename：重命名
+						：key 新文件名
+					transcoding：转码    
+						；key 原编码集  新编码集
+					encrypt：加密
+						；key   加密类型
+					decrypt：解密
+						：key	 解密类型
+					mkdir：创建目录
+                    	：key	 需要创建的目录
+                    print: 打印xml配置文件
+                    	: 不需要data数据
+                    delFile：删除使用原文件名上传的文件
+                        key:文件路径

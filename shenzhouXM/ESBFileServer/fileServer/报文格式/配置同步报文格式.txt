@@ -1,0 +1,26 @@
+cfgSync:    报文格式：000000{
+                     "target":"cfgSync",
+                     "operateType":"nodeSync",
+                     "data":{
+                           "sysName":"esb",
+                           "cfgNames":"node,nodes,..."
+                           }
+                  }
+      其中key(节点参数名称)
+
+      操作规则：operateType:
+                makeSyncCfg:按系统生成配置文件
+                    sysName:系统名称，必填
+                    cfgNames:一个或多个xml配置文件名，必填
+                nodeSync:按系统配置同步
+                    sysName:系统名称，必填
+                    cfgNames:一个或多个xml配置文件名，必填
+                generateSyncCfgXml:按系统生成临时的配置文件内容
+                    sysName:系统名称，必填
+                    cfgNames:一个xml配置文件名，必填
+                receiveCfgFile:
+                    sysName:系统名称，必填
+                    cfgName:一个xml配置文件名，必填
+                    cfgContent:配置文件内容
+
+      响应报文格式：000000{"code":"0000","message":"成功","data":"{file:true,nodes:true}"}

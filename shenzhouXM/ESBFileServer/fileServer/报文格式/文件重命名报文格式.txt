@@ -1,0 +1,47 @@
+fileRename:
+        上送报文格式：000000{
+                        "target":"node",
+                        "operateType":"add",
+                        "data":{
+                                "id":"asdf",
+                                "type":"adfadf",
+                                "path":"adsfasdfasdf"
+                                }
+                        }
+		其中key(节点参数名称)
+		源文件：
+            <root>
+              <rule id="1" type="dir" path="/esb/jj"/>
+              <rule id="2" type="dir" path="/esb/jjj"/>
+              <rule id="3" type="file" path="/esc/jj/a.txt"/>
+              <rule id="4" type="file" path="/cms/dd/a.txt"/>
+            </root>
+
+		操作规则：operateType:
+					add:添加参数
+						：需要data中所有数据，id必要
+					del：删除参数
+						：只需要id值
+					update：更新参数值
+						；需要data中的数据，id必要
+					select：查询全部
+						；不需要data数据
+					print:打印xml配置文件
+                    	；不需要data数据，前端接收数据需要解码
+                    selbyIDorType:根据id或type做条件查询
+                        ；需要id或type
+
+
+
+        下送报文格式：000000{
+                        "code":"0000",
+                        "message":"abadfa",
+                        "data":"aadadda"
+                        }
+
+        响应规则：code:状态码
+                     ；成功为"0000"，失败为"9999"
+                 message:消息说明
+                     ；包含失败或成功原因，有消息体时不返回。
+                 data：消息体
+                     ；包含所请求的消息内容，请求失败时不返回。

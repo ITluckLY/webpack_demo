@@ -1,0 +1,51 @@
+component:	报文格式：000000{
+							"target":"component",
+							"operateType":"add",
+							"data":{
+									"name":"asdf",
+									"describe":"adfadf",
+									"implement":"adfasdfadsf",
+									"param":"asdf=asdfadf,asdfadf=adsfadf",
+									"comment":"asdf"
+									}
+						}  
+
+		源文件：
+			<?xml version="1.0" encoding="UTF-8"?>
+			<services>
+				<service name="InitService" describe="">
+					<implement>com.dcfs.esb.ftp.impls.service.InitService</implement>
+					<params>
+						<param name="test">TestValue</param>
+					</params>
+					<comment>InitService</comment>
+				</service>
+				<service name="FileService" describe="">
+					<implement>com.dcfs.esb.ftp.impls.service.DefaultFileService</implement>
+					<params>
+						<param name="test">TestValue</param>
+					</params>
+					<comment>FileService</comment>
+				</service>
+				<service name="RNService" describe="">
+					<implement>com.dcfs.esb.ftp.impls.service.RNameService</implement>
+					<params>
+						<param name="test">TestValue</param>
+					</params>
+					<comment>RNService</comment>
+				</service>
+			</services>
+			
+		操作规则：operateType:
+					add:添加组件  
+						name必要
+					del：删除参数 
+						：只需要data中name值数据
+					update：更新参数值
+						name和更新的数据必要
+					select：查询全部    
+						；不需要data数据
+					selByName：按name查询一个
+						；需要key值数据
+					print:打印xml配置文件
+                    	；不需要data数据

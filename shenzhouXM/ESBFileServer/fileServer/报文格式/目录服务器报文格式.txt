@@ -1,0 +1,32 @@
+bizFile:
+
+请求报文：
+        {
+            "target":"bizFile",
+            "operateType":"selByRequestFilePath",
+            "data":{
+                "requestFilePath": "/cms/cms/20160715155622259_490005621059150204_a.txt\"
+            }
+        }
+
+
+响应报文：
+        {
+            "fileInfo": [{
+                "nodeName": "FS01",
+                "state": "0",
+                "systemName": "cms"
+            },
+            {
+                "nodeName": "FS02",
+                "state": "1",
+                "systemName": "cms"
+            }],
+            "fileMD5": "aYeq0AzvYPzXpPtu+m9VwXAVOqvhzPFmjtNSefEeXg4Yz++LeQWqnGby1dY365qBiPY8+CDmIYGa\r\nUlys7jKAFFxlQKTXp9+R",
+            "fileSize": "16"
+        }
+
+
+操作规则：operateType:
+                    selByRequestFilePath:根据请求文件路径查询
+					    :requestFilePath 必要
