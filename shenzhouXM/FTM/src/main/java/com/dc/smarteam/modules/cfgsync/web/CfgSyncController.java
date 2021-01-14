@@ -171,9 +171,6 @@ public class CfgSyncController extends BaseController {
         cfgFileNameList.add("file_clean.xml");
         cfgFileNameList.add("file_rename.xml");
         cfgFileNameList.add("flow.xml");
-        // 此处添加一个文件检验流程文件 file_process.xml
-        cfgFileNameList.add("file_process.xml");
-
         cfgFileNameList.add("nodes.xml");
         cfgFileNameList.add("route.xml");
         cfgFileNameList.add("services_info.xml");
@@ -181,6 +178,10 @@ public class CfgSyncController extends BaseController {
         cfgFileNameList.add("user.xml");
         cfgFileNameList.add("vsysmap.xml");
         cfgFileNameList.add("client_status.xml");
+        // 此处添加一个文件检验流程文件 file_process.xml
+        cfgFileNameList.add("file_process.xml");
+        // 此处添加一个流量控制文件 netty.xml
+        cfgFileNameList.add("netty.xml");
         cfgFileNameList.add("keys.xml");
         for (String fileName : cfgFileNameList) {
             String content = getCurrCfgContent(sysname, fileName, true);

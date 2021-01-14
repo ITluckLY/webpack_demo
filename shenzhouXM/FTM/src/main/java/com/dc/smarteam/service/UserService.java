@@ -3,6 +3,7 @@ package com.dc.smarteam.service;
 import com.dc.smarteam.aspectCfg.cfgOperate.CfgData;
 import com.dc.smarteam.cfgmodel.CfgModelConverter;
 import com.dc.smarteam.cfgmodel.UserModel;
+import com.dc.smarteam.cfgmodel.NettyModel;
 import com.dc.smarteam.common.json.ResultDto;
 import com.dc.smarteam.common.json.ResultDtoTool;
 import com.dc.smarteam.common.utils.StringUtils;
@@ -36,6 +37,7 @@ public class UserService extends AbstractService {
         UserModel model = loadModel();
         return ResultDtoTool.buildSucceed(model.getUserInfos());
     }
+
 
     public ResultDto<UserModel.UserInfo> selByName(FtUser ftUser) {
         UserModel model = loadModel();
@@ -173,11 +175,9 @@ public class UserService extends AbstractService {
     }
 
     private static final String CFG_FILE_NAME = "user.xml";
-
     public UserModel loadModel() {
         return cfgFileService.loadModel4Name(CFG_FILE_NAME, UserModel.class);
     }
-
     private void save(UserModel model) {
         cfgFileService.saveModel4Name(CFG_FILE_NAME, model);
     }

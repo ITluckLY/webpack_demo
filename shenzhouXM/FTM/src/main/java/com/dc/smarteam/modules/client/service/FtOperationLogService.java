@@ -49,6 +49,7 @@ public class FtOperationLogService extends LongCrudService<FtOperationLogDao, Ft
         remarkMap.put("route.xml", "路由配置信息");
         remarkMap.put("file_clean.xml", "文件清理配置信息");
         remarkMap.put("client_status.xml","客户端状态配置信息");
+        remarkMap.put("netty.xml","客户流量信息");
         //...
     }
 

@@ -40,95 +40,95 @@ import java.util.List;
 @Controller
 @RequestMapping(value = "${adminPath}/user/ftUser")
 public class FtUserDirAuthController extends BaseController {
-    @Resource
-    private UserService userService;
-    @Resource
-    private FileAuthService fileAuthService;
+  @Resource
+  private UserService userService;
+  @Resource
+  private FileAuthService fileAuthService;
 
-    @RequiresPermissions("user0:ftUserDirAuth:view")
-    @RequestMapping(value = {"dirList"})
-    public String dirList(UserAuthModel userAuth, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
-        FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
-        if (ftServiceNode == null || ftServiceNode.getSystemName() == null) {
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";//NOSONAR
-        }
-
-        ResultDto<List<FileModel.BaseFile>> resultDto = fileAuthService.listAll();
-        List<UserAuthModel> userAuthList = new LinkedList<>();
-        if (ResultDtoTool.isSuccess(resultDto)) {
-            List<FileModel.BaseFile> baseFiles = resultDto.getData();
-            for (FileModel.BaseFile baseFile : baseFiles) {
-                if (StringUtils.isNoneEmpty(userAuth.getPath()) && !StringUtils.containsIgnoreCase(baseFile.getName(), userAuth.getPath()))
-                    continue;
-                List<FileModel.Grant> grants = baseFile.getGrants();
-                for (FileModel.Grant grant : grants) {
-                    if (StringUtils.isNoneEmpty(userAuth.getUserName()) && !StringUtils.containsIgnoreCase(grant.getUser(), userAuth.getUserName()))
-                        continue;
-                    UserAuthModel userAuthModel = new UserAuthModel();
-                    userAuthModel.setPath(baseFile.getName());
-                    userAuthModel.setUserName(grant.getUser());
-                    userAuthModel.setAuth(grant.getType());
-                    userAuthList.add(userAuthModel);
-                }
-            }
-        } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
-        }
-
-        PageHelper.getInstance().getPage(userAuth.getClass(), request, response, model, userAuthList);
-        return "modules/user/ftUserDirList";
+  @RequiresPermissions("user0:ftUserDirAuth:view")
+  @RequestMapping(value = {"dirList"})
+  public String dirList(UserAuthModel userAuth, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
+    FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
+    if (ftServiceNode == null || ftServiceNode.getSystemName() == null) {
+      return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";//NOSONAR
     }
 
-    @RequiresPermissions("user0:ftUserDirAuth:edit")
-    @RequestMapping(value = {"addUserDirAuth"})
-    public String addUserDirAuth(UserAuthModel userAuth, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
-        ResultDto<List<UserModel.UserInfo>> resultDto = userService.listAll();
-        List<FtUser> ftUserList = new ArrayList<>();
-        if (ResultDtoTool.isSuccess(resultDto)) {
-            List<UserModel.UserInfo> userInfos = resultDto.getData();
-            for (UserModel.UserInfo userInfo : userInfos) {
-                FtUser ftUser2 = new FtUser();
-                CfgModelConverter.convertTo(userInfo, ftUser2);
-                ftUserList.add(ftUser2);
-            }
-        } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
-            return "redirect:" + Global.getAdminPath() + "/user/ftUser/dirList";//NOSONAR
+    ResultDto<List<FileModel.BaseFile>> resultDto = fileAuthService.listAll();
+    List<UserAuthModel> userAuthList = new LinkedList<>();
+    if (ResultDtoTool.isSuccess(resultDto)) {
+      List<FileModel.BaseFile> baseFiles = resultDto.getData();
+      for (FileModel.BaseFile baseFile : baseFiles) {
+        if (StringUtils.isNoneEmpty(userAuth.getPath()) && !StringUtils.containsIgnoreCase(baseFile.getName(), userAuth.getPath()))
+          continue;
+        List<FileModel.Grant> grants = baseFile.getGrants();
+        for (FileModel.Grant grant : grants) {
+          if (StringUtils.isNoneEmpty(userAuth.getUserName()) && !StringUtils.containsIgnoreCase(grant.getUser(), userAuth.getUserName()))
+            continue;
+          UserAuthModel userAuthModel = new UserAuthModel();
+          userAuthModel.setPath(baseFile.getName());
+          userAuthModel.setUserName(grant.getUser());
+          userAuthModel.setAuth(grant.getType());
+          userAuthList.add(userAuthModel);
         }
-        model.addAttribute("ftUserList", ftUserList);
-        model.addAttribute("userAuth", userAuth);
-        return "modules/user/addUserDirAuth";
+      }
+    } else {
+      addMessage(redirectAttributes, resultDto.getMessage());
+      return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
     }
 
-    @RequiresPermissions("user0:ftUserDirAuth:edit")
-    @RequestMapping(value = {"saveUserDirAuth"})
-    public String saveUserDirAuth(UserAuthModel userAuth, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    PageHelper.getInstance().getPage(userAuth.getClass(), request, response, model, userAuthList);
+    return "modules/user/ftUserDirList";
+  }
 
-        ResultDto<String> resultDto = fileAuthService.add(userAuth);
-        if (ResultDtoTool.isSuccess(resultDto)) {
-            addMessage(redirectAttributes, "保存目录权限成功");
-        } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
-        }
-        return "redirect:" + Global.getAdminPath() + "/user/ftUser/dirList";
+  @RequiresPermissions("user0:ftUserDirAuth:edit")
+  @RequestMapping(value = {"addUserDirAuth"})
+  public String addUserDirAuth(UserAuthModel userAuth, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
+    ResultDto<List<UserModel.UserInfo>> resultDto = userService.listAll();
+    List<FtUser> ftUserList = new ArrayList<>();
+    if (ResultDtoTool.isSuccess(resultDto)) {
+      List<UserModel.UserInfo> userInfos = resultDto.getData();
+      for (UserModel.UserInfo userInfo : userInfos) {
+        FtUser ftUser2 = new FtUser();
+        CfgModelConverter.convertTo(userInfo, ftUser2);
+        ftUserList.add(ftUser2);
+      }
+    } else {
+      addMessage(redirectAttributes, resultDto.getMessage());
+      return "redirect:" + Global.getAdminPath() + "/user/ftUser/dirList";//NOSONAR
+    }
+    model.addAttribute("ftUserList", ftUserList);
+    model.addAttribute("userAuth", userAuth);
+    return "modules/user/addUserDirAuth";
+  }
+
+  @RequiresPermissions("user0:ftUserDirAuth:edit")
+  @RequestMapping(value = {"saveUserDirAuth"})
+  public String saveUserDirAuth(UserAuthModel userAuth, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+
+    ResultDto<String> resultDto = fileAuthService.add(userAuth);
+    if (ResultDtoTool.isSuccess(resultDto)) {
+      addMessage(redirectAttributes, "保存目录权限成功");
+    } else {
+      addMessage(redirectAttributes, resultDto.getMessage());
+    }
+    return "redirect:" + Global.getAdminPath() + "/user/ftUser/dirList";
+  }
+
+  @RequiresPermissions("user0:ftUserDirAuth:edit")
+  @RequestMapping(value = {"delUserAuth"})
+  public String delUserAuth(UserAuthModel userAuth, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    if (!beanValidator(model, userAuth)) {
+      addMessage(redirectAttributes, "无权限操作");
+      return "redirect:" + Global.getAdminPath() + "/user/ftUser/dirList";
     }
 
-    @RequiresPermissions("user0:ftUserDirAuth:edit")
-    @RequestMapping(value = {"delUserAuth"})
-    public String delUserAuth(UserAuthModel userAuth, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        if (!beanValidator(model, userAuth)) {
-            addMessage(redirectAttributes, "无权限操作");
-            return "redirect:" + Global.getAdminPath() + "/user/ftUser/dirList";
-        }
-
-        ResultDto<String> resultDto = fileAuthService.del(userAuth);
-        if (ResultDtoTool.isSuccess(resultDto)) {
-            addMessage(redirectAttributes, "删除目录权限成功");
-        } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
-        }
-        return "redirect:" + Global.getAdminPath() + "/user/ftUser/dirList";
+    ResultDto<String> resultDto = fileAuthService.del(userAuth);
+    if (ResultDtoTool.isSuccess(resultDto)) {
+      addMessage(redirectAttributes, "删除目录权限成功");
+    } else {
+      addMessage(redirectAttributes, resultDto.getMessage());
     }
+    return "redirect:" + Global.getAdminPath() + "/user/ftUser/dirList";
+  }
 
 }

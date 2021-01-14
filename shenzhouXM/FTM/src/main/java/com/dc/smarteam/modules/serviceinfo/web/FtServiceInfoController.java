@@ -306,6 +306,7 @@ public class FtServiceInfoController extends BaseController {
     return REDIRECT + Global.getAdminPath() + "/serviceinfo/ftServiceInfo/?repage";
   }
 
+  // 服务管理 相关权限列表
   @RequiresPermissions("serviceinfo:ftServiceInfo:view")
   @RequestMapping(value = "putGetTotal")
   public String putGetTotal(FtServiceInfo ftServiceInfo, HttpServletRequest request, Model model) {

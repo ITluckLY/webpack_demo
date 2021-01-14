@@ -106,6 +106,11 @@ public class ComponentService extends AbstractService {
   private static final String CFG_FILE_NAME = "components.xml";
   private static final String FILE_PROCESS_NAME = "file_process.xml";
 
+
+  /**
+   *  增删改查都会走这个方法
+   * @return
+   */
   private ComponentModel loadModel() {
     return cfgFileService.loadModel4Name(CFG_FILE_NAME, ComponentModel.class);
   }

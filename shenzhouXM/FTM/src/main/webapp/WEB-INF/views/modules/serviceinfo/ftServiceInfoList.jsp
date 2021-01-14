@@ -37,7 +37,7 @@
       <form:input path="flow" htmlEscape="false" maxlength="50" class="input-medium"/>
     </li>
     <li><label>校验流程：</label>
-      <form:input path="flow" htmlEscape="false" maxlength="50" class="input-medium"/>
+      <form:input path="psFlow" htmlEscape="false" maxlength="50" class="input-medium"/>
     </li>
     <li><label>交易码描述：</label>
       <form:input path="describe" htmlEscape="false" maxlength="100" class="input-medium"/>
@@ -90,7 +90,7 @@
           ${ftServiceInfo.flow}
       </td>
       <td style="WORD-WRAP:break-word">
-          ${ftServiceInfo.psflow}
+          ${ftServiceInfo.psFlow}
       </td>
       <td>
           ${ftServiceInfo.rename=="1"?"是":""}

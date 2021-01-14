@@ -17,7 +17,7 @@
 	<description>Spring Configuration</description>
 	
     <!-- 加载配置属性文件 -->
-	<context:property-placeholder location="classpath:smarteam.properties,classpath:smarteam-local.properties"
+	<context:property-placeholder location="classpath:smarteam.properties,classpath:smarteam.properties"
 								  ignore-unresolvable="true" ignore-resource-not-found="true" local-override="true"/>
 	
 	<!-- 加载应用属性实例，可通过  @Value("#{APP_PROP['jdbc.driver']}") String jdbcDriver 方式引用 -->

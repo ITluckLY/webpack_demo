@@ -89,7 +89,7 @@
     <div class="control-group">
         <label class="control-label">校验流程：</label>
         <div class="controls">
-            <form:select path="psflow" class="input-xlarge" style="WIDTH:265PX">
+            <form:select path="psFlow" class="input-xlarge" style="WIDTH:265PX">
                 <form:options items="${ftPSFlowList}" itemLabel="name" itemValue="name" htmlEscape="false"/>
             </form:select>
         </div>

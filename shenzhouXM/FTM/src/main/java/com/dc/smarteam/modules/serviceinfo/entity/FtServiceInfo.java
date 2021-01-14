@@ -18,7 +18,8 @@ public class FtServiceInfo extends DataEntity<FtServiceInfo> implements CfgData 
   private static final long serialVersionUID = 1L;
   private String trancode;            //交易码
   private String flow;     // %流 %
-  private String psflow;     // %校验流程 %
+
+  private String psFlow;     // %校验流程 %
   private String describe;    //描述
   private String systemName;      //系统
   private String rename;          //是否重命名
@@ -135,20 +136,25 @@ public class FtServiceInfo extends DataEntity<FtServiceInfo> implements CfgData 
     return this.getTrancode();
   }
 
-  public String getPsflow() {
-    return psflow;
+
+  public String getPsFlow() {
+    return psFlow;
   }
 
-  public void setPsflow(String psflow) {
-    this.psflow = psflow;
+  public void setPsFlow(String psFlow) {
+    this.psFlow = psFlow;
   }
+
+
+
+
 
   @Override
   public String toString() {
     return "FtServiceInfo{" +
         "trancode='" + trancode + '\'' +
         ", flow='" + flow + '\'' +
-        ", psflow='" + psflow + '\'' +
+        ", psFlow='" + psFlow + '\'' +
         ", describe='" + describe + '\'' +
         ", systemName='" + systemName + '\'' +
         ", rename='" + rename + '\'' +
@@ -160,4 +166,5 @@ public class FtServiceInfo extends DataEntity<FtServiceInfo> implements CfgData 
         ", cross='" + cross + '\'' +
         '}';
   }
+
 }

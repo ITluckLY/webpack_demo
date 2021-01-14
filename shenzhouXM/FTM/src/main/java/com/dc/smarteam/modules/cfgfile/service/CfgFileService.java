@@ -2,6 +2,7 @@ package com.dc.smarteam.modules.cfgfile.service;
 
 import com.dc.smarteam.cfgmodel.BaseModel;
 import com.dc.smarteam.common.service.LongCrudService;
+import com.dc.smarteam.common.utils.StringUtils;
 import com.dc.smarteam.cons.NodeType;
 import com.dc.smarteam.helper.EmptyCfgXmlHelper;
 import com.dc.smarteam.helper.IDHelper;
@@ -78,7 +79,6 @@ public class CfgFileService extends LongCrudService<CfgFileDao, CfgFile> {
             cfgXml = cfgFile.getContent(); // 获取流程组件数据
         }
 
-        // ？？？？？？？？？？？？？？？？？？？？？？？？
         if (cfgXml == null) {
             // 此处为数据为空的时候时候会走默认的 组件
             cfgXml = EmptyCfgXmlHelper.getEmptyXml(fileName);
@@ -87,15 +87,17 @@ public class CfgFileService extends LongCrudService<CfgFileDao, CfgFile> {
     }
 
     public <T extends BaseModel> T loadModel4Name(String cfgFileName, Class<? extends T> tclass) {
+
         CfgFile cfgFile = new CfgFile();
         cfgFile.setFileName(cfgFileName);
         cfgFile.setNodeType(NodeType.NAMENODE.name());
         cfgFile.setSystem("UNDEFINED");
+        // 根据cfgFile 对象的内容查找数据 ，有则返回 1 或者 1+ 没有就是0
         List<CfgFile> list = findList(cfgFile);
         String xml;
         /* 这一步生产xml 文件时 */
         if (list.size() == 0) xml = EmptyCfgXmlHelper.getEmptyXml(cfgFileName);
-        else xml = CharsetUtil.convertFromUTF8(list.get(0).getContent());
+        else xml = CharsetUtil.convertFromUTF8(list.get(0).getContent()); /* 读取list 中的数据，并设置字符集 */
         Document doc = XMLDealTool.readXml(xml);
         T model = XmlBeanUtil.toEntity(XMLDealTool.getRootXml(doc), tclass);
         model.init();

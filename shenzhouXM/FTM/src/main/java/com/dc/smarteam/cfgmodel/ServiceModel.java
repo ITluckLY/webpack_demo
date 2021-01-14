@@ -39,7 +39,7 @@ public class ServiceModel extends BaseModel {
         private String flow;
 
         @XStreamAsAttribute
-        private String psflow;
+        private String psFlow;
         @XStreamAsAttribute
         private String describe;
         @XStreamAsAttribute
@@ -78,12 +78,12 @@ public class ServiceModel extends BaseModel {
         public void setFlow(String flow) {
             this.flow = flow;
         }
-        public String getPsflow() {
-            return psflow;
+        public String getpsFlow() {
+            return psFlow;
         }
 
-        public void setPsflow(String psflow) {
-            this.psflow = psflow;
+        public void setpsFlow(String psFlow) {
+            this.psFlow = psFlow;
         }
         public String getDescribe() {
             return describe;

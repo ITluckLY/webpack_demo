@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 流程管理下的
  * 组件管理Controller
  *
  * @author liwang
@@ -40,119 +41,120 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/component/ftComponent")
 public class FtComponentController extends BaseController {
 
-    @Resource
-    private ComponentService componentService;
+  @Resource
+  private ComponentService componentService;
 
-    @RequiresPermissions("component:ftComponent:view")
-    @RequestMapping(value = {"list", ""})
-    public String list(FtComponent ftComponent, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
+  @RequiresPermissions("component:ftComponent:view")
+  @RequestMapping(value = {"list", ""})
+  public String list(FtComponent ftComponent, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
 
-        FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
-        if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
-        }
-        List<FtComponent> list = new ArrayList<FtComponent>();
-        ResultDto<List<ComponentModel.Service>> dto = componentService.listAll();
-        if (ResultDtoTool.isSuccess(dto)) {
-            List<ComponentModel.Service> services = dto.getData();
-            String ftComponentName = ftComponent.getName();
-            for (ComponentModel.Service service : services) {
-                if (StringUtils.isNoneEmpty(ftComponentName) && !StringUtils.containsIgnoreCase(service.getName(), ftComponentName)) continue;
-                FtComponent ftComponent2 = new FtComponent();
-                CfgModelConverter.convertTo(service, ftComponent2);
-                ftComponent2.setId(String.valueOf(list.size()));
-                list.add(ftComponent2);
-            }
-        } else {
-            addMessage(redirectAttributes, dto.getMessage());
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
-
-        }
-//        model.addAttribute("ftComponentList", list2);
-        PageHelper.getInstance().getPage(ftComponent.getClass(), request, response, model, list);
-        return "modules/component/ftComponentList";
+    FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
+    if (null == ftServiceNode || null == ftServiceNode.getSystemName()) {
+      return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
     }
-
-    @RequiresPermissions("component:ftComponent:view")
-    @RequestMapping(value = "form")
-    public String form(FtComponent ftComponent, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        if (StringUtils.isEmpty(ftComponent.getName())) {
-            return "modules/component/ftComponentForm";
-        } else {
-            ftComponent.setId("1111");
-        }
-        ResultDto<ComponentModel.Service> dto = componentService.selByName(ftComponent);
+    List<FtComponent> list = new ArrayList<FtComponent>();
+    ResultDto<List<ComponentModel.Service>> dto = componentService.listAll();
+    if (ResultDtoTool.isSuccess(dto)) {
+      List<ComponentModel.Service> services = dto.getData();
+      String ftComponentName = ftComponent.getName();
+      for (ComponentModel.Service service : services) {
+        if (StringUtils.isNoneEmpty(ftComponentName) && !StringUtils.containsIgnoreCase(service.getName(), ftComponentName))
+          continue;
         FtComponent ftComponent2 = new FtComponent();
-        if (ResultDtoTool.isSuccess(dto)) {
-            ComponentModel.Service compsvc = dto.getData();
-            CfgModelConverter.convertTo(compsvc, ftComponent2);
-        } else {
-            addMessage(redirectAttributes, dto.getMessage());
-            return "redirect:" + Global.getAdminPath() + "/component/ftComponent/?repage";
-        }
-        ftComponent2.setId(ftComponent.getId());
-        model.addAttribute("ftComponent", ftComponent2);
-        return "modules/component/ftComponentForm";
+        CfgModelConverter.convertTo(service, ftComponent2);
+        ftComponent2.setId(String.valueOf(list.size()));
+        list.add(ftComponent2);
+      }
+    } else {
+      addMessage(redirectAttributes, dto.getMessage());
+      return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
+
+    }
+//        model.addAttribute("ftComponentList", list2);
+    PageHelper.getInstance().getPage(ftComponent.getClass(), request, response, model, list);
+    return "modules/component/ftComponentList";
+  }
+
+  @RequiresPermissions("component:ftComponent:view")
+  @RequestMapping(value = "form")
+  public String form(FtComponent ftComponent, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    if (StringUtils.isEmpty(ftComponent.getName())) {
+      return "modules/component/ftComponentForm";
+    } else {
+      ftComponent.setId("1111");
+    }
+    ResultDto<ComponentModel.Service> dto = componentService.selByName(ftComponent);
+    FtComponent ftComponent2 = new FtComponent();
+    if (ResultDtoTool.isSuccess(dto)) {
+      ComponentModel.Service compsvc = dto.getData();
+      CfgModelConverter.convertTo(compsvc, ftComponent2);
+    } else {
+      addMessage(redirectAttributes, dto.getMessage());
+      return "redirect:" + Global.getAdminPath() + "/component/ftComponent/?repage";
+    }
+    ftComponent2.setId(ftComponent.getId());
+    model.addAttribute("ftComponent", ftComponent2);
+    return "modules/component/ftComponentForm";
+  }
+
+  @RequiresPermissions("component:ftComponent:edit")
+  @RequestMapping(value = "save")
+  public String save(FtComponent ftComponent, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    ResultDto<String> resultDto;
+    if (StringUtils.isEmpty(ftComponent.getId())) {
+      resultDto = componentService.add(ftComponent);
+    } else {
+      resultDto = componentService.update(ftComponent);
+    }
+    if (ResultDtoTool.isSuccess(resultDto)) {
+      addMessage(redirectAttributes, "保存组件管理成功");
+    } else {
+      addMessage(redirectAttributes, resultDto.getMessage());
+    }
+    return "redirect:" + Global.getAdminPath() + "/component/ftComponent/?repage";
+  }
+
+  @RequiresPermissions("component:ftComponent:edit")
+  @RequestMapping(value = "delete")
+  public String delete(FtComponent ftComponent, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
+    if (ftServiceNode == null) {
+      return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
     }
 
-    @RequiresPermissions("component:ftComponent:edit")
-    @RequestMapping(value = "save")
-    public String save(FtComponent ftComponent, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        ResultDto<String> resultDto;
-        if (StringUtils.isEmpty(ftComponent.getId())) {
-            resultDto = componentService.add(ftComponent);
-        } else {
-            resultDto = componentService.update(ftComponent);
-        }
-        if (ResultDtoTool.isSuccess(resultDto)) {
-            addMessage(redirectAttributes, "保存组件管理成功");
-        } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
-        }
-        return "redirect:" + Global.getAdminPath() + "/component/ftComponent/?repage";
+    ResultDto<String> resultDto = componentService.del(ftComponent);
+    if (ResultDtoTool.isSuccess(resultDto)) {
+
+      addMessage(redirectAttributes, "删除组件管理成功");
+    } else {
+      addMessage(redirectAttributes, resultDto.getMessage());
     }
+    return "redirect:" + Global.getAdminPath() + "/component/ftComponent/?repage";
+  }
 
-    @RequiresPermissions("component:ftComponent:edit")
-    @RequestMapping(value = "delete")
-    public String delete(FtComponent ftComponent, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        FtServiceNode ftServiceNode = CurrNameNodeHelper.getCurrNameNode(request);
-        if (ftServiceNode == null) {
-            return "redirect:" + Global.getAdminPath() + "/servicenode/ftServiceNode/nodeList";
-        }
+  @RequiresPermissions("servicenode:ftServiceNode:view")
+  @RequestMapping(value = "otherConf")
+  public String otherConf(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model) {
+    String getAllStr = MessageFactory.getInstance().component(new FtComponent(), "print");//生成查询报文
 
-        ResultDto<String> resultDto = componentService.del(ftComponent);
-        if (ResultDtoTool.isSuccess(resultDto)) {
+    FtServiceNodeHelper.getOtherConf(request, model, getAllStr);
+    return "modules/component/ftComponentOtherConf";
+  }
 
-            addMessage(redirectAttributes, "删除组件管理成功");
-        } else {
-            addMessage(redirectAttributes, resultDto.getMessage());
-        }
-        return "redirect:" + Global.getAdminPath() + "/component/ftComponent/?repage";
-    }
+  @RequiresPermissions("component:ftComponent:view")
+  @RequestMapping(value = "confComp")
+  public String confComp(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model) {
+    FtServiceNode ftServiceNodeNameNode = (FtServiceNode) request.getSession().getAttribute("ftServiceNodeNameNode");
+    String getAllStr = MessageFactory.getInstance().cfgSync("components", "generateSyncCfgXml", ftServiceNodeNameNode.getSystemName());//生成查询报文
+    String getOtherAllStr = MessageFactory.getInstance().component(new FtComponent(), "print");//生成查询报文
+    FtServiceNodeHelper.getConfComp(ftServiceNode, ftServiceNodeNameNode, getAllStr, getOtherAllStr, request, model);
+    return "modules/component/ftComponentConfComp";
+  }
 
-    @RequiresPermissions("servicenode:ftServiceNode:view")
-    @RequestMapping(value = "otherConf")
-    public String otherConf(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model) {
-        String getAllStr = MessageFactory.getInstance().component(new FtComponent(), "print");//生成查询报文
-
-        FtServiceNodeHelper.getOtherConf(request, model, getAllStr);
-        return "modules/component/ftComponentOtherConf";
-    }
-
-    @RequiresPermissions("component:ftComponent:view")
-    @RequestMapping(value = "confComp")
-    public String confComp(FtServiceNode ftServiceNode, HttpServletRequest request, HttpServletResponse response, Model model) {
-        FtServiceNode ftServiceNodeNameNode = (FtServiceNode) request.getSession().getAttribute("ftServiceNodeNameNode");
-        String getAllStr = MessageFactory.getInstance().cfgSync("components", "generateSyncCfgXml", ftServiceNodeNameNode.getSystemName());//生成查询报文
-        String getOtherAllStr = MessageFactory.getInstance().component(new FtComponent(), "print");//生成查询报文
-        FtServiceNodeHelper.getConfComp(ftServiceNode, ftServiceNodeNameNode, getAllStr, getOtherAllStr, request, model);
-        return "modules/component/ftComponentConfComp";
-    }
-
-    @RequiresPermissions("serviceinfo:ftServiceInfo:view")
-    @RequestMapping(value = {"catchFileCfg"})
-    @ResponseBody
-    public String catchFileCfg(FtServiceNode ftServiceNode, String fileName, HttpServletRequest request) {
-        return FtServiceNodeHelper.getCachtFileCfg(fileName, request);
-    }
+  @RequiresPermissions("serviceinfo:ftServiceInfo:view")
+  @RequestMapping(value = {"catchFileCfg"})
+  @ResponseBody
+  public String catchFileCfg(FtServiceNode ftServiceNode, String fileName, HttpServletRequest request) {
+    return FtServiceNodeHelper.getCachtFileCfg(fileName, request);
+  }
 }

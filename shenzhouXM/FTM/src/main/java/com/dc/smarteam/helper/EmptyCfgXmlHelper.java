@@ -4,6 +4,7 @@ import com.dc.smarteam.util.XMLDealTool;
 import org.dom4j.Document;
 
 /**
+ * 设置默认的xml属性
  * Created by mocg on 2016/11/30.
  */
 public class EmptyCfgXmlHelper {
@@ -88,46 +89,84 @@ public class EmptyCfgXmlHelper {
       "<services>\n" +
       "\n" +
       "    <service name=\"ResouceCtrlBySetCliHandler\" describe=\"设置资源处理流程\">\n" +
-      "        <implement>com.dcfs.esb.ftp.impls.service.IsolStateCheckService</implement>\n" +
+      "        <implement>com.dcfs.esb.ftp.process.handler.ResouceCtrlBySetCliHandler</implement>\n" +
       "        <params/>\n" +
       "    </service>\n" +
       "\n" +
       "    <service name=\"UploadDecryptHandler\" describe=\"上传解密处理程序\">\n" +
-      "        <implement>com.dcfs.esb.ftp.impls.service.ApiVersionCheckService</implement>\n" +
+      "        <implement>com.dcfs.esb.ftp.process.handler.UploadDecryptHandler</implement>\n" +
       "        <params/>\n" +
       "    </service>\n" +
       "\n" +
       "    <service name=\"UploadDecompressHandler\" describe=\"上传解压缩处理程序\">\n" +
-      "        <implement>com.dcfs.esb.ftp.impls.service.IPCheckService</implement>\n" +
+      "        <implement>com.dcfs.esb.ftp.process.handler.UploadDecompressHandler</implement>\n" +
       "        <params/>\n" +
       "    </service>\n" +
       "\n" +
       "    <service name=\"SaveUploadFileByEsbFileHandler\" describe=\"通过Esb文件处理程序保存上传文件\">\n" +
-      "        <implement>com.dcfs.esb.ftp.impls.service.PwdAuthWithSeqService</implement>\n" +
+      "        <implement>com.dcfs.esb.ftp.process.handler.SaveUploadFileByEsbFileHandler</implement>\n" +
       "        <params/>\n" +
       "    </service>\n" +
       "\n" +
       "    <service name=\"FileDistributeByTailHandler\" describe=\"通过尾部处理程序分发文件\">\n" +
-      "        <implement>com.dcfs.esb.ftp.impls.service.PushDataNodeListService</implement>\n" +
+      "        <implement>com.dcfs.esb.ftp.process.handler.FileDistributeByTailHandler</implement>\n" +
       "        <params/>\n" +
       "    </service>\n" +
       "\n" +
       "    <service name=\"FileRouteHandler\" describe=\"文件路由处理程序\">\n" +
-      "        <implement>com.dcfs.esb.ftp.impls.service.InitService</implement>\n" +
+      "        <implement>com.dcfs.esb.ftp.process.handler.FileRouteHandler</implement>\n" +
       "        <params/>\n" +
       "    </service>\n" +
       "\n" +
       "    <service name=\"SyncDistributeUploadHandler\" describe=\"同步分发上传处理程序\">\n" +
-      "        <implement>com.dcfs.esb.ftp.impls.service.FileRenameService</implement>\n" +
+      "        <implement>com.dcfs.esb.ftp.process.handler.SyncDistributeUploadHandler</implement>\n" +
       "        <params/>\n" +
       "    </service>\n" +
       "\n" +
       "    <service name=\"LogOnFinishHandler\" describe=\"登录完成处理程序\">\n" +
-      "        <implement>com.dcfs.esb.ftp.impls.service.ResourceCtrlService</implement>\n" +
+      "        <implement>com.dcfs.esb.ftp.process.handler.LogOnFinishHandler</implement>\n" +
       "        <params/>\n" +
       "    </service>\n" +
       "</services>";
 
+  // 新增netty.xml        "    <prarm  />\n" +
+  private static final String NETTY_FLIE = XML_HEAD +
+      "<baseConfig>\n" +
+      "  <nettyConfig >\n" +
+
+      "    <channelSpeed >\n" +
+      "    </channelSpeed>\n" +
+      "  </nettyConfig >\n" +
+      "</baseConfig>";
+  private static final String ADD_NETTY_FLIE = XML_HEAD + "<baseConfig></baseConfig>";
+  private static final String INIT_NETTY_FLIE = XML_HEAD + "<baseConfig></baseConfig>";
+  /*
+ "<baseConfig>\n" +
+      "  <nettyConfig >\n" +
+      "    <prarm maxSpeed='' sleepTime='' scanTime='' />\n" +
+      "    <channelSpeed >\n" +
+      "       <channel userName='' readlimit='' wrtelimit='' ></channel>\n" +
+      "    </channelSpeed>\n" +
+      "  </nettyConfig >\n" +
+      "</baseConfig>";
+      */
+  private static final String INITP_NETTY_FLIE = XML_HEAD +
+      "<baseConfig>\n" +
+      "  <nettyConfig >\n" +
+
+      "  </nettyConfig >\n" +
+      "</baseConfig>";
+  private static final String INITC_NETTY_FLIE = XML_HEAD +
+      "<baseConfig>\n" +
+      "  <nettyConfig >\n" +
+      "    <channelSpeed >\n" +
+      "    </channelSpeed>\n" +
+      "  </nettyConfig >\n" +
+      "</baseConfig>";
+
+  private static final String KEY_FLIE = XML_HEAD +
+      "<keys>\n" +
+      "</keys>";
 
   public static String getEmptyXml(String fileName) {
     fileName = fileName.toLowerCase();
@@ -146,6 +185,11 @@ public class EmptyCfgXmlHelper {
     else if ("system.xml".equals(fileName)) xml = SYSTEM;
     else if ("user.xml".equals(fileName)) xml = USER;
     else if ("client_status.xml".equals(fileName)) xml = CLIENT_STATUS;
+    else if ("netty.xml".equals(fileName)) xml = NETTY_FLIE;
+    else if ("initnetty.xml".equals(fileName)) xml = INIT_NETTY_FLIE;
+    else if ("initpnetty.xml".equals(fileName)) xml = INITP_NETTY_FLIE;
+    else if ("initcnetty.xml".equals(fileName)) xml = INITC_NETTY_FLIE;
+    else if ("keys.xml".equals(fileName)) xml = KEY_FLIE;
     if (xml == null) xml = EMPTY_XML;
     return xml;
   }

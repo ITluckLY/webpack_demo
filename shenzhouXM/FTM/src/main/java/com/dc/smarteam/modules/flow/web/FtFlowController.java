@@ -155,7 +155,9 @@ public class FtFlowController extends BaseController {
     public String component(FtFlow ftFlow, HttpServletRequest request, HttpServletResponse response, Model model, RedirectAttributes redirectAttributes) {
 
         // 重写获取方法  流程处理数据
+          // 分开处理数据
         ResultDto<List<ComponentModel.Service>> dto = componentService.getlistAll(ftFlow.getName());
+        //ResultDto<List<ComponentModel.Service>> dto = componentService.listAll();
 
         List<FtComponent> list = new ArrayList<>();
         if (ResultDtoTool.isSuccess(dto)) {
