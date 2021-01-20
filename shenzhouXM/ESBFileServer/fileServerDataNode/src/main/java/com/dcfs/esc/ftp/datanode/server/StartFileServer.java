@@ -27,6 +27,7 @@ import com.dcfs.esb.ftp.spring.SpringContext;
 import com.dcfs.esb.ftp.utils.ProcessIdUtil;
 import com.dcfs.esc.ftp.comm.helper.NanoHelper;
 import com.dcfs.esc.ftp.datanode.nework.server.FTPServer;
+import com.dcfs.esc.ftp.datanode.nework.server.HttpServer;
 import com.dcfs.esc.ftp.datanode.pool.ThreadExecutorFactory;
 import com.dcfs.esc.ftp.datanode.spring.DataSpringContext;
 import com.dcfs.esc.ftp.datanode.spring.ServiceBeans;
@@ -71,6 +72,19 @@ public class StartFileServer {
         DistributeFileReceiveService receiveService = new DistributeFileReceiveService(ip, ftpConfig.getDistributeFileReceivePort());
         new Thread(receiveService).start();
         log.info("启动FTS服务结束...");
+    }
+
+    /* http */
+    private static void startHttpServer() throws FtpException {
+        log.info("开始启动HTTP服务...");
+        FtpConfig ftpConfig = FtpConfig.getInstance();
+        String ip = Cfg.getHostAddress();
+        int httpServPort = ftpConfig.getHttpServPort();
+        new Thread(new HttpServer(ip, httpServPort, handlerLogLevelName)).start();
+
+//        DistributeFileReceiveService receiveService = new DistributeFileReceiveService(ip, ftpConfig.getDistributeFileReceivePort());
+//        new Thread(receiveService).start();
+        log.info("启动HTTP服务结束...");
     }
 
     private static void startInvokeSocket() throws FtpException {
@@ -184,6 +198,11 @@ public class StartFileServer {
         //Cfg.loadRuleConfig();//NOSONAR
         Cfg.loadSystemConfig(); // 读取系统配置文件 system.xml
 
+        Cfg.loadNettyConfig();
+        Cfg.loadKeyConfig();
+
+
+
         //初始化基本组件参数
         FtpConfig ftpConfig = FtpConfig.getInstance(); // new 文件服务器配置参数类
         IdWorker idWorker = new IdWorker(Cfg.getNodeId(), 0); //业务编码无业务则用5位随机数
@@ -192,8 +211,8 @@ public class StartFileServer {
         ThreadExecutorFactory.setFileRouteExecutorCount(ftpConfig.getRoutePoolSize()); //获取文件大小的最大值
 
         String defNodeListStrForTest = ServiceBeans.getDataEfsProperties().getDefNodeListStrForTest();
-        NodeListHelper.setDefNodeListStrForTest(defNodeListStrForTest);
-        //
+        NodeListHelper.setDefNodeListStrForTest(defNodeListStrForTest); //默认的节点列表字符串
+        //初始化 基础流程
         ServiceContainer.getInstance();
         RouteManager.getInstance();
         ServiceFlowManager.getInstance();

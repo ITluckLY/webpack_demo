@@ -11,6 +11,24 @@ public class SystemInfo {
     private int port;
     private String username = null;
     private String password = null;
+    private String uploadPath = null;
+    private String downloadPath = null;
+
+    public String getUploadPath() {
+        return uploadPath;
+    }
+
+    public void setUploadPath(String uploadPath) {
+        this.uploadPath = uploadPath;
+    }
+
+    public String getDownloadPath() {
+        return downloadPath;
+    }
+
+    public void setDownloadPath(String downloadPath) {
+        this.downloadPath = downloadPath;
+    }
 
     public String getName() {
         return name;

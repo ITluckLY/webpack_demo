@@ -13,9 +13,9 @@
     <entry key="FTP_POOL_SIZE" describe="线程池大小">64</entry>
     <entry key="ROUTE_POOL_SIZE" describe="路由处理线程池">32</entry>
     <entry key="IP_CHECK" describe="IP检查开关">false</entry>
-    <entry key="HOST_IP" describe="本机IP地址">127.0.0.1</entry>
+    <entry key="HOST_IP" describe="本机IP地址">192.168.43.226</entry>
     <entry key="HOST_NAME" describe="hostName"/>
-    <entry key="MANAGER_IP" describe="管理端IP地址">127.0.0.1</entry>
+    <entry key="MANAGER_IP" describe="管理端IP地址">192.168.43.226</entry>
     <entry key="SYSTEM_NAME" describe="系统名称">comm</entry>
     <entry key="TOKEN_POOL" describe="令牌池">100,100,100,100,100</entry>
     <entry key="MAX_NETWORK_SPEED" describe="最大流量（单位：M）">1000</entry>

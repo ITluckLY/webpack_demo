@@ -6,6 +6,8 @@ import com.dcfs.esb.ftp.common.error.FtpException;
 import com.dcfs.esb.ftp.common.helper.HostIpHelper;
 import com.dcfs.esb.ftp.impls.context.ContextFactory;
 import com.dcfs.esb.ftp.interfases.context.CachedContext;
+import com.dcfs.esb.ftp.key.KeyManager;
+import com.dcfs.esb.ftp.netty.ServiceNetty;
 import com.dcfs.esb.ftp.server.client.ClientManage;
 import com.dcfs.esb.ftp.server.file.EsbFileManager;
 import com.dcfs.esb.ftp.server.file.EsbFileWorker;
@@ -42,6 +44,9 @@ public class Cfg {
     public static final String VSYS_MAP_CFG = "vsysmap.xml";
     public static final String FILE_VERSION = "version.properties";
     public static final String CLIENT_STATUS_CFG = "client_status.xml";
+
+    public static final String NETTY_CFG = "netty.xml";// 流量控制
+    public static final String KEY_CFG = "keys.xml";
 
     private static final Logger log = LoggerFactory.getLogger(Cfg.class);
     //存放一些临时的公共配置、参数
@@ -124,6 +129,19 @@ public class Cfg {
         log.info("开始装载系统信息参数...");
         ClientManage.reload();
     }
+
+
+    public static void loadNettyConfig() throws FtpException {//NOSONAR
+        log.info("开始装载 Netty 信息参数...");
+        ServiceNetty.getInstance().reload();
+    }
+
+    public static void loadKeyConfig() throws FtpException {//NOSONAR
+        log.info("开始装载 Key 信息参数...");
+        KeyManager.getInstance().reload();
+    }
+
+
     public static String getConfigPath() {
         return configPath;
     }
@@ -173,6 +191,12 @@ public class Cfg {
     public static String getFlowCfg() {
         return configPath + FLOW_CFG;
     }
+
+    public static String getNettyCfg() {
+        return configPath + NETTY_CFG;
+    }
+
+    public static String getKeyCfg () {return configPath + KEY_CFG;}
 
     // 校验流程
     public static String getPsFlowCfg() {

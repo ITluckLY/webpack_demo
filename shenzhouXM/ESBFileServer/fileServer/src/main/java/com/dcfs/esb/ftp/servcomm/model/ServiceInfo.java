@@ -9,6 +9,7 @@ public class ServiceInfo {
     private String sysName;
     private String trancode;
     private String flow;
+    private String psFlow;
     private String discribe;
     private boolean rename;
     private long filePeriod;
@@ -74,7 +75,13 @@ public class ServiceInfo {
     public int getSize() {
         return size;
     }
+    public String getPsFlow() {
+        return psFlow;
+    }
 
+    public void setPsFlow(String psFlow) {
+        this.psFlow = psFlow;
+    }
     public void setSize(int size) {
         this.size = size;
     }

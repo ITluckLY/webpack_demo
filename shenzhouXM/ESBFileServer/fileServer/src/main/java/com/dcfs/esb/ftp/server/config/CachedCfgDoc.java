@@ -43,19 +43,19 @@ public class CachedCfgDoc {
       else if (Cfg.FILE_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.FILE_CFG, null);
       else if (Cfg.FILE_CLEAN_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.FILE_CLEAN_CFG, null);
       else if (Cfg.FLOW_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.FLOW_CFG, null);
-      else if (Cfg.PSFLOW_CFG.equals(cfgFileName))
-        doc = cfgDocServiceFace.getCfgDoc(Cfg.PSFLOW_CFG, null); /*配置缓存 校验 流程xml 文件*/
+      else if (Cfg.PSFLOW_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.PSFLOW_CFG, null); /*配置缓存 校验 流程xml 文件*/
       else if (Cfg.NODES_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.NODES_CFG, null);
       else if (Cfg.ROUTE_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.ROUTE_CFG, null);
       else if (Cfg.RULE_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.RULE_CFG, null);
-      else if (Cfg.SERVICES_INFO_CFG.equals(cfgFileName))
-        doc = cfgDocServiceFace.getCfgDoc(Cfg.SERVICES_INFO_CFG, null);
+      else if (Cfg.SERVICES_INFO_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.SERVICES_INFO_CFG, null);
       else if (Cfg.SYSTEM_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.SYSTEM_CFG, null);
       else if (Cfg.USER_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.USER_CFG, null);
       else if (Cfg.FILE_RENAME_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.FILE_RENAME_CFG, null);
       else if (Cfg.VSYS_MAP_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.VSYS_MAP_CFG, null);
-      else if (Cfg.CLIENT_STATUS_CFG.equals(cfgFileName))
-        doc = cfgDocServiceFace.getCfgDoc(Cfg.CLIENT_STATUS_CFG, null);
+      else if (Cfg.CLIENT_STATUS_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.CLIENT_STATUS_CFG, null);
+      else if (Cfg.NETTY_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.NETTY_CFG, null);
+      else if (Cfg.KEY_CFG.equals(cfgFileName)) doc = cfgDocServiceFace.getCfgDoc(Cfg.KEY_CFG, null);
+
     } else {
       doc = loadLocalXML(cfgFileName);
     }
@@ -161,6 +161,15 @@ public class CachedCfgDoc {
   // 新增psflow 的文件
   public Document loadPsFlow() throws FtpException {
     return load2(Cfg.PSFLOW_CFG);
+  }
+
+  // 新增 Netty 的文件
+  public Document loadNetty() throws FtpException {
+    return load2(Cfg.NETTY_CFG);
+  }
+
+  public Document reloadKey() throws FtpException {
+    return reload2(Cfg.KEY_CFG);
   }
 
   public Document reloadPsFlow() throws FtpException {

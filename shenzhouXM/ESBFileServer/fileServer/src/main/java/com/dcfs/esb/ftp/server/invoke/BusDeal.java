@@ -2,6 +2,7 @@ package com.dcfs.esb.ftp.server.invoke;
 
 import com.dcfs.esb.ftp.common.error.FtpErrCode;
 import com.dcfs.esb.ftp.common.error.FtpException;
+import com.dcfs.esb.ftp.key.KeyDeal;
 import com.dcfs.esb.ftp.server.config.FtpConfig;
 import com.dcfs.esb.ftp.server.invoke.auth.AuthDeal;
 import com.dcfs.esb.ftp.server.invoke.bizfile.BizFileDeal;
@@ -80,7 +81,8 @@ public class BusDeal implements Runnable {
     public static final String STOP_SERVER = "stopServer";
     // 发送给客户端的文件消费信息
     public static final String FILE_MSG_2_CLIENT = "fileMsg2Client";
-
+    // 秘钥状态
+    String KEYS = "keys";
     private static final Logger log = LoggerFactory.getLogger(BusDeal.class);
     private String mess;
     private Socket socket;
@@ -240,6 +242,8 @@ public class BusDeal implements Runnable {
             } else {
                 MessDealTool.sendBackMes(ResultDtoTool.buildError("无权限"), socket);
             }
+        }else if (target.equalsIgnoreCase(KEYS)){
+            new KeyDeal().dealMess(jsonObject, socket);
         } else {
             MessDealTool.sendBackMes(ResultDtoTool.buildError("不能识别报文信息"), socket);
         }

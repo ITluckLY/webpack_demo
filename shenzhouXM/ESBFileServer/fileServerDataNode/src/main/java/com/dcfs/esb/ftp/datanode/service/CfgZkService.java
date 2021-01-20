@@ -64,6 +64,7 @@ public class CfgZkService {
         cfgFileNameList.add("user.xml");
         cfgFileNameList.add("vsysmap.xml");
         cfgFileNameList.add("client_status.xml");
+        cfgFileNameList.add("netty.xml");
 
         boolean ifCfgSyncByStart = true;
         if (efsProperties != null && !efsProperties.getIfCfgSyncByStart()) {

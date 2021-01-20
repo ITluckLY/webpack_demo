@@ -113,13 +113,17 @@ public class NodeListProcess {
             if (context.isCanntInvokeNextFlow()) break;
             log.debug("nano:{}#Dispatcher正在执行前置基础服务{}", nano, service);
             try {
-                GeneralService impl = serviceContainer.getService(service);
+                if (service.endsWith("Handler")) {
+                    context.put("Handler", service); // 此处是handler
+                } else {
+                    GeneralService impl = serviceContainer.getService(service);
                 if (!impl.isStarted()) {
                     log.error("nano:{}#前置基础服务{}未正确启动", nano, service);
                     FLowHelper.setError(context, FtpErrCode.FLOW_ERROR, "Dispatcher调度前置基础服务" + service + "出现异常,");
                 } else {
                     if (impl instanceof AbstractPreprocessService) impl.invoke(context, bean);
                     else log.warn("nano:{}#类[{}]不属于AbstractPreprocessService", nano, impl.getClass().getName());
+                }
                 }
             } catch (FtpException e) {
                 log.error("nano:{}#前置基础服务{} error", nano, service, e);

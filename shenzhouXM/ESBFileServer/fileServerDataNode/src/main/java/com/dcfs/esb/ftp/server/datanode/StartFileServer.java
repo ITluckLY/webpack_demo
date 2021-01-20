@@ -12,6 +12,7 @@ import com.dcfs.esb.ftp.impls.flow.ServiceFlowManager;
 import com.dcfs.esb.ftp.impls.uuid.IdWorker;
 import com.dcfs.esb.ftp.impls.uuid.UUIDService;
 import com.dcfs.esb.ftp.kafka.KfkProducer;
+import com.dcfs.esb.ftp.key.KeyManager;
 import com.dcfs.esb.ftp.server.config.Cfg;
 import com.dcfs.esb.ftp.server.config.FtpConfig;
 import com.dcfs.esb.ftp.server.config.SysContent;
@@ -142,6 +143,8 @@ public class StartFileServer {
         Cfg.loadSystemConfig();
         ServiceContainer.getInstance();
         RouteManager.getInstance();
+        // 新增密钥
+        KeyManager.getInstance();
         ServiceFlowManager.getInstance();
         FileCleanManager.getInstance();
 

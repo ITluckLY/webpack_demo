@@ -125,6 +125,18 @@ public class UserInfoWorker {
         return info != null && info.doAuth(head.getPasswd());
     }
 
+    /**
+     * 进行用户的权限认证
+     * @param uId 用户名
+     * @param passwdId 密码
+     * @return验证结果 true - 成功 false - 失败
+     */
+    public boolean doAuth(String uId,String passwdId) {
+        AuthInfo info = this.authInfoPool.get(uId);
+        return info != null && info.doAuth(passwdId);
+    }
+
+
     public boolean doAuthByMd5(FileMsgBean head) {
         String uid = head.getUid();
         AuthInfo info = this.authInfoPool.get(uid);

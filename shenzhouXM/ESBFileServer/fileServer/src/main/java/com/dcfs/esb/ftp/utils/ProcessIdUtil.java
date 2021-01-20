@@ -20,6 +20,7 @@ public class ProcessIdUtil {
 
     public static int getProcessID() {
         try {
+            //返回Java虚拟机的运行时系统的托管Bean。
             RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
             if (log.isDebugEnabled()) log.debug(runtimeMXBean.getName());
             Integer pid = Integer.valueOf(runtimeMXBean.getName().split("@")[0]);

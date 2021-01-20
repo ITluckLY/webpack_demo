@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.Charset;
 
 /**
- * Created by mocg on 2016/9/29.
+    zk 客户端工具类
  */
 public class ZkClientTool {
     private static final Logger log = LoggerFactory.getLogger(ZkClientTool.class);
@@ -27,6 +27,7 @@ public class ZkClientTool {
         return ourInstance;
     }
 
+    // 初始化 zk 客户端
     public ZkClient getZkClient() {
         if (zkClient != null) return zkClient;
         return createZkClient();
@@ -34,19 +35,22 @@ public class ZkClientTool {
 
     public ZkClient createZkClient() {
         log.info("create zk...");
-        String zookeeperUrls = efsProperties.getZookeeperUrls();
+        String zookeeperUrls = efsProperties.getZookeeperUrls();//获取zk 的url 地址
         log.info("createZkClient#zookeeperUrls:{}", zookeeperUrls);
+
         ZkClient zkClient = new ZkClient(zookeeperUrls, 6000, 5000, new ZkSerializer() {//NOSONAR
-            @Override
+            @Override    // 序列化
             public byte[] serialize(Object data) throws ZkMarshallingError {//NOSONAR
                 //if (data == null) return null;//NOSONAR
                 String dataStr;
                 if (data instanceof String) dataStr = (String) data;
                 else dataStr = String.valueOf(data);
+                //返回命名字符集的字符集对象。
+                // 为dataStr 设置成 utf8的编码格式
                 return dataStr.getBytes(Charset.forName("UTF-8"));
             }
 
-            @Override
+            @Override       //反序列化
             public Object deserialize(byte[] bytes) throws ZkMarshallingError {//NOSONAR
                 if (bytes == null) return null;
                 return new String(bytes, Charset.forName("UTF-8"));

@@ -15,9 +15,11 @@ import java.util.List;
 public class ProcessExecutor {
   private static final Logger log = LoggerFactory.getLogger(ProcessHandler.class);
 
+
+
   private List<ProcessHandler> handlers = new ArrayList<>();
-  private boolean doneFinish = false;
-  private boolean processThrowable = false;
+  private boolean doneFinish = false; // 是否完成
+  private boolean processThrowable = false; //是否抛出
 
   public void start(ProcessHandlerContext cxt) throws Exception {//NOSONAR
     cxt.setProcessStatus(ProcessStatus.START);
@@ -156,4 +158,7 @@ public class ProcessExecutor {
     return handlers;
   }
 
+  public void setHandlers(List<ProcessHandler> handlers) {
+    this.handlers = handlers;
+  }
 }

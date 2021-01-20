@@ -50,6 +50,9 @@ public class FtpConfig {
     public static final String MANAGER_IP = "MANAGER_IP";
     public static final String SYSTEM_NAME = "SYSTEM_NAME";
     public static final String TOKEN_POOL = "TOKEN_POOL";
+    public static final String HTTP_SERV_PORT = "HTTP_SERV_PORT";//HTTP传输服务端口
+    public static final String HTTP_POOL_SIZE = "HTTP_POOL_SIZE";//HTTP线程池大小
+    public static final String STREAM_SERV_PORT = "STREAM_SERV_PORT";//文件块存储转发接口
     //net speed ctrl
     public static final String MAX_NETWORK_SPEED = "MAX_NETWORK_SPEED";//单位M
     public static final String NETWORK_CTRL_THRESHOLD = "NETWORK_CTRL_THRESHOLD";//单位M
@@ -109,6 +112,10 @@ public class FtpConfig {
     private int managePort;
     private int distributeFileReceivePort;
     private int poolSize;
+    private int httpPoolSize;
+    private int httpServPort;
+    private int streamServPort;
+
 
     private FtpConfig() {
     }
@@ -192,6 +199,9 @@ public class FtpConfig {
             distributeFileReceivePort = StringTool.toInt(prop.getProperty(DISTRIBUTE_FILE_RECEIVE_PORT), 6003);//NOSONAR
 
             poolSize = StringTool.toInt(prop.getProperty(FTP_POOL_SIZE), 50);//NOSONAR
+            httpPoolSize = StringTool.toInt(prop.getProperty(HTTP_POOL_SIZE), 50);//NOSONAR
+            httpServPort = StringTool.toInt(prop.getProperty(HTTP_SERV_PORT), 6005);//NOSONAR
+            streamServPort = StringTool.toInt(prop.getProperty(STREAM_SERV_PORT), 6004);//NOSONAR
         } catch (Exception e) {
             log.error("加载配置文件出错", e);
             throw new FtpException(FtpErrCode.LOAD_CONFIG_FILE_ERROR, e);
@@ -416,5 +426,17 @@ public class FtpConfig {
 
     public void setDistributeNodeNum(int distributeNodeNum) {
         this.distributeNodeNum = distributeNodeNum;
+    }
+
+    public int getHttpPoolSize() {
+        return httpPoolSize;
+    }
+
+    public int getHttpServPort() {
+        return httpServPort;
+    }
+
+    public int getStreamServPort() {
+        return streamServPort;
     }
 }

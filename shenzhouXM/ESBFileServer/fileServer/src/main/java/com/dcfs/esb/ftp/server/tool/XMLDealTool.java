@@ -126,6 +126,9 @@ public class XMLDealTool {
                 if (fileName.equals(Cfg.FILE_RENAME_CFG)) return writerDB(doc, Cfg.FILE_RENAME_CFG);
                 if (fileName.equals(Cfg.VSYS_MAP_CFG)) return writerDB(doc, Cfg.VSYS_MAP_CFG);
                 if (fileName.equals(Cfg.CLIENT_STATUS_CFG)) return writerDB(doc, Cfg.CLIENT_STATUS_CFG);
+                if (fileName.equals(Cfg.NETTY_CFG)) return writerDB(doc, Cfg.NETTY_CFG);
+                if (fileName.equals(Cfg.KEY_CFG)) return writerDB(doc, Cfg.KEY_CFG);
+
             } else {
                 return writerXml2(doc, new File(configFilepath));
             }
